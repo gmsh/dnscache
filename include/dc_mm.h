@@ -16,3 +16,4 @@ void dc_free(void * ptr)
 {
   free(ptr);
 }
+#endif
