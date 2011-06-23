@@ -1,6 +1,5 @@
-lirstack:foo2
-foo2:bar.o
+lirstack:
 .PHONY:clean
 clean:
-	-rm foo2 *.o
+	-rm *.o
 CPPFLAGS = -I../include

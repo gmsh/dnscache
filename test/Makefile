@@ -1,5 +1,5 @@
-test: foo
+test: 
 .PHONY: clean
 clean:
-	-rm foo
+	-rm 
 CPPFLAGS = -I../include
