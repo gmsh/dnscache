@@ -5,7 +5,7 @@
 #ifndef _SLIST_H_
 #define _SLIST_H_
 
-#include "dc_mm.h"
+#include <stdlib.h>
 struct sl_node {
   void * data;
   struct sl_node * next;
