@@ -1,5 +1,7 @@
-lirstack:slist.o
+liblirsstack.a:slist.o
+	ar rs liblirsstack.a slist.o
+	cp liblirsstack.a ../lib
 .PHONY:clean
 clean:
-	-rm *.o
+	-rm *.o *.a
 CPPFLAGS = -I../include
