@@ -60,8 +60,10 @@ int push(void * data, struct slist * sl);
  * traverse
  * implement void visit(struct sl_node *) then call it
  */
-void traverse(void (visit *)(struct sl_node *), 
-	      struct slist * sl);
+void traverse(
+	      void (* visit)(struct sl_node *), 
+	      struct slist * sl
+	      );
 
 /*
  * free the slist

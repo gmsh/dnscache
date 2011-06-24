@@ -9,17 +9,17 @@
 struct slist * mk_slist(void * p, size_t capacity)
 {
   struct slist * to_return = (struct slist *) p;
-  p->head = p->end = NULL;
-  p->length = 0;
-  p->capacity = capacity;
-  p->memlist = (struct sl_node *)dc_alloc(sizeof(sl_node));
-  p->memlist->data = p;
-  p->memlist->next = NULL;
-  p->blank = (struct sl_node *)(p + sizeof(struct slist));
-  struct sl_node * ptr = p->blank;
+  to_return->head = to_return->end = NULL;
+  to_return->length = 0;
+  to_return->capacity = capacity;
+  to_return->memlist = (struct sl_node *)dc_alloc(sizeof(struct sl_node));
+  to_return->memlist->data = p;
+  to_return->memlist->next = NULL;
+  to_return->blank = (struct sl_node *)(p + sizeof(struct slist));
+  struct sl_node * ptr = to_return->blank;
   while(capacity>0){
     ptr->next = (struct sl_node *)(ptr + sizeof(struct sl_node));
-    capcity--;
+    capacity--;
   }
   ptr->next = NULL;
   return to_return;
@@ -38,10 +38,10 @@ struct slist *sl_expand(struct slist *sl, void *p, size_t delta)
     delta--;
   }
   ptr->next = NULL;
-  ptr = p->memlist;
-  p->memlist = dc_alloc(sizeof(struct sl_node));
+  ptr = dc_alloc(sizeof(struct sl_node));
   ptr->data = p;
-  p->next = ptr;
+  ptr->next = sl->memlist;
+  sl->memlist = ptr;
   return sl;
 }
 
@@ -61,20 +61,20 @@ void sl_free(struct slist *sl)
 
 int append(void * data, struct slist * sl)
 {
-  if(unlikely(length == capcity))
+  if(unlikely(sl->length == sl->capacity))
     return 1;
   else{
     struct sl_node * ptr = sl->blank;
     sl->blank = sl->blank->next;
     ptr->data = data;
-    if(unlikely(head == NULL)){
+    if(unlikely(sl->head == NULL)){
       sl->head = ptr;
       sl->end = ptr;
     }else{
       sl->end->next = ptr;
       sl->end = ptr;
     }
-    length++;
+    sl->length++;
     return 0;
   }
 }
@@ -91,13 +91,13 @@ void * pop(struct slist * sl)
   /* move the sl_node to blank list */
   ptr->next = sl->blank;
   sl->blank = ptr;
-  length--;
+  sl->length--;
   return to_return;
 }
 
 int push(void * data, struct slist *sl)
 {
-  if(unlikely(length == capcity))
+  if(unlikely(sl->length == sl->capacity))
     return 1;
   else{
     struct sl_node * ptr = sl->blank;
@@ -107,12 +107,12 @@ int push(void * data, struct slist *sl)
     sl->head = ptr;
     if(unlikely(sl->end == NULL))
       sl->end = ptr;
-    length++;
+    sl->length++;
     return 0;
   }
 }
 
-void traverse(void (visit*)(struct sl_node *),
+void traverse(void (* visit)(struct sl_node *),
 	      struct slist *sl)
 {
   struct sl_node * ptr;
