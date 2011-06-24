@@ -1,13 +1,14 @@
 
 
 %******************************************************************************
-% *filename:		02RequirementsDocument.tex
+% *filename:		systemDesign.tex
 % *author:  		synckey
 % *version: 		v1.0
 % *datetime:		2011-06-23 13:18
 % *description:
 % *****************************************************************************/
 \documentclass[12pt, a4paper, titlepage]{article}
+\usepackage{titletoc}
 \usepackage{fontspec}
 \usepackage{graphicx}
 \usepackage{array}
@@ -15,14 +16,29 @@
 \usepackage{paralist}
 \usepackage{float,longtable}
 \usepackage{enumerate}
+\usepackage{xcolor,listings}
 \usepackage{booktabs, multirow}
 \usepackage[pagestyles]{titlesec}
 \usepackage{xeCJK}
+\lstset{
+	numbers=left,%行号
+	framexleftmargin = 2em,%背景框
+	frame = none,
+	backgroundcolor = \color[RGB]{245, 245,244},
+	keywordstyle = \bf\color{blue},
+	identifierstyle = \bf,
+	numberstyle=\color[RGB]{0,192,192},
+	commentstyle=\it\color[RGB]{0,96,96},
+	stringstyle=\rmfamily\slshape\color[RGB]{128,0,0},
+	showstringspaces=false
+}
+
+
 \newcommand{\codebox}[3]
 {
 \begin{center}
 \fbox{
-	\begin{minipage}[b]{125mm}
+	\begin{minipage}[b]{130mm}
 		#1\\
 		#2
 		\begin{flushright}
@@ -34,6 +50,12 @@
 }
 
 
+\titlecontents{section}[4em]{\small}{\contentslabel{3.3em}}{}
+	{\titlerule*[0.5pc]{$\cdot$}\contentspage}
+\titlecontents{subsection}[7em]{\small}{\contentslabel{3.3em}}{}
+	{\titlerule*[0.5pc]{$\cdot$}\contentspage}
+\titlecontents{subsubsection}[7em]{\small}{\contentslabel{3.3em}}{}
+	{\titlerule*[0.5pc]{$\cdot$}\contentspage}
 \renewcommand{\today}{\number\year-\number\month-\number\day}
 \setmainfont[BoldFont=SimHei]{SimSun}
 \setmonofont{SimSun}
@@ -64,6 +86,7 @@
 \linespread{1.25}
 \usepackage[pagebackref,colorlinks, linkcolor = blue , urlcolor = blue]{hyperref}
 \newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
+
 \begin{document}
 \maketitle
 \begin{table}[H]

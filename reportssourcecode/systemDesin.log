@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.1415926-2.2-0.9997.4 (TeX Live 2010) (format=xelatex 2011.4.13)  24 JUN 2011 22:59
+This is XeTeX, Version 3.1415926-2.2-0.9997.4 (TeX Live 2010) (format=xelatex 2011.4.13)  25 JUN 2011 01:14
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -23,6 +23,10 @@ File: size12.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 \abovecaptionskip=\skip41
 \belowcaptionskip=\skip42
 \bibindent=\dimen102
+)
+(/usr/local/texlive/2010/texmf-dist/tex/latex/titlesec/titletoc.sty
+Package: titletoc 2007/08/12 v1.6 TOC entries
+\ttl@leftsep=\dimen103
 )
 (/usr/local/texlive/2010/texmf-dist/tex/latex/fontspec/fontspec.sty
 Package: fontspec 2010/07/14 v2.0b Advanced font selection for XeLaTeX/LuaLaTeX
@@ -118,12 +122,12 @@ Package: l3skip 2010/05/25 v1933 L3 Experimental skip registers
 \l_tmpc_skip=\skip45
 \g_tmpa_skip=\skip46
 \g_tmpb_skip=\skip47
-\l_tmpa_dim=\dimen103
-\l_tmpb_dim=\dimen104
-\l_tmpc_dim=\dimen105
-\l_tmpd_dim=\dimen106
-\g_tmpa_dim=\dimen107
-\g_tmpb_dim=\dimen108
+\l_tmpa_dim=\dimen104
+\l_tmpb_dim=\dimen105
+\l_tmpc_dim=\dimen106
+\l_tmpd_dim=\dimen107
+\g_tmpa_dim=\dimen108
+\g_tmpb_dim=\dimen109
 )
 (/usr/local/texlive/2010/texmf-dist/tex/latex/expl3/l3box.sty
 Package: l3box 2010/05/22 v1919 L3 Experimental Box module
@@ -182,15 +186,15 @@ Package: l3fp 2010/07/08 v1979 L3 Experimental floating-point operations
 \l_fp_tmp_int=\count131
 \c_one_hundred_million=\count132
 \c_one_thousand_million=\count133
-\l_fp_tmp_dim=\dimen109
+\l_fp_tmp_dim=\dimen110
 \l_fp_round_precision_int=\count134
 )
 (/usr/local/texlive/2010/texmf-dist/tex/latex/tools/calc.sty
 Package: calc 2007/08/22 v4.3 Infix arithmetic (KKT,FJ)
 \calc@Acount=\count135
 \calc@Bcount=\count136
-\calc@Adimen=\dimen110
-\calc@Bdimen=\dimen111
+\calc@Adimen=\dimen111
+\calc@Bdimen=\dimen112
 \calc@Askip=\skip48
 \calc@Bskip=\skip49
 LaTeX Info: Redefining \setlength on input line 76.
@@ -333,13 +337,13 @@ Package graphics Info: Driver file: xetex.def on input line 91.
 File: xetex.def 2009/11/22 v0.94 LaTeX color/graphics driver for XeTeX (RRM/JK)
 
 ))
-\Gin@req@height=\dimen112
-\Gin@req@width=\dimen113
+\Gin@req@height=\dimen113
+\Gin@req@width=\dimen114
 )
 (/usr/local/texlive/2010/texmf-dist/tex/latex/tools/array.sty
 Package: array 2008/09/09 v2.4c Tabular extension package (FMi)
-\col@sep=\dimen114
-\extrarowheight=\dimen115
+\col@sep=\dimen115
+\extrarowheight=\dimen116
 \NC@list=\toks37
 \extratabsurround=\skip51
 \backup@length=\skip52
@@ -351,7 +355,7 @@ Package: longtable 2004/02/01 v4.11 Multi-page Table package (DPC)
 \LTpre=\skip55
 \LTpost=\skip56
 \LTchunksize=\count149
-\LTcapwidth=\dimen116
+\LTcapwidth=\dimen117
 \LT@head=\box27
 \LT@firsthead=\box28
 \LT@foot=\box29
@@ -382,40 +386,81 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 Package: enumerate 1999/03/05 v3.00 enumerate extensions (DPC)
 \@enLab=\toks42
 )
+(/usr/local/texlive/2010/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2007/01/21 v2.11 LaTeX color extensions (UK)
+
+(/usr/local/texlive/2010/texmf-dist/tex/latex/latexconfig/color.cfg
+File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
+)
+Package xcolor Info: Driver file: xetex.def on input line 225.
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1337.
+Package xcolor Info: Model `RGB' extended on input line 1353.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1355.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1356.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1357.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1358.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1359.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1360.
+)
+(/usr/local/texlive/2010/texmf-dist/tex/latex/listings/listings.sty
+\lst@mode=\count155
+\lst@gtempboxa=\box33
+\lst@token=\toks43
+\lst@length=\count156
+\lst@currlwidth=\dimen118
+\lst@column=\count157
+\lst@pos=\count158
+\lst@lostspace=\dimen119
+\lst@width=\dimen120
+\lst@newlines=\count159
+\lst@lineno=\count160
+\lst@maxwidth=\dimen121
+
+(/usr/local/texlive/2010/texmf-dist/tex/latex/listings/lstmisc.sty
+File: lstmisc.sty 2007/02/22 1.4 (Carsten Heinz)
+\c@lstnumber=\count161
+\lst@skipnumbers=\count162
+\lst@framebox=\box34
+)
+(/usr/local/texlive/2010/texmf-dist/tex/latex/listings/listings.cfg
+File: listings.cfg 2007/02/22 1.4 listings configuration
+))
+Package: listings 2007/02/22 1.4 (Carsten Heinz)
+
 (/usr/local/texlive/2010/texmf-dist/tex/latex/booktabs/booktabs.sty
 Package: booktabs 2005/04/14 v1.61803 publication quality tables
-\heavyrulewidth=\dimen117
-\lightrulewidth=\dimen118
-\cmidrulewidth=\dimen119
-\belowrulesep=\dimen120
-\belowbottomsep=\dimen121
-\aboverulesep=\dimen122
-\abovetopsep=\dimen123
-\cmidrulesep=\dimen124
-\cmidrulekern=\dimen125
-\defaultaddspace=\dimen126
-\@cmidla=\count155
-\@cmidlb=\count156
-\@aboverulesep=\dimen127
-\@belowrulesep=\dimen128
-\@thisruleclass=\count157
-\@lastruleclass=\count158
-\@thisrulewidth=\dimen129
+\heavyrulewidth=\dimen122
+\lightrulewidth=\dimen123
+\cmidrulewidth=\dimen124
+\belowrulesep=\dimen125
+\belowbottomsep=\dimen126
+\aboverulesep=\dimen127
+\abovetopsep=\dimen128
+\cmidrulesep=\dimen129
+\cmidrulekern=\dimen130
+\defaultaddspace=\dimen131
+\@cmidla=\count163
+\@cmidlb=\count164
+\@aboverulesep=\dimen132
+\@belowrulesep=\dimen133
+\@thisruleclass=\count165
+\@lastruleclass=\count166
+\@thisrulewidth=\dimen134
 )
 (/usr/local/texlive/2010/texmf-dist/tex/latex/multirow/multirow.sty
-\bigstrutjot=\dimen130
+\bigstrutjot=\dimen135
 )
 (/usr/local/texlive/2010/texmf-dist/tex/latex/titlesec/titlesec.sty
 Package: titlesec 2007/08/12 v2.8 Sectioning titles
-\ttl@box=\box33
+\ttl@box=\box35
 \beforetitleunit=\skip61
 \aftertitleunit=\skip62
-\ttl@plus=\dimen131
-\ttl@minus=\dimen132
-\ttl@toksa=\toks43
-\titlewidth=\dimen133
-\titlewidthlast=\dimen134
-\titlewidthfirst=\dimen135
+\ttl@plus=\dimen136
+\ttl@minus=\dimen137
+\ttl@toksa=\toks44
+\titlewidth=\dimen138
+\titlewidthlast=\dimen139
+\titlewidthfirst=\dimen140
 
 (/usr/local/texlive/2010/texmf-dist/tex/latex/titlesec/ttlps.def
 File: ttlps.def 2007/08/12
@@ -427,22 +472,22 @@ eX
 (/usr/local/texlive/2010/texmf-dist/tex/generic/ifxetex/ifxetex.sty
 Package: ifxetex 2009/01/23 v0.5 Provides ifxetex conditional
 )
-\xeCJK@cnta=\count159
-\xeCJK@cntb=\count160
-\xeCJK@cntc=\count161
-\xeCJK@cntd=\count162
-\xeCJK@cnte=\count163
-\xeCJK@dima=\dimen136
+\xeCJK@cnta=\count167
+\xeCJK@cntb=\count168
+\xeCJK@cntc=\count169
+\xeCJK@cntd=\count170
+\xeCJK@cnte=\count171
+\xeCJK@dima=\dimen141
 LaTeX Info: Redefining \normalfont on input line 779.
 LaTeX Info: Redefining \rmfamily on input line 788.
 LaTeX Info: Redefining \sffamily on input line 792.
 LaTeX Info: Redefining \ttfamily on input line 796.
-\xeCJK@featureadded=\count164
+\xeCJK@featureadded=\count172
 )
  fontspec Info: Font SimSun does not contain any OpenType `Script' information.
 
 
-\c@zf@famc@SimSun=\count165
+\c@zf@famc@SimSun=\count173
  fontspec Info: Defining font family for 'SimSun' with options [BoldFont=SimHei
 ].
 
@@ -521,9 +566,9 @@ Package: xcolor-patch 2009/12/12 xcolor patch
 (/usr/local/texlive/2010/texmf-dist/tex/latex/oberdiek/letltxmacro.sty
 Package: letltxmacro 2008/06/24 v1.3 Let assignment for LaTeX macros (HO)
 )
-\@linkdim=\dimen137
-\Hy@linkcounter=\count166
-\Hy@pagecounter=\count167
+\@linkdim=\dimen142
+\Hy@linkcounter=\count174
+\Hy@pagecounter=\count175
 
 (/usr/local/texlive/2010/texmf-dist/tex/latex/hyperref/pd1enc.def
 File: pd1enc.def 2010/06/18 v6.81g Hyperref: PDFDocEncoding definition (HO)
@@ -570,10 +615,10 @@ Package: bitset 2007/09/28 v1.0 Data type bit set (HO)
 (/usr/local/texlive/2010/texmf-dist/tex/generic/oberdiek/bigintcalc.sty
 Package: bigintcalc 2007/11/11 v1.1 Expandable big integer calculations (HO)
 ))
-\Fld@menulength=\count168
-\Field@Width=\dimen138
-\Fld@charsize=\dimen139
-\Field@toks=\toks44
+\Fld@menulength=\count176
+\Field@Width=\dimen143
+\Fld@charsize=\dimen144
+\Field@toks=\toks45
 Package hyperref Info: Hyper figures OFF on input line 5137.
 Package hyperref Info: Link nesting OFF on input line 5142.
 Package hyperref Info: Hyper index ON on input line 5145.
@@ -587,9 +632,9 @@ LaTeX Info: Redefining \pageref on input line 5211.
 (/usr/local/texlive/2010/texmf-dist/tex/generic/oberdiek/atbegshi.sty
 Package: atbegshi 2010/03/25 v1.12 At begin shipout hook (HO)
 )
-\Hy@abspage=\count169
-\c@Item=\count170
-\c@Hfootnote=\count171
+\Hy@abspage=\count177
+\c@Item=\count178
+\c@Hfootnote=\count179
 )
 * hyperref using default driver hxetex *
 (/usr/local/texlive/2010/texmf-dist/tex/latex/hyperref/hxetex.def
@@ -601,109 +646,101 @@ File: puenc.def 2010/06/18 v6.81g Hyperref: PDF Unicode definition (HO)
 (/usr/local/texlive/2010/texmf-dist/tex/generic/oberdiek/stringenc.sty
 Package: stringenc 2010/03/01 v1.8 Converts strings between encodings (HO)
 )
-\pdfm@box=\box34
-\c@Hy@AnnotLevel=\count172
-\HyField@AnnotCount=\count173
-\Fld@listcount=\count174
-\c@bookmark@seq@number=\count175
+\pdfm@box=\box36
+\c@Hy@AnnotLevel=\count180
+\HyField@AnnotCount=\count181
+\Fld@listcount=\count182
+\c@bookmark@seq@number=\count183
 \Hy@SectionHShift=\skip63
 )
 (./systemDesin.aux)
 \openout1 = `systemDesin.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 67.
-LaTeX Font Info:    ... okay on input line 67.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 67.
-LaTeX Font Info:    ... okay on input line 67.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 67.
-LaTeX Font Info:    ... okay on input line 67.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 67.
-LaTeX Font Info:    ... okay on input line 67.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 67.
-LaTeX Font Info:    ... okay on input line 67.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 67.
-LaTeX Font Info:    ... okay on input line 67.
-LaTeX Font Info:    Checking defaults for EU1/lmr/m/n on input line 67.
-LaTeX Font Info:    ... okay on input line 67.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 67.
-LaTeX Font Info:    ... okay on input line 67.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 67.
-LaTeX Font Info:    ... okay on input line 67.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 90.
+LaTeX Font Info:    ... okay on input line 90.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 90.
+LaTeX Font Info:    ... okay on input line 90.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 90.
+LaTeX Font Info:    ... okay on input line 90.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 90.
+LaTeX Font Info:    ... okay on input line 90.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 90.
+LaTeX Font Info:    ... okay on input line 90.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 90.
+LaTeX Font Info:    ... okay on input line 90.
+LaTeX Font Info:    Checking defaults for EU1/lmr/m/n on input line 90.
+LaTeX Font Info:    ... okay on input line 90.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 90.
+LaTeX Font Info:    ... okay on input line 90.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 90.
+LaTeX Font Info:    ... okay on input line 90.
  fontspec Info: Adjusting the maths setup (use [no-math] to avoid this).
 
 \symlegacymaths=\mathgroup4
 LaTeX Font Info:    Overwriting symbol font `legacymaths' in version `bold'
-(Font)                  OT1/cmr/m/n --> OT1/cmr/bx/n on input line 67.
-LaTeX Font Info:    Redeclaring math accent \acute on input line 67.
-LaTeX Font Info:    Redeclaring math accent \grave on input line 67.
-LaTeX Font Info:    Redeclaring math accent \ddot on input line 67.
-LaTeX Font Info:    Redeclaring math accent \tilde on input line 67.
-LaTeX Font Info:    Redeclaring math accent \bar on input line 67.
-LaTeX Font Info:    Redeclaring math accent \breve on input line 67.
-LaTeX Font Info:    Redeclaring math accent \check on input line 67.
-LaTeX Font Info:    Redeclaring math accent \hat on input line 67.
-LaTeX Font Info:    Redeclaring math accent \dot on input line 67.
-LaTeX Font Info:    Redeclaring math accent \mathring on input line 67.
-LaTeX Font Info:    Redeclaring math symbol \colon on input line 67.
-LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 67.
-LaTeX Font Info:    Redeclaring math symbol \Delta on input line 67.
-LaTeX Font Info:    Redeclaring math symbol \Theta on input line 67.
-LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 67.
-LaTeX Font Info:    Redeclaring math symbol \Xi on input line 67.
-LaTeX Font Info:    Redeclaring math symbol \Pi on input line 67.
-LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 67.
-LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 67.
-LaTeX Font Info:    Redeclaring math symbol \Phi on input line 67.
-LaTeX Font Info:    Redeclaring math symbol \Psi on input line 67.
-LaTeX Font Info:    Redeclaring math symbol \Omega on input line 67.
-LaTeX Font Info:    Redeclaring math symbol \mathdollar on input line 67.
-LaTeX Font Info:    Redeclaring symbol font `operators' on input line 67.
+(Font)                  OT1/cmr/m/n --> OT1/cmr/bx/n on input line 90.
+LaTeX Font Info:    Redeclaring math accent \acute on input line 90.
+LaTeX Font Info:    Redeclaring math accent \grave on input line 90.
+LaTeX Font Info:    Redeclaring math accent \ddot on input line 90.
+LaTeX Font Info:    Redeclaring math accent \tilde on input line 90.
+LaTeX Font Info:    Redeclaring math accent \bar on input line 90.
+LaTeX Font Info:    Redeclaring math accent \breve on input line 90.
+LaTeX Font Info:    Redeclaring math accent \check on input line 90.
+LaTeX Font Info:    Redeclaring math accent \hat on input line 90.
+LaTeX Font Info:    Redeclaring math accent \dot on input line 90.
+LaTeX Font Info:    Redeclaring math accent \mathring on input line 90.
+LaTeX Font Info:    Redeclaring math symbol \colon on input line 90.
+LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 90.
+LaTeX Font Info:    Redeclaring math symbol \Delta on input line 90.
+LaTeX Font Info:    Redeclaring math symbol \Theta on input line 90.
+LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 90.
+LaTeX Font Info:    Redeclaring math symbol \Xi on input line 90.
+LaTeX Font Info:    Redeclaring math symbol \Pi on input line 90.
+LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 90.
+LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 90.
+LaTeX Font Info:    Redeclaring math symbol \Phi on input line 90.
+LaTeX Font Info:    Redeclaring math symbol \Psi on input line 90.
+LaTeX Font Info:    Redeclaring math symbol \Omega on input line 90.
+LaTeX Font Info:    Redeclaring math symbol \mathdollar on input line 90.
+LaTeX Font Info:    Redeclaring symbol font `operators' on input line 90.
 LaTeX Font Info:    Encoding `OT1' has changed to `EU1' for symbol font
-(Font)              `operators' in the math version `normal' on input line 67.
+(Font)              `operators' in the math version `normal' on input line 90.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
-(Font)                  OT1/cmr/m/n --> EU1/SimSun(0)/m/n on input line 67.
+(Font)                  OT1/cmr/m/n --> EU1/SimSun(0)/m/n on input line 90.
 LaTeX Font Info:    Encoding `OT1' has changed to `EU1' for symbol font
-(Font)              `operators' in the math version `bold' on input line 67.
+(Font)              `operators' in the math version `bold' on input line 90.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
-(Font)                  OT1/cmr/bx/n --> EU1/SimSun(0)/m/n on input line 67.
+(Font)                  OT1/cmr/bx/n --> EU1/SimSun(0)/m/n on input line 90.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
-(Font)                  EU1/SimSun(0)/m/n --> EU1/SimSun(0)/m/n on input line 6
-7.
+(Font)                  EU1/SimSun(0)/m/n --> EU1/SimSun(0)/m/n on input line 9
+0.
 LaTeX Font Info:    Overwriting math alphabet `\mathrm' in version `normal'
-(Font)                  EU1/SimSun(0)/m/n --> EU1/SimSun(0)/m/n on input line 6
-7.
+(Font)                  EU1/SimSun(0)/m/n --> EU1/SimSun(0)/m/n on input line 9
+0.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
-(Font)                  OT1/cmr/m/it --> EU1/SimSun(0)/m/it on input line 67.
+(Font)                  OT1/cmr/m/it --> EU1/SimSun(0)/m/it on input line 90.
 LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
-(Font)                  OT1/cmr/bx/n --> EU1/SimSun(0)/bx/n on input line 67.
+(Font)                  OT1/cmr/bx/n --> EU1/SimSun(0)/bx/n on input line 90.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
-(Font)                  OT1/cmss/m/n --> EU1/lmss/m/n on input line 67.
+(Font)                  OT1/cmss/m/n --> EU1/lmss/m/n on input line 90.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
-(Font)                  OT1/cmtt/m/n --> EU1/SimSun(1)/m/n on input line 67.
+(Font)                  OT1/cmtt/m/n --> EU1/SimSun(1)/m/n on input line 90.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
 (Font)                  EU1/SimSun(0)/m/n --> EU1/SimSun(0)/bx/n on input line 
-67.
+90.
 LaTeX Font Info:    Overwriting math alphabet `\mathrm' in version `bold'
 (Font)                  EU1/SimSun(0)/m/n --> EU1/SimSun(0)/bx/n on input line 
-67.
+90.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
-(Font)                  OT1/cmr/bx/it --> EU1/SimSun(0)/bx/it on input line 67.
+(Font)                  OT1/cmr/bx/it --> EU1/SimSun(0)/bx/it on input line 90.
 
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
-(Font)                  OT1/cmss/bx/n --> EU1/lmss/bx/n on input line 67.
+(Font)                  OT1/cmss/bx/n --> EU1/lmss/bx/n on input line 90.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
-(Font)                  OT1/cmtt/m/n --> EU1/SimSun(1)/bx/n on input line 67.
-\AtBeginShipoutBox=\box35
-
-(/usr/local/texlive/2010/texmf-dist/tex/latex/graphics/color.sty
-Package: color 2005/11/14 v1.0j Standard LaTeX Color (DPC)
-
-(/usr/local/texlive/2010/texmf-dist/tex/latex/latexconfig/color.cfg
-File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
-)
-Package color Info: Driver file: xetex.def on input line 130.
-)
-Package hyperref Info: Link coloring ON on input line 67.
+(Font)                  OT1/cmtt/m/n --> EU1/SimSun(1)/bx/n on input line 90.
+\c@lstlisting=\count184
+\AtBeginShipoutBox=\box37
+Package hyperref Info: Link coloring ON on input line 90.
 
 (/usr/local/texlive/2010/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2010/04/30 v2.40 Cross-referencing by name of section
@@ -714,20 +751,20 @@ Package: refcount 2008/08/11 v3.1 Data extraction from references (HO)
 (/usr/local/texlive/2010/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
 Package: gettitlestring 2009/12/18 v1.3 Cleanup title references (HO)
 )
-\c@section@level=\count176
+\c@section@level=\count185
 )
-LaTeX Info: Redefining \ref on input line 67.
-LaTeX Info: Redefining \pageref on input line 67.
-LaTeX Info: Redefining \nameref on input line 67.
+LaTeX Info: Redefining \ref on input line 90.
+LaTeX Info: Redefining \pageref on input line 90.
+LaTeX Info: Redefining \nameref on input line 90.
 
 (./systemDesin.out) (./systemDesin.out)
 \@outlinefile=\write3
 \openout3 = `systemDesin.out'.
 
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <14.4> on input line 69.
+(Font)              <14.4> on input line 92.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 69.
+(Font)              <7> on input line 92.
 
 (/usr/local/texlive/2010/texmf-dist/tex/generic/oberdiek/se-ascii-print.def
 File: se-ascii-print.def 2010/03/01 v1.8 stringenc: Printable ASCII characters
@@ -736,42 +773,44 @@ File: se-ascii-print.def 2010/03/01 v1.8 stringenc: Printable ASCII characters
 
 ]
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <17.28> on input line 74.
+(Font)              <17.28> on input line 97.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 74.
+(Font)              <12> on input line 97.
  [1] (./systemDesin.toc
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 2.
+(Font)              <10.95> on input line 1.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 2.
- [1])
+(Font)              <8> on input line 1.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 1.
+)
 \tf@toc=\write4
 \openout4 = `systemDesin.toc'.
 
- [2]
+ [1]
 File: pitures/zixitongcengcitu.png Graphic file (type QTm)
- <use  "pitures/zixitongcengcitu.png" >
-[1]
+ <use  "pitures/zixitongcengcitu.png" > [1]
 LaTeX Font Info:    Try loading font information for OMS+SimSun(0) on input lin
-e 123.
-LaTeX Font Info:    No file OMSSimSun(0).fd. on input line 123.
+e 146.
+LaTeX Font Info:    No file OMSSimSun(0).fd. on input line 146.
 LaTeX Font Info:    Font shape `OMS/SimSun(0)/m/n' undefined
 (Font)              using `OMS/cmsy/m/n' instead
-(Font)              for symbol `textbullet' on input line 123.
- [2]
+(Font)              for symbol `textbullet' on input line 146.
+
+[2]
 File: pitures/xitongyunxing.png Graphic file (type QTm)
  <use  "pitures/xitongyunxing.png" >
 File: pitures/struct.png Graphic file (type QTm)
- <use  "pitures/struct.png" >
-[3]
+ <use  "pitures/struct.png" > [3]
 File: pitures/xitongwulijiegou.png Graphic file (type QTm)
- <use  "pitures/xitongwulijiegou.png" > [4]
+
+<use  "pitures/xitongwulijiegou.png" > [4]
 
 Package xeCJK Warning: Unknown CJK family `tt' is ignored.
-Use \setCJKfamilyfont to define a CJK family. on input line 166.
+Use \setCJKfamilyfont to define a CJK family. on input line 189.
 
 
-Underfull \vbox (badness 10000) detected at line 172
+Underfull \vbox (badness 10000) detected at line 195
  []
 
 (./shejisilu.tex [5]) (./mokuaisheji.tex [6]
@@ -795,31 +834,36 @@ File: pitures/response1.png Graphic file (type QTm)
 File: pitures/response2.png Graphic file (type QTm)
 
 <use  "pitures/response2.png" > [12]) (./jiekousheji.tex
-Overfull \hbox (21.75995pt too wide) in paragraph at lines 21--23
-\EU1/SimSun(1)/m/n/12 dc[]free() 释 放 由 dc[]alloc() 分 配 的 内 存。
-| 如 果 先 前 已 经 调 用 了 dc[]free(ptr)
+(/usr/local/texlive/2010/texmf-dist/tex/latex/listings/lstlang1.sty
+File: lstlang1.sty 2004/09/05 1.3 listings language file
+)
+(/usr/local/texlive/2010/texmf-dist/tex/latex/listings/lstmisc.sty
+File: lstmisc.sty 2007/02/22 1.4 (Carsten Heinz)
+)
+Underfull \hbox (badness 10000) in paragraph at lines 43--43
+
  []
 
-) [13] (./systemDesin.brf)
+[13] [14]) [15] (./systemDesin.brf)
 \tf@brf=\write5
 \openout5 = `systemDesin.brf'.
 
 
-Underfull \hbox (badness 1205) in paragraph at lines 196--196
+Underfull \hbox (badness 1205) in paragraph at lines 219--219
 []\EU1/SimSun(1)/m/n/12 Theppitak Karoonboonyanan, [][]An Implementation of Dou
 ble-
  []
 
-[14] (./systemDesin.aux)
+[16] (./systemDesin.aux)
 LaTeX Font Info:    Some font shapes were not available, defaults substituted.
  ) 
 Here is how much of TeX's memory you used:
- 13617 strings out of 495675
- 230936 string characters out of 3187192
- 309809 words of memory out of 3000000
- 16504 multiletter control sequences out of 15000+200000
- 8315 words of font info for 43 fonts, out of 3000000 for 9000
+ 15455 strings out of 495675
+ 256499 string characters out of 3187192
+ 365294 words of memory out of 3000000
+ 18317 multiletter control sequences out of 15000+200000
+ 9239 words of font info for 47 fonts, out of 3000000 for 9000
  36 hyphenation exceptions out of 8191
- 38i,14n,46p,501b,392s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 38i,14n,74p,501b,1113s stack positions out of 5000i,500n,10000p,200000b,50000s
 
-Output written on systemDesin.pdf (18 pages).
+Output written on systemDesin.pdf (19 pages).

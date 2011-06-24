@@ -24,6 +24,6 @@
 \BOOKMARK [2][-]{subsection.6.2}{返回报文1}{section.6}% 24
 \BOOKMARK [2][-]{subsection.6.3}{返回报文2}{section.6}% 25
 \BOOKMARK [1][-]{section.7}{接口设计}{}% 26
-\BOOKMARK [2][-]{subsection.7.1}{内存管理模块向外提供的接口}{section.7}% 27
-\BOOKMARK [2][-]{subsection.7.2}{公共接口}{section.7}% 28
-\BOOKMARK [3][-]{subsubsection.7.2.1}{单链表}{subsection.7.2}% 29
+\BOOKMARK [2][-]{subsection.7.1}{公共接口}{section.7}% 27
+\BOOKMARK [3][-]{subsubsection.7.1.1}{单链表}{subsection.7.1}% 28
+\BOOKMARK [2][-]{subsection.7.2}{内存管理模块向外提供的接口}{section.7}% 29
