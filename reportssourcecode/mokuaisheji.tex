@@ -1,0 +1,79 @@
+
+
+%/******************************************************************************
+% *filename:		mokuaisheji.tex
+% *author:  		synckey
+% *version: 		v1.0
+% *datetime:		2011-06-24 08:42:26
+% *description:		模块设计
+% *****************************************************************************/
+\section{模块设计}
+\subsection{线程池设计} 
+在系统开始运行时创建MAXTHREAD个线程，放入线程池中。主线程创建监听套接字，开启服
+务。每个线程各自调用accept，采用互斥锁来保证在每一个时刻只有一个线程调用accept。
+每个线程在accept后为客户端服务。
+\par{由于TCP内部为监听套接字维护两个队列：a.已完成队列，b.未
+完成队列。所以在主线程睡眠期间，新的客户连接会使这两个队列充满（两个队列之和不超
+过在listen时指定的backlog），而在这两个队列满了之后当一个客户的SYN到达时，TCP就
+忽略该分节，也就时说，并不返回RST。这样做是因为：这种情况是暂时的，客户将重发SYN
+，期望在不久就能在这些队列中找到可用空间\cite{unpv1}。 所以当这两个队列充满以后
+，客户只是重发SYN ，而服务器不会接受客户端创建更多的连接。}
+\begin{figure}[H]
+\centering
+\includegraphics[keepaspectratio, scale=0.4]{pitures/xianchengmoxing.png}
+\caption{多线程模型} 
+\end{figure}
+\subsection{工作线程设计}
+
+线程池中的工作线程首先调用connect，接受一个客户端的连接，然后从报文的前4个字节中
+获取报文的长度，从内存管理模块申请响应大小的内存，用于存放请求报文。
+在收到请求后，逐次扫描每个域名。获得域名后，首先在本地的缓存中查找域名对应的IP，
+如果有记录，就把IP地址填写到返回报文中，如果没有记录，则填入127.0.0.1，表明本地
+没有缓存，将会进行DNS查询，结果在第二个报文中返回。然后把这个域名相应的序号和域
+名填入到下图所示的链表中。
+
+\begin{figure}[H]
+\centering
+\includegraphics[keepaspectratio, scale=0.5]{pitures/response2_dns_list.png}
+\caption{本地缓存未命中的域名构成的链表} 
+\end{figure}
+
+\par{工作线程在把请求报文遍历完毕后，就把第一次返回报文发送
+给客户端，同时也把所有本地没有缓存的域名构造成了一个链表。如果链表为空，说明请求
+的域名在本地都有缓存，任务完毕，关闭连接。否则，根据链表中的数目，申请用于构造第
+二次返回报文的内存空间。对链表进行遍历，对链表中的每个域名调用一个DNS查询线程进行
+DNS查询，在最后一个DNS查询完成后，把第二个报文发送给客户端，关闭连接。}
+
+\begin{figure}[H]
+\centering
+\includegraphics[keepaspectratio, scale=1]{pitures/xianchengliuchengtu.png}
+\caption{线程工作流程图} 
+\end{figure}
+
+
+\input{mm.tex}
+
+
+
+
+%在系统开始运行时初始化clifd数组，其大小为MAXCLI（同时服务的客户端总个数）。令
+%iput为要存入clifd的下一个元素的下标，iget为线程池中某个线程将从该数组中取出的下
+%一个元素的下标。
+%\begin{figure}[H]
+%\centering
+%\includegraphics[keepaspectratio, scale=0.5]{pitures/xianchengduilie.png}
+%\caption{DNS缓存系统子系统层次图}
+%\end{figure}
+%\par{在主线程中accept客户端的请求，将已连接套接字的文件描述符fd存入clifd，同时检
+%查iput有没有赶上iget，如果赶上iget，表明个线程池中的线程处理速度赶不上客户连接的
+%速度。则主线程睡眠300us，由于TCP内部为监听套接字维护两个队列：a.已完成队列，b.未
+%完成队列。所以在主线程睡眠期间，新的客户连接会使这两个队列充满（两个队列之和不超
+%过在listen时指定的backlog），而在这两个队列满了之后当一个客户的SYN到达时，TCP就
+%忽略该分节，也就时说，并不返回RST。这样做是因为：这种情况是暂时的，客户将重发SYN
+%，期望在不久就能在这些队列中找到可用空间。\cite{unpv1}}
+%\par{主线程和线程池中的线程通过条件变量进行同步。}
+\subsection{缓存管理模块} 
+
+
+
+%/*********************************  END OF mokuaisheji.tex  *********************************/

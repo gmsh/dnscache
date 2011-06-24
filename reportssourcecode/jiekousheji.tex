@@ -1,0 +1,30 @@
+%
+%
+%/******************************************************************************
+% *filename:		jiekousheji.tex
+% *author:  		synckey
+% *version: 		v1.0
+% *datetime:		2011-06-24 15:08:01
+% *description:		接口设计
+% *****************************************************************************/
+\section{接口设计}
+\subsection{内存管理模块向外提供的接口}
+
+\codebox{\#include<dc\_mm.h >}
+	{void * dc\_alloc(size\_t size)}{若成功返回分配内存的首地址，若出错则返
+	回NULL}
+	dc\_alloc() 分配size字节的内存空间，返回一个指向所分配空间的void类型指针
+	。如果size为0，则返回NULL或一个可以被dc\_free()成功释放的一个特定的指针
+	。
+
+\codebox{\#include<dc\_mm.h >}{void dc\_free(void * ptr)}{无返回值}
+	dc\_free()释放由dc\_alloc()分配的内存。如果先前已经调用了dc\_free(ptr)
+	，则产生未定义操作，可能产生严重后果。如果ptr为NULL，就什么也不做。 
+
+\subsection{公共接口}
+\subsubsection{单链表}
+%\codebox{}
+
+
+%
+%/*********************************  END OF jiekousheji.tex  *********************************/
