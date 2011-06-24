@@ -1,5 +1,5 @@
 test: 
 .PHONY: clean
 clean:
-	-rm 
+	-rm test
 CPPFLAGS = -I../include
