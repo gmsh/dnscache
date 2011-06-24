@@ -6,13 +6,16 @@
 #define unlikely(x)     __builtin_expect((x),0)
 #include "slist.h"
 
-struct slist * mk_slist(void * p, size_t capacity)
+struct slist * mk_slist(void * ( *my_alloc) (size_t),
+			size_t capacity)
 {
+  void *p = my_alloc(sizeof(struct slist)
+		     + sizeof(struct sl_node) * capacity);
   struct slist * to_return = (struct slist *) p;
   to_return->head = to_return->end = NULL;
   to_return->length = 0;
   to_return->capacity = capacity;
-  to_return->memlist = (struct sl_node *)dc_alloc(sizeof(struct sl_node));
+  to_return->memlist = (struct sl_node *)my_alloc(sizeof(struct sl_node));
   to_return->memlist->data = p;
   to_return->memlist->next = NULL;
   to_return->blank = (struct sl_node *)(p + sizeof(struct slist));
@@ -25,8 +28,11 @@ struct slist * mk_slist(void * p, size_t capacity)
   return to_return;
 }
 
-struct slist *sl_expand(struct slist *sl, void *p, size_t delta)
+struct slist *sl_expand(struct slist *sl,
+			void * (* my_alloc)(size_t),
+			size_t delta)
 {
+  void * p = my_alloc(delta * sizeof(struct sl_node));
   /* append mem to the blank list*/
   struct sl_node * ptr = (struct sl_node *)p;
   if(sl->blank == NULL)
@@ -38,14 +44,15 @@ struct slist *sl_expand(struct slist *sl, void *p, size_t delta)
     delta--;
   }
   ptr->next = NULL;
-  ptr = dc_alloc(sizeof(struct sl_node));
+  ptr = my_alloc(sizeof(struct sl_node));
   ptr->data = p;
   ptr->next = sl->memlist;
   sl->memlist = ptr;
   return sl;
 }
 
-void sl_free(struct slist *sl)
+void sl_free(void (* my_free) (void *),
+	     struct slist *sl)
 {
   struct sl_node * ptr;
   struct sl_node * ptr2;
@@ -53,8 +60,8 @@ void sl_free(struct slist *sl)
   ptr = sl->memlist; /* hold the memlist */
   while(ptr != NULL){
     ptr2 = ptr->next; /* hold the next pointer */
-    dc_free(ptr->data);
-    dc_free(ptr);
+    my_free(ptr->data);
+    my_free(ptr);
     ptr = ptr2;
   }
 }

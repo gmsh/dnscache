@@ -23,16 +23,18 @@ struct slist{
 
 /*
  * to make a empty slist from given memory
- * *p shold be a continuous memory larger than 
- * sizeof(sl_node) * capacity + sizeof(slist)
+ * allocation function.
  */
-struct slist * mk_slist(void * p, size_t capacity);
+struct slist * mk_slist(void * ( *my_alloc) (size_t),
+			size_t capacity);
 
 /*
  * to expand the slist delta more free sl_nodes
  *
  */
-struct slist * sl_expand(struct slist * sl, void * p, size_t delta);
+struct slist * sl_expand(struct slist * sl,
+			 void * (my_alloc) (size_t),
+			 size_t delta);
 /*
  * to add a sl_node who points to *p to the end of list
  * RETURN
@@ -68,5 +70,8 @@ void traverse(
 /*
  * free the slist
  */
-void sl_free(struct slist * sl);
+void sl_free(
+	     void (* my_free)(void *),
+	     struct slist * sl
+	     );
 #endif
