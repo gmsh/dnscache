@@ -54,7 +54,8 @@ DNS查询，在最后一个DNS查询完成后，把第二个报文发送给客�
 \input{mm.tex}
 
 \subsection{缓存管理模块} 
-\textbf{定义：}双数组Trie（Double-Array  Trie，DATrie）是 trie 树的一个简单而有效的实现，
+%缓存管理模块由 DATrie 和 LIRS 栈驱动.
+\textbf{定义1：}双数组Trie（Double-Array  Trie，DATrie）是 trie 树的一个简单而有效的实现，
 由两整数数组构成，一个是 base[]，另一个是check[]。check[base[s] + c] = s base[s]
 + c = t.
 
@@ -68,7 +69,7 @@ DNS查询，在最后一个DNS查询完成后，把第二个报文发送给客�
 \par{ 静态DATrie 由离线生成，并且不断从动态 DATrie 中学习补充。 }
 \par{ 域名索引不仅是对缓存内容索引，由于DATrie 查询字符串速度快，但插入或删除效率较低因此采用上
 	述两个DATrie结合的缓存方法。 }
-\par{ 最短最近使用间隔算法(Low  Inter-Reference  Recency  Set,LIRS):LIRS算法是一中基于LRU算法
+\par{ 定义2:最短最近使用间隔算法(Low  Inter-Reference  Recency  Set,LIRS):LIRS算法是一中基于LRU算法
 	弱点而改进的算法，使用页面的最近实用间隔(Inter-Reference Recency,IRR)来决定要替
 	换的页面。IRR 用来表示一个页面的最近两次访问的间隔中的其他无重复页面的个数。LIRS 用来
 	表示一个页面的最近两次访问的间隔中的其它无重复页面的个数。 LIRS还定义了一中不同的最
@@ -88,8 +89,7 @@ DNS查询，在最后一个DNS查询完成后，把第二个报文发送给客�
 \begin{figure}[H]
 \centering
 \includegraphics[keepaspectratio, scale=0.4]{pitures/lirsstack.png}
-\caption{ The LIRS stack S holds LIR blocks as well as HIRS blocks with or without
-resident status, and a list Q holds all the resident(常驻) HIR blocks. } 
+\caption{ DATrie 的状态转换示意，base[s]+c=t, check[t]=s } 
 \end{figure}
 
 
