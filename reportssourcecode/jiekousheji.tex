@@ -39,11 +39,12 @@ struct slist{
 \paragraph{创建链表}
 \codebox{\#include "slist.h"}{struct slist * mk\_slist(void *
 			(*my\_alloc)(size\_t),\\[-30pt]
-		 \begin{flushright}size\_t capacity)\end{flushright}}{创建的链表}
+		 \begin{flushright}size\_t capacity)\end{flushright}}{创建的链表
+		 指针}
 	\begin{compactdesc}
 	\item[功能：]创建一个新的链表
 	\item[参数：]my\_alloc()用来分配内存的函数指针;capacity，链表的容量
-	\item[返回：]创建的链表
+	\item[返回：]创建的链表指针
 	\end{compactdesc}
 \paragraph{增加链表的容量}
 \codebox{\#include "slist.h"}{struct slist * sl\_expand(struct slist *sl,\\[-30pt]
@@ -117,7 +118,7 @@ sl\_node*),\\[-30pt]
 		为NULL，就什么也不做。 
 	\end{compactdesc}
 
-\subsection{缓存接口对外接口}
+%\subsection{缓存接口对外接口}
 
 %
 %/*********************************  END OF jiekousheji.tex  *********************************/
