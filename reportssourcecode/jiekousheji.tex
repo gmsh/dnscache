@@ -41,10 +41,11 @@ struct slist{
 			(*my\_alloc)(size\_t),\\[-30pt]
 		 \begin{flushright}size\_t capacity)\end{flushright}}{创建的链表}
 	\begin{compactdesc}
-	\item[功能：]创建一个新的链表。
-	\item[参数：]my\_alloc()用来分配内存的函数指针，capacity，链表的容量。
+	\item[功能：]创建一个新的链表
+	\item[参数：]my\_alloc()用来分配内存的函数指针;capacity，链表的容量
 	\item[返回：]创建的链表
 	\end{compactdesc}
+\paragraph{增加链表的容量}
 \codebox{\#include "slist.h"}{struct slist * sl\_expand(struct slist *sl,\\[-30pt]
 		 \begin{flushright}void * (my\_alloc) (size\_t),size\_t delta);
 		 \end{flushright}}{指向链表的指针}
@@ -53,32 +54,45 @@ struct slist{
 	\item[参数：]链表指针，分配内存的函数和增加的大小
 	\item[返回：]指向链表的指针
 	\end{compactdesc}
+\paragraph{向链表尾部增加节点}
 \codebox{\#include "slist.h"}{int append(void * data, struct slist * sl);}{若成功
 	则为0，若没有内存1}
 	\begin{compactdesc}
 	\item[功能：]向链表尾部添加一个节点
-	\item[参数：]data，要存放的数据指针。sl，操作的链表指针。
-	\item[返回：]若成功则返回0，返回1表示内存不足，函数执行失败。
+	\item[参数：]data，要存放的数据指针;sl，操作的链表指针
+	\item[返回：]若成功则返回0，返回1表示内存不足，函数执行失败
 	\end{compactdesc}
-\codebox{\#include "slist.h"}{void * pop(struct slist * sl);}{无}
+\paragraph{从链表头部弹出节点}
+\codebox{\#include "slist.h"}{void * pop(struct slist * sl)}{无}
 	\begin{compactdesc}
-	\item[功能：]从链表的头部弹出一个节点，并返回这个指向这个节点的指针。
+	\item[功能：]从链表的头部弹出一个节点，并返回这个指向这个节点的指针
 	\item[参数：]链表指针
-	\item[返回：]指向弹出节点的指针。
+	\item[返回：]指向弹出节点的指针
 	\end{compactdesc}
-\codebox{\#include "slist.h"}{int push(void * data, struct slist * sl);}{若成功
+\paragraph{在链表头部插入一个节点}
+\codebox{\#include "slist.h"}{int push(void * data, struct slist * sl)}{若成功
 	则为0，若没有内存1}
 	\begin{compactdesc}
-	\item[功能：]在链表头部前面插入一个节点。
-	\item[参数：]data，插入节点的数据指针，sl，操作的链表。
-	\item[返回：]若成功则返回0，返回1表示内存不足，函数执行失败。
+	\item[功能：]在链表头部前面插入一个节点
+	\item[参数：]data，插入节点的数据指针;sl，操作的链表
+	\item[返回：]若成功则返回0，返回1表示内存不足，函数执行失败
 	\end{compactdesc}
-\codebox{\#include "slist.h"}{void sl\_free(void (* my\_free)(void *),struct slist * sl);
-		     }{若成功则为0，若没有内存1}
+\paragraph{遍历链表}
+\codebox{\#include "slist.h"}{void traverse(void (* visit)(struct
+sl\_node*),\\[-30pt]
+	      	    \begin{flushright}  struct slist * sl)\end{flushright}}{无}
 	\begin{compactdesc}
-	\item[功能：]在链表头部前面插入一个节点。
-	\item[参数：]data，插入节点的数据指针，sl，操作的链表。
-	\item[返回：]若成功则返回0，返回1表示内存不足，函数执行失败。
+	\item[功能：]遍历链表
+	\item[参数：]sl\_node，从sl\_node开始遍历;sl，操作的链表
+	\item[返回：]无
+	\end{compactdesc}
+\paragraph{ 释放链表}
+\codebox{\#include "slist.h"}{void sl\_free(void (* my\_free)(void *), struct slist * sl)
+		     }{无}
+	\begin{compactdesc}
+	\item[功能：]释放sl指向的链表
+	\item[参数：]my\_free()进行内存释放的函数指针，sl，操作的链表
+	\item[返回：]无
 	\end{compactdesc}
 
 
