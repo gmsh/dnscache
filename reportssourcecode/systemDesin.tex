@@ -140,12 +140,12 @@
 	，把DNS查询结果返回给客户端，并且把结果缓存在本地。当客户下一次请求同样
 	的域名时，就可以在本地的缓存中查找，如果缓存中存在未被替换的结果，则返回
 	该结果；否则，系统重新请求DNS服务器，并将DNS服务器返回结果存入缓存
-	中。。客户可以在一次请求中查询多个域名的IP地址，本系统予以响应。我们把整
+	中。客户可以在一次请求中查询多个域名的IP地址，本系统予以响应。我们把整
 	个系统分为三个大的模块:
 	\begin{compactitem}
 	\item{\textbf{缓存管理模块：} 把从DNS处获得的IP地址在本地缓存。域名使用
 	字典树\cite{IDAT}在本地组织，从而加快对域名的检索速度。在缓存区满了以后，采用比传统
-	LRU算法效率更高的LIRS\cite{LIRS}算法。}
+	LRU算法效率更高的LIRS\cite{LIRS}算法，进行缓冲区的更新。}
 	\item{\textbf{内存管理模块：}为了加快系统的响应速度，减少动态申请内存带
 	来的时间损耗，为请求报文预分配一块内存区域，当客户有连接时，从用户报文的
 	前四个字节中获取整个报文的长度，然后从内存管理模块中申请（不是动态申请）
@@ -154,7 +154,7 @@
 	在系统中采用线程池技术。在系统启动时，创建一定数目的线程。主线程负责接受
 	用户的请求，然后调用线程池中的线程为客户服务。线程池管理模块负责线程的创
 	建，申请和回收。}
-	\item{\textbf{测试客户端}用于测试本DNS缓存系统是否正确工作，同时也测试它
+	\item{\textbf{测试客户端：}用于测试本DNS缓存系统是否正确工作，同时也测试它
 	的并发性能。}
 	\end{compactitem}
 \subsection{运行系统}
@@ -175,7 +175,7 @@
 \subsection{系统物理结构}
 \begin{figure}[H]
 \centering
-\includegraphics[keepaspectratio, scale=0.6]{pitures/xitongwulijiegou.png}
+\includegraphics[keepaspectratio, scale=0.7]{pitures/xitongwulijiegou.png}
 \caption{系统物理结构图}
 \end{figure}
 
@@ -200,12 +200,6 @@
 \input{mokuaisheji.tex}
 
 
-\begin{asparaenum}[1.]
-\item{aa}
-\item{aa}
-\item{aa}
-\item{aa}
-\end{asparaenum}
 
 \input{tongxinxieyi.tex}
 \input{jiekousheji.tex}

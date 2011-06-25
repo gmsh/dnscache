@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.1415926-2.2-0.9997.4 (TeX Live 2010) (format=xelatex 2011.4.13)  25 JUN 2011 01:14
+This is XeTeX, Version 3.1415926-2.2-0.9997.4 (TeX Live 2010) (format=xelatex 2011.4.13)  25 JUN 2011 14:03
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -825,45 +825,62 @@ File: pitures/xianchengliuchengtu.png Graphic file (type QTm)
 <use  "pitures/xianchengliuchengtu.png" > [8] (./mm.tex
 File: pitures/mm.png Graphic file (type QTm)
 
-<use  "pitures/mm.png" > [9])) (./tongxinxieyi.tex
+<use  "pitures/mm.png" > [9]) [10]
+File: pitures/irr.png Graphic file (type QTm)
+ <use  "pitures/irr.png" >
+Overfull \hbox (6.0pt too wide) in paragraph at lines 69--78
+[]\EU1/SimSun(1)/m/n/12 最 短 最 近 使 用 间 隔 算 法 (Low Inter-Refe
+rence Recency Set,LIRS):LIRS
+ []
+
+File: pitures/aaa.png Graphic file (type QTm)
+<use  "pitures/aaa.png" >
+File: pitures/lirsstack.png Graphic file (type QTm)
+ <use  "pitures/lirsstack.png" > [11])
+(./tongxinxieyi.tex
 File: pitures/request.png Graphic file (type QTm)
-
-<use  "pitures/request.png" > [10]
+ <use  "pitures/request.png" > [12]
 File: pitures/response1.png Graphic file (type QTm)
- <use  "pitures/response1.png" > [11]
-File: pitures/response2.png Graphic file (type QTm)
 
-<use  "pitures/response2.png" > [12]) (./jiekousheji.tex
+<use  "pitures/response1.png" >
+File: pitures/response2.png Graphic file (type QTm)
+ <use  "pitures/response2.png" > [13])
+(./jiekousheji.tex
 (/usr/local/texlive/2010/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2004/09/05 1.3 listings language file
 )
 (/usr/local/texlive/2010/texmf-dist/tex/latex/listings/lstmisc.sty
 File: lstmisc.sty 2007/02/22 1.4 (Carsten Heinz)
-)
-Underfull \hbox (badness 10000) in paragraph at lines 43--43
+) [14]
+Underfull \hbox (badness 10000) in paragraph at lines 42--42
 
  []
 
-[13] [14]) [15] (./systemDesin.brf)
+
+Underfull \hbox (badness 10000) in paragraph at lines 50--50
+
+ []
+
+[15] [16]) [17] (./systemDesin.brf)
 \tf@brf=\write5
 \openout5 = `systemDesin.brf'.
 
 
-Underfull \hbox (badness 1205) in paragraph at lines 219--219
+Underfull \hbox (badness 1205) in paragraph at lines 213--213
 []\EU1/SimSun(1)/m/n/12 Theppitak Karoonboonyanan, [][]An Implementation of Dou
 ble-
  []
 
-[16] (./systemDesin.aux)
+[18] (./systemDesin.aux)
 LaTeX Font Info:    Some font shapes were not available, defaults substituted.
  ) 
 Here is how much of TeX's memory you used:
- 15455 strings out of 495675
- 256499 string characters out of 3187192
- 365294 words of memory out of 3000000
- 18317 multiletter control sequences out of 15000+200000
+ 15460 strings out of 495675
+ 256558 string characters out of 3187192
+ 365564 words of memory out of 3000000
+ 18319 multiletter control sequences out of 15000+200000
  9239 words of font info for 47 fonts, out of 3000000 for 9000
  36 hyphenation exceptions out of 8191
- 38i,14n,74p,501b,1113s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 38i,14n,74p,501b,1778s stack positions out of 5000i,500n,10000p,200000b,50000s
 
-Output written on systemDesin.pdf (19 pages).
+Output written on systemDesin.pdf (21 pages).
