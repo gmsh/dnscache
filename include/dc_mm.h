@@ -7,6 +7,14 @@
 #define _DC_MM_H
 
 #include <stdlib.h>
+/*
+ * the main thread calls mm_init() to initialize the momery managment 
+ * modules.
+ * RETURN 0 if succeed;
+ * RETURN 1 if failed.
+ */
+int mm_init();
+
 /* dc_alloc() allocates size bytes and returns a pointer  to  the  allocated
  * memory.   The  memory  is  not  cleared.   If  size is 0, then dc_alloc()
  * returns either NULL, or a unique pointer value that can later  be  suc‐

@@ -24,7 +24,8 @@ $(targetnameb).pdf: $(targetnameb).tex mokuaisheji.tex tongxinxieyi.tex mm.tex\
 
 .PHONY: clean
 clean:
-	-rm *.toc *.aux *.brf *.out *.log 
+	-rm *.toc *.aux *.brf *.out *.log *.pdf $(destdir)/$(targetnamea).pdf \
+	$(destdir)/$(targetnameb).pdf
 
 	
 
