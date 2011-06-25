@@ -10,8 +10,8 @@
 /*
  * the main thread calls mm_init() to initialize the momery managment 
  * modules.
- * RETURN 0 if initialize failed, the main thread must recall it again.
- * RETURN 1 if initialize successfully.
+ * RETURN 0 if succeed;
+ * RETURN 1 if failed.
  */
 int mm_init();
 
