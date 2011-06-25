@@ -57,6 +57,8 @@ DNS查询，在最后一个DNS查询完成后，把第二个报文发送给客�
 \textbf{定义：}双数组Trie（Double-Array  Trie，DATrie）是 trie 树的一个简单而有效的实现，
 由两整数数组构成，一个是 base[]，另一个是check[]。check[base[s] + c] = s base[s]
 + c = t.
+
+
 \par{对域名集合的索引是有两个双数组字典(Double-Array  Trie，DATrie)驱动的。其中
 	一个 DATrie较大，存放所有已知域名集合，是静态的；另一个DATrie 较小，实际应用中作为较大的
 	DATrie的补充，是动态变化的。每当动态DATrie 中记录达到一定数目时，就会离线补充静态DATrie
