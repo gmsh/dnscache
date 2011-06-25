@@ -19,6 +19,9 @@
 \contentsline {subsection}{\numberline {5.2}工作线程设计}{8}{subsection.5.2}
 \contentsline {subsection}{\numberline {5.3}内存管理模块}{9}{subsection.5.3}
 \contentsline {subsection}{\numberline {5.4}缓存管理模块}{10}{subsection.5.4}
+\contentsline {paragraph}{DATri和eLIRS的定义\\[5pt]}{10}{paragraph*.1}
+\contentsline {paragraph}{DATrie的实现\\[5pt]}{11}{paragraph*.2}
+\contentsline {paragraph}{LIRS算法的实现\\[5pt]}{12}{paragraph*.3}
 \contentsline {section}{\numberline {6}通信协议}{13}{section.6}
 \contentsline {subsection}{\numberline {6.1}请求报文}{13}{subsection.6.1}
 \contentsline {subsection}{\numberline {6.2}返回报文1}{13}{subsection.6.2}
@@ -26,15 +29,15 @@
 \contentsline {section}{\numberline {7}接口设计}{15}{section.7}
 \contentsline {subsection}{\numberline {7.1}公共接口}{15}{subsection.7.1}
 \contentsline {subsubsection}{\numberline {7.1.1}单链表}{15}{subsubsection.7.1.1}
-\contentsline {paragraph}{创建链表}{15}{paragraph*.1}
-\contentsline {paragraph}{增加链表的容量}{16}{paragraph*.2}
-\contentsline {paragraph}{向链表尾部增加节点}{16}{paragraph*.3}
-\contentsline {paragraph}{从链表头部弹出节点}{16}{paragraph*.4}
-\contentsline {paragraph}{在链表头部插入一个节点}{17}{paragraph*.5}
-\contentsline {paragraph}{遍历链表}{17}{paragraph*.6}
-\contentsline {paragraph}{ 释放链表}{17}{paragraph*.7}
+\contentsline {paragraph}{创建链表}{15}{paragraph*.4}
+\contentsline {paragraph}{增加链表的容量}{16}{paragraph*.5}
+\contentsline {paragraph}{向链表尾部增加节点}{16}{paragraph*.6}
+\contentsline {paragraph}{从链表头部弹出节点}{16}{paragraph*.7}
+\contentsline {paragraph}{在链表头部插入一个节点}{17}{paragraph*.8}
+\contentsline {paragraph}{遍历链表}{17}{paragraph*.9}
+\contentsline {paragraph}{ 释放链表}{17}{paragraph*.10}
 \contentsline {subsection}{\numberline {7.2}内存管理模块向外提供的接口}{17}{subsection.7.2}
-\contentsline {paragraph}{内存申请函数}{18}{paragraph*.8}
-\contentsline {paragraph}{内存释放函数}{18}{paragraph*.9}
+\contentsline {paragraph}{内存申请函数}{18}{paragraph*.11}
+\contentsline {paragraph}{内存释放函数}{18}{paragraph*.12}
 \contentsline {subsection}{\numberline {7.3}缓存接口对外接口}{18}{subsection.7.3}
 \contentsfinish 
