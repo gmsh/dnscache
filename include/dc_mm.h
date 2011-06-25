@@ -7,6 +7,15 @@
 #define _DC_MM_H
 
 #include <stdlib.h>
+#include "typedefs.h"
+#include "slist.h"
+/*
+ * call mm_pre_alloc() to pre-allocate number of counts' chunks with 
+ * 2^capacity KB memory.
+ * RETURN the pointer to a chunks list.
+ */
+struct slist * mm_pre_alloc(uint32 capacity,uint8 counts);
+
 /*
  * the main thread calls mm_init() to initialize the momery managment 
  * modules.
