@@ -123,6 +123,7 @@ void traverse(void (* visit)(struct sl_node *),
 	      struct slist *sl)
 {
   struct sl_node * ptr;
+  ptr = sl->head;
   while(ptr != NULL){
     visit(ptr);
     ptr = ptr->next;
