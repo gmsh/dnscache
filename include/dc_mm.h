@@ -44,4 +44,22 @@ void dc_free(void * ptr)
 {
   free(ptr);
 }
+
+/*
+ * The  dc_realloc() function changes the size of the memory block pointed to
+ * by ptr to size bytes.  The contents will be unchanged in the range from
+ * the start of the region up to the minimum of the old and new sizes.  If
+ * the new size is larger than the old size, the added memory will not  be
+ * initialized.   If  ptr  is  NULL,  then  the call is equivalent to dc_al‐
+ * loc(size), for all values of size; if size is equal to zero, and ptr is
+ * not  NULL,  then  the  call  is equivalent to dc_free(ptr).  Unless ptr is
+ * NULL, it must have been returned by an earlier call to  dc_alloc(),
+ * dc_realloc().  If the area pointed to was moved, a dc_free(ptr) is done.
+ *
+ */
+void * dc_realloc(void * ptr, size_t size)
+{
+	return realloc(ptr, size);
+}
+
 #endif
