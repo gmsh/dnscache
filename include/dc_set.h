@@ -1,9 +1,9 @@
 /*
  * dc_set.h
  *	CharSet for domain names.
- *	∑ = {a-z 0-9 - .}
+ *	∑ = {a-z 0-9 - . '\0'}
  *	There are 38(=26 + 10 + 2) characters.
- *	The code 0 is reserved.
+ *	The code 0 is reserved for the end symbol '\0'.
 +---------+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
 |character| a| b| c| d| e| f| g| h| i| j| k| l| m| n| o| p| q| r| s| t| u|
 +---------+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+

@@ -13,6 +13,7 @@ int main(){
 	 * forward test: get_char
 	 */
 	printf("code\tchar\n");
+	printf("%d\t%c\n", 0, get_char(0));
 	uint8 i;
 	for(i = 1; i < 39; i++){
 		printf("%d\t%c\n", i, get_char(i));
@@ -21,6 +22,7 @@ int main(){
 	 * backward test: get_code
 	 */
 	printf("char\tcode\n");
+	printf("%c\t\%d\n", '\0', get_code('\0'));
 	for(i = 97; i < 123; i++){
 		printf("%c\t%d\n", i, get_code(i));
 	}

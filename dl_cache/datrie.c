@@ -8,13 +8,13 @@
 
 #include "datrie.h"
 struct _da_cell{
-	uint32 base;
-	uint32 check;
+	int32 base;
+	int32 check;
 	void * user_data;
 };
 
 struct _dobule_array{
-	uint32 cell_num;
+	int32 cell_num;
 	da_cell * cells;
 };
 
