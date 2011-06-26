@@ -14,10 +14,12 @@
 #ifndef DATRIE_H_
 #define DATRIE_H_
 
-typedef struct {
-	uint32 base;
-	uint32 check;
-	void * data;
-} array_element;
+typedef struct _da_cell da_cell;
+
+typedef struct _double_array double_array;
+
+typedef struct _tail_block tail_block;
+
+typedef struct _tail tail;
 
 #endif /* DATRIE_H_ */
