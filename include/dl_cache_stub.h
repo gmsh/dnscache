@@ -1,7 +1,7 @@
 /*
  * dl_cache_stub.h
  *
- *	This header file could be used by the dc_server for a stub,
+ *	This header file could be used by the dc_server as a stub,
  *	when the real dl_cache lib is under heavy development.
  *	It is promised that the api would not changed dramatically.
  *  Created on: Jun 26, 2011
