@@ -63,9 +63,9 @@ void * dc_alloc(size_t size){
 	struct sl_node * node_ptr;
 	int position=cap-SMALL;  /* position of the pointer in the array. */
 	/* if capacity chunks not pre-allocated. */
-	if( cap < SMALL || cap>BIG){
+	if( cap < SMALL || cap>BIG){ 
 		/* if hasn't extra list */
-		if(elm_table[cap]==NULL){
+		if(elm_table[cap]==NULL){ 
 			elm_table[cap]=(struct extra_list_manager *)malloc(sizeof(struct extra_list_manager));
 			list_ptr=mm_pre_alloc(cap,DEFAULT_EXTRA);
 			elm_table[cap]->idle_num=DEFAULT_EXTRA;
@@ -107,6 +107,13 @@ void * dc_alloc(size_t size){
 	return select_pre_alloced(cap);
 }
 
+find(struct sl_node * sn){
+	if 	
+}
+
+void find_extra(struct sl_node * sn){
+	if(sn->data)	
+}
 /*
  * dc_free()  frees  the memory space pointed to by ptr, which must have been
  * returned by a previous call to dc_alloc().  Otherwise,  or if free(ptr)
@@ -114,8 +121,17 @@ void * dc_alloc(size_t size){
  * occurs.  If ptr is NULL, no operation is performed.
  */
 void dc_free(void * ptr){
-	uint32 cap=LOG@(sizeof(ptr));
+	uint32 cap=LOG2(sizeof(ptr));
+	/* if ptr is NULL,no operation is performed. */
 	if(!ptr)
 		return;
-	if()		
+	/* if capacity wasn't pre-allocated */
+	if(cap<SMALL || cap>BIG){
+		struct sl_node * ptr;
+		while(ptr!=null){}			
+	}	
+
+
+
+	if(traverse(find()))		
 }
