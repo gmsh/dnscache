@@ -21,7 +21,7 @@ struct slist * mm_pre_alloc(uint32 capacity, uint16 counts){
 int mm_init(){
 	uint32 i;
 	while((i=CHUNK_TYPE_NUM)--){
-		idle_chunks[i]=mm_pre_alloc((SMALL+i), num_each_chunks[i])	
+		idle_chunks[i]=mm_pre_alloc((SMALL+i), num_each_chunks[i]);	
 	}
 	return 0;	
 }
