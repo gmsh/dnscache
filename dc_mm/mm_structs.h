@@ -10,7 +10,7 @@
 
 #define SMALL 8			                /* the 2^SMALL is the smallese chunks */
 #define	BIG	20			        /* the 2^BIG is the biggest chunks */
-#define CHUNCK_TYPE_NUM ( BIG - SMALL + 1 )	/* counts of  chunck's type */
+#define CHUNK_TYPE_NUM ( BIG - SMALL + 1 )	/* counts of  chunk's type */
 #define POW2(x) pow(2,x)
 #define	LOG2(x) (log(x)/log(2))
 #define DEFAULT_EXTRA 4;	/* default number of each type of extra chunks  */
@@ -18,13 +18,13 @@
 #include <math.h>
 #include "typedefs.h"
 
-struct chunck_manager {	/* manage the chunks with small capacity. */
-	uint32	chunck_cap;	/* the defined n for the capacity of  2^n-bytes chunks */
+struct chunk_manager {	/* manage the chunks with small capacity. */
+	uint32	chunk_cap;	/* the defined n for the capacity of  2^n-bytes chunks */
 	uint16	idle_num;	/*  the count of pre-alllocated chunks */
 	slist * idle_chucks;	/* the list of idle chunk or chunks */
 	slist * alloced_chucks;	/* the list of allocated chunk or chunks */
-	slist * extra_chunks;   /* the dynamicly allocated chunks list */
-}	chunk_manager_table[CHUNCK_TYPE_NUM];
+	//slist * extra_chunks;   /* the dynamicly allocated chunks list */
+}	chunk_manager_table[CHUNK_TYPE_NUM];
 
 struct extra_list_manager{	/* manager the extra list of chunks */
 	uint16 idle_num;	/* idle number */

@@ -23,7 +23,9 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <pthread.h>
+#include <errno.h>
 
+#define MAXLINE		4096
 #define	MAXDNSTHREADS	512	/* the number of DNS threads  */
 #define	MAXSERVTHREADS	4096	/* the number of work threads */
 
@@ -40,19 +42,63 @@ typedef struct{
 typedef struct{
 	int sockfd;		/* the connected fd */
 	char *domain;		/* point to the domain */
-	uint32 number;		/* domains to search */
+	int number;		/* domains to search */
+	int count;		/* the order of the request*/
+	uint32 *ipptr;		/* first address to write ip */
 	pthread_mutex_t	*mutex;	/* lock the number */
+	int total;		/* total domians */
 } dns_thread_t;
 
+thread_t *dns_thread_tptr;	/* point to the memory alloc for 
+				   dns threads	
+				 */
+dns_thread_t dns_array[MAXDNSTHREADS];		
+				/*
+				 *  dns threads read it and know
+				 *  how to server
+				 */
 
+pthread_mutex_t dns_array_mutex;/*
+				 *  lock the dns_array;
+				 */
 
+pthread_cond_t	dns_array_cond; /*
+				 *  notify the dns threads;
+				 */
 
+int iget, iput;			/* 
+				 * iget, next idex to put in dns array,
+				 * iput, next to read 
+				 */
 
+/* wraped functions */
+void	Pthread_create(pthread_t *, const pthread_attr_t *,
+					   void * (*)(void *), void *);
+void	Pthread_join(pthread_t, void **);
+void	Pthread_detach(pthread_t);
+void	Pthread_kill(pthread_t, int);
 
+void	Pthread_mutexattr_init(pthread_mutexattr_t *);
+void	Pthread_mutexattr_setpshared(pthread_mutexattr_t *, int);
+void	Pthread_mutex_init(pthread_mutex_t *, pthread_mutexattr_t *);
+void	Pthread_mutex_lock(pthread_mutex_t *);
+void	Pthread_mutex_unlock(pthread_mutex_t *);
 
+void	Pthread_cond_broadcast(pthread_cond_t *);
+void	Pthread_cond_signal(pthread_cond_t *);
+void	Pthread_cond_wait(pthread_cond_t *, pthread_mutex_t *);
+void	Pthread_cond_timedwait(pthread_cond_t *, pthread_mutex_t *,
+							   const struct timespec *);
 
+void	Pthread_key_create(pthread_key_t *, void (*)(void *));
+void	Pthread_setspecific(pthread_key_t, const void *);
+void	Pthread_once(pthread_once_t *, void (*)(void));
 
-
+void	 err_dump(const char *, ...);
+void	 err_msg(const char *, ...);
+void	 err_quit(const char *, ...);
+void	 err_ret(const char *, ...);
+void	 err_sys(const char *, ...);
 
 
 #endif /*SERVER_H_*/
