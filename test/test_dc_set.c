@@ -13,7 +13,7 @@ int main(){
 	 * forward test: get_char
 	 */
 	printf("code\tchar\n");
-	printf("%d\t%c\n", 0, get_char(0));
+	printf("%d\t%c\n", 39, get_char(39));
 	uint8 i;
 	for(i = 1; i < 39; i++){
 		printf("%d\t%c\n", i, get_char(i));
