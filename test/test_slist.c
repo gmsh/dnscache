@@ -19,7 +19,7 @@ int main(){
 	test_list = mk_slist((uint32 *)malloc(sizeof(uint32)),CAPACITY);	
 	while((++ptr) < (test_list->head + test_list->length)){
 		*(int * )(ptr->data)=i++;			
-	}
+	}/* 依次遍历赋值 */
 }
 
 /* print the data */
