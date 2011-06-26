@@ -13,7 +13,7 @@
 #define CHUNCK_TYPE_NUM ( BIG - SMALL + 1 )	/* counts of  chunck's type */
 #define POW2(x) pow(2,x)
 #define	LOG2(x) (log(x)/log(2))
-#define DEFAULT_EXTRA 4;
+#define DEFAULT_EXTRA 4;	/* default number of each type of extra chunks  */
 
 #include <math.h>
 #include "typedefs.h"

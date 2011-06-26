@@ -51,7 +51,7 @@ void * dc_alloc(size_t size){
 
 
 
-		|| chunk_manager_table[position]->idle_num==0){
+		 chunk_manager_table[position]->idle_num==0){
 		extra_list=mm_pre_alloc(cap,num_extra_chunks[position]);
 		chunk_manager_table[positon]->extra_chunks=extra_list;
 	}
