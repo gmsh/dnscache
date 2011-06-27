@@ -1,7 +1,7 @@
 #ifndef _DC_UTILS_H
 #define DC_UTILS_H
 
-#define _DC_DEBUG
+//#Define _DC_DEBUG
 
 #include <string.h>
 
