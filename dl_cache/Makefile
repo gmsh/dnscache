@@ -5,4 +5,4 @@ libdl_cache.a:dc_set.o datrie_tail_pool.o
 clean:
 	-rm *.o *.a
 CPPFLAGS = -I../include
-CFLANGS= -g
+CFLAGS= -g

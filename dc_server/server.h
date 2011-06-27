@@ -1,4 +1,4 @@
-
+  
 
 /**********************************************************
  * filename:		server.h
@@ -8,6 +8,8 @@
  * description:		Some head file that are needed for
  			network program.
  **********************************************************/
+
+
 
 #ifndef SERVER_H_
 #define SERVER_H_ 1
@@ -24,9 +26,10 @@
 #include <sys/types.h>
 #include <pthread.h>
 #include <errno.h>
+#include <fcntl.h>
 
 #define MAXLINE		4096
-#define	MAXDNSTHREADS	512	/* the number of DNS threads  */
+#define	MAXDNSTHREADS	8192	/* the number of DNS threads  */
 #define	MAXSERVTHREADS	4096	/* the number of work threads */
 
 typedef struct{
@@ -41,12 +44,14 @@ typedef struct{
  */
 typedef struct{
 	int sockfd;		/* the connected fd */
-	char *domain;		/* point to the domain */
-	int number;		/* domains to search */
+	int *number;		/* domains to search reduce 1 when one dns
+				 * search is finished.		
+				 */
 	int count;		/* the order of the request*/
+	int total;		/* total domians */
+	char *domain;		/* point to the domain */
 	uint32 *ipptr;		/* first address to write ip */
 	pthread_mutex_t	*mutex;	/* lock the number */
-	int total;		/* total domians */
 } dns_thread_t;
 
 thread_t *dns_thread_tptr;	/* point to the memory alloc for 
@@ -70,6 +75,9 @@ int iget, iput;			/*
 				 * iget, next idex to put in dns array,
 				 * iput, next to read 
 				 */
+void thread_make_dns(int i);
+void *thread_main_dns(void *arg);
+
 
 /* wraped functions */
 void	Pthread_create(pthread_t *, const pthread_attr_t *,

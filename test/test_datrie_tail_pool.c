@@ -6,7 +6,6 @@
  */
 
 #include "datrie_tail_pool.h"
-#include "../dl_cache/datrie_tail_pool.c"
 char buff[80];
 void replace_n(){
 	int i;
@@ -16,12 +15,16 @@ void replace_n(){
 			break;
 		}
 	}
+	buff[79] = '\0';
 }
 int main()
 {
 	datrie_tail_pool * dtp = new_datrie_tail_pool();
 	FILE * domains = fopen("./uniq_domain.list", "r");
-	while(NULL != fgets(buff, 80, domains));
+	while(NULL != fgets(buff, 80, domains)){
+	  replace_n();
+	  dt_push_tail(buff, dtp);
+	}
 	fclose(domains);
 	while(1);/* check memory use.*/
 	return 0;
