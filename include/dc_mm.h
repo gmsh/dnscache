@@ -14,7 +14,7 @@
  * 2^capacity KB memory.
  * RETURN the pointer to a chunks list.
  */
-struct slist * mm_pre_alloc(uint32 capacity,uint8 counts);
+//struct slist * mm_pre_alloc(uint32 capacity,uint8 counts);
 
 /*
  * the main thread calls mm_init() to initialize the momery managment 
