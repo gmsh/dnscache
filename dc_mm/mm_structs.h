@@ -21,9 +21,8 @@
 struct chunk_manager {	/* manage the chunks with small capacity. */
 	uint32	chunk_cap;	/* the defined n for the capacity of  2^n-bytes chunks */
 	uint16	idle_num;	/*  the count of pre-alllocated chunks */
-	slist * idle_chucks;	/* the list of idle chunk or chunks */
-	slist * alloced_chucks;	/* the list of allocated chunk or chunks */
-	//slist * extra_chunks;   /* the dynamicly allocated chunks list */
+	slist * idle_chunks;	/* the list of idle chunk or chunks */
+	slist * alloced_chunks;	/* the list of allocated chunk or chunks */
 }	chunk_manager_table[CHUNK_TYPE_NUM];
 
 struct extra_list_manager{	/* manager the extra list of chunks */

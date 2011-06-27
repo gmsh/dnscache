@@ -8,15 +8,16 @@
 #define unlikely(x)     __builtin_expect((x),0)
 #include "dc_mm.h"
 #include "constants.h"
+#include "dc_utils.h"
 #include "datrie_tail_pool.h"
 #include <string.h>
 struct _datrie_tail_pool{
 	uint8 * pool;
-	/*
-	 * TODO memory waste of use next_free.
-	 */
-	uint32 next_free;
-	uint32 pool_size;
+  /*
+   * TODO memory waste of use next_free.
+   */
+	int32 next_free;
+	int32 pool_size;
 };
 datrie_tail_pool * new_datrie_tail_pool()
 {
@@ -30,13 +31,19 @@ datrie_tail_pool * new_datrie_tail_pool()
 int32 dt_push_tail(uint8 * tail, datrie_tail_pool * pool)
 {
 	uint32 index = pool->next_free;
-	if(unlikely(strlen((char*) tail) /* -1 for '\0' */
-			< pool->pool_size - pool->next_free -1)){
+	while(unlikely(dc_strlen((char*) tail) + 1 /* +1 for '\0'
+						    * may _not_ use to -1 in the right
+						    * part because the result is uint32
+						    */
+		       > pool->pool_size - pool->next_free)){
 		pool->pool_size = pool->pool_size * DATRIE_TAIL_POOL_INCREASING_RATE;
 		pool->pool = dc_realloc(pool->pool, pool->pool_size);
 	}
-	strcpy(pool->pool, tail);
-	pool->next_free = pool->next_free + strlen((char *)tail) + 1;
+	strcpy(pool->pool + pool->next_free, tail);
+	pool->next_free = pool->next_free + dc_strlen((char *)tail) + 1;
+#ifdef _DC_DEBUG
+	printf("%d\t%d\n", pool->next_free, pool->pool_size);
+#endif
 	return index;
 }
 

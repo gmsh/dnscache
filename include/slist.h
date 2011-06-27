@@ -76,7 +76,7 @@ void traverse(
 struct sl_node * find(void * data,struct slist * sl);
 
 /*
- * Mpve a node to slist's head
+ * Move a node to slist's head
  * RETURN 0 if success
  * RETURN 1 if failed
  */

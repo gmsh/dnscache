@@ -122,31 +122,34 @@ void find_extra(struct sl_node * sn){
  */
 void dc_free(void * ptr){
 	uint32 cap=LOG2(sizeof(ptr));
+	int pos = cap - SMALL;
 	struct sl_node * sn_ptr;
 	struct slist * sl_ptr;
 	/* if ptr is NULL,no operation is performed. */
 	if(!ptr)
 		return;
-	/* if capacity wasn't pre-allocated */
+	/* if chunks wasn't pre-allocated */
 	if(cap<SMALL || cap>BIG){
 		sl_ptr = elm_table[cap]->chunks_list;
-		sn_ptr = sl_ptr->head;
-		while(sn_ptr!=null){
-			if(sn_ptr->data==ptr){
-				if(ptr == sl_ptr->head){
-					(sl_ptr->idle_num)++;	
-					return;
-				}
-				if(ptr == sl_ptr->end){
-					s
-				}
-				
-			}
-			ptr = ptr->next;
-		}			
-	}	
-
-
-
-	if(traverse(find()))		
+		mv2head(ptr,sl_ptr);
+		(elm_table[cap]->idle_num)++;
+		/*
+		 * TODO free the memory if all the chunks is idle.
+		 */
+		return;				
+	}
+	/* if chunks was pre-allocated */
+	/* if chunk to be freed in the pre-alloc-list */
+	sl_node=find(ptr,(sl_ptr = chunk_manager_table[pos]->alloced_chunks));
+	if(sl_node){
+		push(pop(sl_ptr),chunk_manager_table[pos]->idle_chunks);
+		++(chunk_manager_table[pos]->idle_num);
+	}		
+	/* if chunk to be freed in the extra-list */
+	sl_ptr = elm_table[cap]->chunks_list;
+	mv2head(ptr,sl_ptr);
+	(elm_table[cap]->idle_num)++;
+		/*
+		 * TODO free the memory if all the chunks is idle.
+		 */
 }

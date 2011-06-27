@@ -16,7 +16,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-
+#include "typedefs.h"
 
 typedef struct _datrie_tail_pool datrie_tail_pool;
 
