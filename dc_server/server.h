@@ -15,6 +15,7 @@
 #define SERVER_H_ 1
 
 #include "typedefs.h"
+#include "dc_mm.h"
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
