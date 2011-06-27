@@ -14,8 +14,10 @@
 #ifndef SERVER_H_
 #define SERVER_H_ 1
 
+#include "constants.h"
 #include "typedefs.h"
-#include "dc_mm.h"
+//#include "dc_mm.h"
+//#include "dl_cache_stub.h"
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,12 +32,12 @@
 #include <fcntl.h>
 
 #define MAXLINE		4096
-#define	MAXDNSTHREADS	8192	/* the number of DNS threads  */
-#define	MAXSERVTHREADS	4096	/* the number of work threads */
+//#define	MAXDNSTHREADS	8192	/* the number of DNS threads  */
+//#define	MAXSERVTHREADS	4096	/* the number of work threads */
 
 typedef struct{
 	pthread_t thread_tid;	/* thread ID */
-	unsigned long	thread_count;	/* works handled, just for test */
+//	unsigned long	thread_count;	/* works handled, just for test */
 } thread_t;
 
 
@@ -57,6 +59,9 @@ typedef struct{
 
 thread_t *dns_thread_tptr;	/* point to the memory alloc for 
 				   dns threads	
+				 */
+thread_t *work_thread_tptr;	/* point to the memory alloc for 
+				   work threads	
 				 */
 dns_thread_t dns_array[MAXDNSTHREADS];		
 				/*

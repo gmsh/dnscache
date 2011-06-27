@@ -7,6 +7,7 @@ TARGETA = dnsrequest
 TARGETB = libwraps.a
 TARGETC = thread_make.o 
 TARGETD = moveport
+TARGETE = mainserver
 
 
 CC = gcc
@@ -18,7 +19,7 @@ LIB = -Llib -lwraps -lpthread
 #CFLAGS = -o -ansi  
 
 
-all: $(TEST) $(TARGETB) $(TARGETC) $(TESTC)  $(TARGETD)
+all: $(TEST) $(TARGETB) $(TARGETC) $(TESTC)  $(TARGETD) $(TARGETE)
 
 $(TARGETA).o:$(TARGETA).c 
 	$(CC) $(CFLAGS) -c  $^  $(LIB)
@@ -39,7 +40,14 @@ $(TARGETD): $(TARGETD).o
 	mv $@ $(DESTDIR)
 
 
-$(TEST).o: $(TEST).c
+$(TARGETE).o: $(TARGETE).c
+	$(CC) $(CFLAGS) -c $^
+$(TARGETE): $(TARGETE).o
+	$(CC) $(CFLAGS) -o $@ $^
+	mv $@ $(DESTDIR)
+
+
+$(TEST).o: $(TEST).c $(TARGETB)
 	$(CC) $(CFLAGS) -c $^
 $(TEST): $(TARGETA).o $(TEST).o  $(TARGETC)
 	$(CC) $(CLAGS) -o $@  $^ $(LIB)
@@ -55,6 +63,6 @@ $(TESTC): $(TESTC).o
 	
 .PHONY:clean
 clean:
-	rm *.o  *.a
+	rm *.o  
 
 #all:dc_server

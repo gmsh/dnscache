@@ -9,7 +9,7 @@
  ********************************************************************/
 
 #include "server.h"
-
+#include "dc_mm.h"
 void thread_make_dns(int i)
 {
 	void*	thread_main_dns(void *);
