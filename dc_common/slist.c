@@ -119,10 +119,45 @@ int push(void * data, struct slist *sl)
   }
 }
 
+struct sl_node * find(void * data,struct slist * sl){
+	struct sl_node * ptr;
+	ptr = sl->head;
+	while(ptr){
+		if(ptr->data == data)
+			return ptr;
+		ptr=ptr->next;	
+	}
+	return NULL;
+}
+
+int mv2head(void * data,struct slist * sl){
+	struct sl_node * cur, * pre;
+	cur = sl->head;
+	if(cur->data == data)
+		return 0;
+	pre = cur;
+	cur = cur->next;
+	while(cur){
+		if(cur->data == data){
+			if(cur == sl->end)
+				sl->end = pre;
+			pre->next = cur->next;
+			cur = sl->head;
+			sl->head = cur;
+			return 0;
+		}
+		pre = cur;
+		cur = cur->next;
+		return 0;
+	}
+	return 1;	
+}
+
 void traverse(void (* visit)(struct sl_node *),
 	      struct slist *sl)
 {
   struct sl_node * ptr;
+  ptr = sl->head;
   while(ptr != NULL){
     visit(ptr);
     ptr = ptr->next;

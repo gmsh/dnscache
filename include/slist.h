@@ -1,6 +1,7 @@
 /*
  * Single linked list using static memory allocation
  * Author gmsh
+ * Modified by wakemecn with add function find() and delete();
  */
 #ifndef _SLIST_H_
 #define _SLIST_H_
@@ -67,6 +68,20 @@ void traverse(
 	      struct slist * sl
 	      );
 
+/*
+ * return pointer to sl_node whose data point to
+ * datai.
+ * return null if not exist.
+ */
+struct sl_node * find(void * data,struct slist * sl);
+
+/*
+ * Mpve a node to slist's head
+ * RETURN 0 if success
+ * RETURN 1 if failed
+ */
+int mv2head(void * data,struct slist * sl);
+ 
 /*
  * free the slist
  */
