@@ -51,13 +51,10 @@ thread_main_dns(void *arg)
 			iget = 0;		
 
 		Pthread_mutex_unlock(&dns_array_mutex);
-	
 
-
-		
 		//do our job 
 		dnsrequest(domain, ipptr + count);
-		free(domain);	//free the memory of domain
+		dc_free(domain);	//dc_free the memory of domain
 	
 		Pthread_mutex_lock(mutex);
 		(*number)--;
@@ -65,10 +62,10 @@ thread_main_dns(void *arg)
 
 		if((*number) == 0){
 			write(connfd, ipptr, total*sizeof(uint32));
-		//	close(connfd);
-			free(ipptr);
-			free(number);
-			free(mutex);
+		//	close(connfd);	//todo
+			dc_free(ipptr);
+			dc_free(number);
+			dc_free(mutex);
 		} 
 
 
