@@ -5,10 +5,18 @@
  * decription:	dnscache's memory management
  */
 
-//#include "dc_mm.h"
+#include "dc_mm.h"
 #include "mm_structs.h"
 
-struct slist * mm_pre_alloc(uint32 capacity, uint16 counts){
+void * dc_alloc(size_t size);
+
+/*
+ * call mm_pre_alloc() to pre-allocate number of counts' chunks with 
+ * 2^capacity KB memory.
+ * RETURN the pointer to a chunks list.
+ */
+struct slist * mm_pre_alloc(uint32 capacity, uint16 counts)
+{
 	struct slist * init_idle_list;
 	void * chunk_ptr;
 	//todo
@@ -20,7 +28,14 @@ struct slist * mm_pre_alloc(uint32 capacity, uint16 counts){
 	return init_idle_list;	
 }
 
-int mm_init(){
+/*
+ * the main thread calls mm_init() to initialize the momery managment 
+ * modules.
+ * RETURN 0 if succeed;
+ * RETURN 1 if failed.
+ */
+int mm_init()
+{
 	int i = CHUNK_TYPE_NUM;
 	while(i--){
 		idle_chunks_table[i] = mm_pre_alloc((SMALL+i), num_each_chunks[i]);	
@@ -35,7 +50,8 @@ int mm_init(){
 }
 
 /* select a node from the pre-allocated idle list */
-void * select_pre_alloced(uint32 cap){
+void * select_pre_alloced(uint32 cap)
+{
 	int pos=cap-SMALL;  /* position of the pointer in the array. */
 	void * ptr;
 	if(chunks_manager_table[pos]==0)
@@ -47,7 +63,8 @@ void * select_pre_alloced(uint32 cap){
 } 
 
 /* select a node frome the extra idle list */
-void * select_extra(uint32 cap){
+void * select_extra(uint32 cap)
+{
 	void * ptr;
 	if(elm_table[cap]->idle_num==0)
 		return dc_alloc(POW2(cap));	
@@ -57,7 +74,8 @@ void * select_extra(uint32 cap){
 	return ptr;
 }
 
-void * dc_alloc(size_t size){
+void * dc_alloc(size_t size)
+{
 	uint32 cap=floor((uint32)LOG2(size)); /* */
 	struct slist * list_ptr;
 	struct sl_node * node_ptr;
@@ -67,7 +85,7 @@ void * dc_alloc(size_t size){
 		/* if hasn't extra list */
 		if(elm_table[cap]==NULL){ 
 			elm_table[cap]=(struct extra_list_manager *)malloc(sizeof(struct extra_list_manager));
-			list_ptr=mm_pre_alloc(cap,DEFAULT_EXTRA);
+			list_ptr = mm_pre_alloc(cap , DEFAULT_EXTRA);
 			elm_table[cap]->idle_num=DEFAULT_EXTRA;
 			elm_table[cap]->total_num=DEFAULT_EXTRA;
 			elm_table[cap]->chunks_list=list_ptr;
@@ -77,14 +95,15 @@ void * dc_alloc(size_t size){
 		if(elm_table[cap]->idle_num==0){
 			list_ptr=elm_table[cap]->chunks_list;
 			list_ptr=sl_expand(list_ptr,malloc,DEFAULT_EXTRA);
-			while((node_ptr=list_ptr->blank)++ < list_ptr->end)
+			node_ptr = list_ptr->blank;
+			while(node_ptr++ < list_ptr->end)
 					node_ptr->data=malloc(POW2(cap));
-			list_ptr->idle_num += DEFAULT_EXTRA;
-			list_ptr->total_num += DEFAULT_EXTRA;
+			elm_table[cap]->idle_num += DEFAULT_EXTRA;
+			elm_table[cap]->total_num += DEFAULT_EXTRA;
 		}
 		return select_extra(cap);
 	}
-	/* capacity chunks pre-allocated .*/i
+	/* capacity chunks pre-allocated .*/
 	/* if no idle chunks */
 	if(chunks_manager_table[position]->idle_num==0){
 		/* if hasn't extra list ,then create it */
@@ -92,7 +111,7 @@ void * dc_alloc(size_t size){
 			elm_table[cap]=(struct extra_list_manager *)malloc(sizeof(struct extra_list_manager));
 			list_ptr=mm_pre_alloc(cap,DEFAULT_EXTRA);
             elm_table[cap]->idle_num=DEFAULT_EXTRA;
-			elm_tablep[cap]->total_num += DEFAULT_EXTRA;
+			elm_table[cap]->total_num += DEFAULT_EXTRA;
             elm_table[cap]->chunks_list=list_ptr;
             return select_extra(cap);
         } 
@@ -100,10 +119,11 @@ void * dc_alloc(size_t size){
 		if(elm_table[cap]->idle_num==0){
 			list_ptr=elm_table[cap]->chunks_list;
 			list_ptr=sl_expand(list_ptr,malloc,DEFAULT_EXTRA);
-			while((node_ptr=list_ptr->blank)++ < list_ptr->end)
+			node_ptr = list_ptr->blank;
+			while(node_ptr++ < list_ptr->end)
 				node_ptr->data=malloc(POW2(cap));
-		 	list_ptr->idle_num += DEFAULT_EXTRA;
-			elm_tablep[cap]->total_num += DEFAULT_EXTRA;
+		 	elm_table[cap]->idle_num += DEFAULT_EXTRA;
+			elm_table[cap]->total_num += DEFAULT_EXTRA;
 		}  
 		return select_extra(cap);
 	}
@@ -131,8 +151,8 @@ void dc_free(void * ptr){
 	}
 	/* if chunks was pre-allocated */
 	/* if chunk to be freed in the pre-alloc-list */
-	sl_node=find(ptr,(sl_ptr = chunks_manager_table[pos]->alloced_chunks));
-	if(sl_node){
+	sn_ptr = find(ptr,(sl_ptr = chunks_manager_table[pos]->alloced_chunks));
+	if(sn_ptr){
 		push(pop(sl_ptr),chunks_manager_table[pos]->idle_chunks);
 		++(chunks_manager_table[pos]->idle_num);
 	}		
@@ -144,4 +164,16 @@ void dc_free(void * ptr){
 		sl_free(free,elm_table[cap]->chunks_list);		
 		free(elm_table[cap]);	
 	}
+}
+
+void * dc_realloc(void * ptr, size_t size)
+{
+	void * new_ptr;	
+	if(size == 0)
+		dc_free(ptr);
+	if(size <= sizeof(ptr))
+		return ptr;
+	new_ptr = dc_alloc(POW2(floor(LOG2(size))));
+	memcpy(new_ptr,ptr,sizeof(ptr));
+	return new_ptr;
 }

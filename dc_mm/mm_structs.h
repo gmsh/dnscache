@@ -13,11 +13,13 @@
 #define CHUNK_TYPE_NUM ( BIG - SMALL + 1 )	/* counts of  chunk's type */
 #define POW2(x) pow(2,x)
 #define	LOG2(x) (log(x)/log(2))
-#define DEFAULT_EXTRA 4;	/* default number of each type of extra chunks  */
+#define DEFAULT_EXTRA 4	/* default number of each type of extra chunks  */
 
+#include <stdlib.h>
 #include <math.h>
 #include "typedefs.h"
-#include <stdlib.h>
+#include "slist.h"
+#include "dc_mm.h"
 
 struct chunks_manager {	/* manage the chunks with small capacity. */
 	uint32	chunks_cap;	/* the defined n for the capacity of  2^n-bytes chunks */
