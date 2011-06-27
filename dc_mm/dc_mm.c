@@ -6,7 +6,6 @@
  */
 
 #include "dc_mm.h"
-#include "dc_mm_structs.h"
 
 void * dc_alloc(size_t size);
 
