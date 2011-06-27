@@ -17,8 +17,8 @@
  * meet the demand.
  */
 struct {
-	uint32 = 1;
-	uint16 = 2;
+	uint32 a;
+	uint16 b;
 } fake_data;
 
 /*
@@ -45,7 +45,7 @@ void unlock_after_copy(uint8 * key){
 /*
  * To write a <key, data> pair to the cache.
  */
-void push(uint8 * key, void * data){
+void push_dc(uint8 * key, void * data){
 	/* do nothing here.*/
 }
 

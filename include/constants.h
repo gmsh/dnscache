@@ -27,6 +27,11 @@
 						// 1 means there are dns
 						// requests, results will be in
 						// the second message.
+#define	PORT	8888				//server port
+
+//modify 
+#define MAXDNSTHREADS   20  			/* the number of DNS threads  */
+#define MAXSERVTHREADS  200    			/* the number of work threads */
 
 
 //synckey
