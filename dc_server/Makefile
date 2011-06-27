@@ -6,6 +6,7 @@ TESTC = testclient
 TARGETA = dnsrequest
 TARGETB = libwraps.a
 TARGETC = thread_make.o 
+TARGETD = moveport
 
 
 CC = gcc
@@ -17,7 +18,7 @@ LIB = -Llib -lwraps -lpthread
 #CFLAGS = -o -ansi  
 
 
-all: $(TEST) $(TARGETB) $(TARGETC) $(TESTC) 
+all: $(TEST) $(TARGETB) $(TARGETC) $(TESTC)  $(TARGETD)
 
 $(TARGETA).o:$(TARGETA).c 
 	$(CC) $(CFLAGS) -c  $^  $(LIB)
@@ -28,7 +29,14 @@ $(TARGETB): wraps.c errors.c
 	cp $@ ./lib
 
 $(TARGETC):thread_make.c $(TARGETA).o 
-	gcc $(CFLAGS) -c  $^	$(LIB)
+	$(CC) $(CFLAGS) -c  $^	$(LIB)
+
+$(TARGETD).o: $(TARGETD).c
+	$(CC) $(CFLAGS) -c $(TARGETD).c
+
+$(TARGETD): $(TARGETD).o
+	$(CC) $(CFLAGS) -o $@ $^
+	mv $@ $(DESTDIR)
 
 
 $(TEST).o: $(TEST).c

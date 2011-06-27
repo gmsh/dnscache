@@ -9,7 +9,7 @@
  ********************************************************************/
 
 #include "server.h"
-
+#include "dc_mm.h"
 
 int dnsrequest(char *, uint32 *);
 pthread_mutex_t	dns_array_mutex= PTHREAD_MUTEX_INITIALIZER;
@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 	socklen_t addrlen, clilen;
 	struct sockaddr_in cliaddr, servaddr;
 	int  *number, count, total;
-	char *cptra, *cptrb ;
+	char *cptr[5];
 	uint32 *ipptr;
 	pthread_mutex_t *mutex;
 	
@@ -45,68 +45,42 @@ int main(int argc, char **argv)
 	for(i = 0; i < 20; i ++ )
 		thread_make_dns(i);
 
-
 	for(;;){
 		clilen = sizeof(cliaddr);
 		connfd = accept(listenfd, (struct sockaddr *)&cliaddr,
 				&clilen);
 		printf("client connected\n");
-		cptra = (char *)malloc(64*sizeof(char));
-		strcpy(cptra,"baidu.com");
-		cptrb = (char *)malloc(64*sizeof(char));
-		strcpy(cptrb,"google.com");
-		number= (int *)malloc(sizeof(int)); 
-		*number = 2;
-		ipptr = (uint32 *)malloc(5*sizeof(uint32));
-		mutex = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+		number= (int *)dc_alloc(sizeof(int)); 
+		*number = 5;
+		ipptr = (uint32 *)dc_alloc(5*sizeof(uint32));
+		mutex = (pthread_mutex_t *)dc_alloc(sizeof(pthread_mutex_t));
 		Pthread_mutex_init(mutex, NULL);
-
-
-		Pthread_mutex_lock(&dns_array_mutex);
-//		while((iget!=0)&&((iget + 1) % MAXDNSTHREADS == iput))
-//			sleep(0.02);
-		dns_array[iput].domain = cptra;
-		dns_array[iput].sockfd = connfd;
-		dns_array[iput].number = number;
-		dns_array[iput].count  = 0;
-		dns_array[iput].total  = 2;
-		dns_array[iput].ipptr  = ipptr;
-		dns_array[iput].mutex  = mutex;
-		if(++iput == MAXDNSTHREADS)
-			iput = 0;
-		if(iget == iput )
-			exit(0);
-
-		Pthread_cond_signal(&dns_array_cond);
-		Pthread_mutex_unlock(&dns_array_mutex);
-		printf("OK1\n");
-	
 		
-		Pthread_mutex_lock(&dns_array_mutex);
+		for(i=0; i < 5 ; i++){
+			cptr[i] = (char *)dc_alloc(64*sizeof(char));
+			strcpy(cptr[i],"google.com");
+			Pthread_mutex_lock(&dns_array_mutex);
 //		while((iget!=0)&&((iget + 1) % MAXDNSTHREADS == iput))
 //			sleep(0.02);
-		printf("OK3\n");
-		dns_array[iput].domain = cptrb;
-		dns_array[iput].number = number;
-		dns_array[iput].count  = 1;
-		dns_array[iput].total  = 2;
-		dns_array[iput].ipptr  = ipptr;
-		dns_array[iput].mutex  = mutex;
-		dns_array[iput].sockfd = connfd;
-		if(++iput == MAXDNSTHREADS)
-			iput = 0;
-		if(iget == iput  )
-			exit(0);
-		Pthread_cond_signal(&dns_array_cond);
-		Pthread_mutex_unlock(&dns_array_mutex);
-		printf("OK2\n");
+			
+			dns_array[iput].domain = cptr[i];
+			dns_array[iput].sockfd = connfd;
+			dns_array[iput].number = number;
+			dns_array[iput].count  = i;
+			dns_array[iput].total  = 5;
+			dns_array[iput].ipptr  = ipptr;
+			dns_array[iput].mutex  = mutex;
+			if(++iput == MAXDNSTHREADS)
+				iput = 0;
+			if(iget == iput )
+				exit(0);
+
+			Pthread_cond_signal(&dns_array_cond);
+			Pthread_mutex_unlock(&dns_array_mutex);
+	
+		}
 
 	}
-
-
-
-
-
 
 	/*test the function dnsrequest */
 	/*
