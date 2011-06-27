@@ -19,7 +19,6 @@
 #include <math.h>
 #include "typedefs.h"
 #include "slist.h"
-#include "dc_mm.h"
 
 struct chunks_manager {	/* manage the chunks with small capacity. */
 	uint32	chunks_cap;	/* the defined n for the capacity of  2^n-bytes chunks */
