@@ -17,6 +17,21 @@ void replace_n(){
 	}
 	buff[79] = '\0';
 }
+void output(datrie_tail_pool * pool)
+{
+  /*
+   * get the next_free value.
+   */
+  uint32 size = (uint32)*(uint32 *)((uint8 **)pool + 1);
+  uint32 i;
+  for(i = 0; i < size; i++){
+
+    if('\0' == ((uint8 *)(*(uint8 **)pool))[i])
+      putchar('\n');
+    else
+      putchar(((uint8 *)(*(uint8 **)pool))[i]);
+  }
+}
 int main()
 {
 	datrie_tail_pool * dtp = new_datrie_tail_pool();
@@ -26,6 +41,9 @@ int main()
 	  dt_push_tail(buff, dtp);
 	}
 	fclose(domains);
-	while(1);/* check memory use.*/
-	return 0;
+	FILE * to_save = fopen("./out.tail", "rw");
+	long val = write_datp_to_file(to_save, 0, dtp);
+	fclose(to_save);
+	output(dtp);
+      	return 0;
 }
