@@ -6,13 +6,17 @@
  *
  *  DATrie tail pool for keeping suffixes.
  *	Note that in the initial implementation, byte order is
- *	platform relative.
+ *	platform relative. The Tail save the symbols not the
+ *	code, because both a symbol and a code is actually
+ *	uint8. get_char(get_code(i)) = i.
  */
 
 #ifndef DATIRE_TAIL_H_
 #define DATIRE_TAIL_H_
 
 #include <stdlib.h>
+#include <stdio.h>
+
 
 typedef struct _datrie_tail_pool datrie_tail_pool;
 
