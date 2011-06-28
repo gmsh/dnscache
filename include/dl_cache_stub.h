@@ -22,6 +22,15 @@ struct {
 } fake_data;
 
 /*
+ * To initialize the dl_cache.
+ * size_per_data is the size of data.
+ * In the stub, please call dl_cache_init(sizeof(fake_data));
+ */
+void dl_cache_init(size_t size_per_data){
+	/* do nothing here.*/
+}
+
+/*
  * To get the data by the given key. The function return the pointer to
  * the data correspond to the key if hit, otherwise, that is a miss,
  * return NULL.
