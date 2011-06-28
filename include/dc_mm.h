@@ -15,11 +15,11 @@
  * returns either NULL, or a unique pointer value that can later  be  suc‐
  * cessfully passed to dc_free().
  */
-void * dc_alloc(size_t size);
-/*{
- *  return malloc(size);
- *}
- */
+void * dc_alloc(size_t size)
+{
+	return malloc(size);
+}
+
 
 /*
  * dc_free()  frees  the memory space pointed to by ptr, which must have been
@@ -27,11 +27,11 @@ void * dc_alloc(size_t size);
  * has already been called before, undefined behavior
  * occurs.  If ptr is NULL, no operation is performed.
  */
-void dc_free(void * ptr);
-/*{
- * free(ptr);
- *}
- */
+void dc_free(void * ptr)
+{
+	free(ptr);
+}
+
 
 /*
  * The  dc_realloc() function changes the size of the memory block pointed to
