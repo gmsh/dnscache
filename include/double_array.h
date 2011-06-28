@@ -21,6 +21,7 @@
  *		base[0] = -rm;
  *		base[r1] = -r0;
  *		base[ri] = -r( i - 1)
+ *  cell[1] is the root cell.     
  *
  *	Note that in the initial implementation, byte order is
  *	platform relative, and the data pointer is set to zero
