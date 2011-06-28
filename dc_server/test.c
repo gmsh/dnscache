@@ -55,10 +55,19 @@ int main(int argc, char **argv)
 		ipptr = (uint32 *)dc_alloc(5*sizeof(uint32));
 		mutex = (pthread_mutex_t *)dc_alloc(sizeof(pthread_mutex_t));
 		Pthread_mutex_init(mutex, NULL);
+		cptr[0] = (char *)dc_alloc(64*sizeof(char));
+		cptr[1] = (char *)dc_alloc(64*sizeof(char));
+		cptr[2] = (char *)dc_alloc(64*sizeof(char));
+		cptr[3] = (char *)dc_alloc(64*sizeof(char));
+		cptr[4] = (char *)dc_alloc(64*sizeof(char));
 		
+		strcpy(cptr[0],"qq.com");
+		strcpy(cptr[1],"baidu.com");
+		strcpy(cptr[2],"cnbeta.com");
+		strcpy(cptr[3],"sina.com");
+		strcpy(cptr[4],"google.com");
+
 		for(i=0; i < 5 ; i++){
-			cptr[i] = (char *)dc_alloc(64*sizeof(char));
-			strcpy(cptr[i],"google.com");
 			Pthread_mutex_lock(&dns_array_mutex);
 //		while((iget!=0)&&((iget + 1) % MAXDNSTHREADS == iput))
 //			sleep(0.02);

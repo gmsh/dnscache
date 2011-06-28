@@ -9,9 +9,26 @@
  ********************************************************************/
 #include "server.h"
 
+#define  INPUTFILE "out.list"
+#define  LINES      5
 int
 main()
 {
+	FILE *fp ;
+        int i =0 ;
+        fp = fopen(INPUTFILE, "r");
+	uint32 total_length = 0;
+        char readbuff[4096];
+        while(fgets(readbuff, 4096, fp) != NULL){
+        	total_length += strlen(readbuff);
+		if (LINES == ++i)
+			break;
+        } 
+	total_length += HEAD_LENGTH;
+	fseek(fp, 0, SEEK_SET);
+
+
+
         int sockfd;
         struct sockaddr_in servaddr;
         sockfd = socket(AF_INET, SOCK_STREAM, 0); 
@@ -24,26 +41,40 @@ main()
                 printf("connect failed\n");
         else    printf("conneted \n");
 	
-	
-	uint32 total_length=13+14;
         uint8 *buf = (uint8 *)malloc(total_length*sizeof(uint8));
-	uint32 magic_number = MAGIC_NUMBER;
-	uint32 request_number= 1;
-	uint8  reserved_byte = 'F';
+
 
 	*((uint32 *)buf) = total_length;
-	*((uint32 *)(buf + TOTAL_LENGTH)) = magic_number;
-	*((uint32 *)(buf + TOTAL_LENGTH + MAGIC_NUMBER_LENGTH)) = request_number;
+	*((uint32 *)(buf + TOTAL_LENGTH)) = MAGIC_NUMBER;
+	*((uint32 *)(buf + TOTAL_LENGTH + MAGIC_NUMBER_LENGTH)) = 1;
 	*((uint8 *)(buf + TOTAL_LENGTH + MAGIC_NUMBER_LENGTH +
-		REQUEST_NUMBER_LENGTH))=reserved_byte;
-	strcpy(buf+13,"www.baidu.com");
-	strcpy(buf+ 13 + 14,"www.baidu.com");
-	*( buf+ 13 + 13 + 13) = 0;
+		REQUEST_NUMBER_LENGTH))= 'F' ;
+        i = 0;
+	uint32 readcount = HEAD_LENGTH;
+	while(fgets(readbuff, 4096, fp) != NULL){
+		readbuff[strlen(readbuff) - 1] = '\0';
+		strcpy(buf + readcount, readbuff);
+       		readcount += strlen(readbuff) + 1;
+		if (++i == LINES)
+			break;
+        } 
+	
 
 	write(sockfd, buf, total_length);
+	uint32 *retbuf = (uint32 *)malloc(LINES*sizeof(uint32));
+ 	read(sockfd, buf, LINES*sizeof(uint32));
+        char ipstr[16];
+        for(i = 0 ; i < 16 ;i++)
+                ipstr[i] = '\0';
+        for(i = 0; i<LINES; i++){
+        inet_ntop(AF_INET, (in_addr_t *)(buf+i), ipstr , 16);
+                printf("%s\n", ipstr);
+        }   
+    
 
         //read(sockfd, buf, 100);
         close(sockfd);
+	fclose(fp);
 
 }
 /***************  END OF servtest.c  **************/
