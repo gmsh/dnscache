@@ -17,10 +17,12 @@ void * dc_alloc(size_t size);
 struct slist * mm_pre_alloc(uint32 capacity, uint16 counts)
 {
 	struct slist * init_idle_list;
-	void * chunk_ptr;
+	struct chunk * chunk_ptr;
 	init_idle_list = mk_slist(malloc,counts);  /* 构造链表 */
 	while(counts--){
-		chunk_ptr = malloc(POW2(capacity));/* 申请空间 */
+		chunk_ptr = malloc(sizeof(chunk));/* 申请空间 */
+		chunk_ptr->chunk_cap = capacity;
+		chunk_ptr->mem = malloc(POW2(capacity));
 		push(chunk_ptr,init_idle_list);  /* 压入链表中*/
 	}
 	return init_idle_list;	
