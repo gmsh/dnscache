@@ -81,7 +81,7 @@ struct _dobule_array {
  * _next_code and _next_state will not be set if the input
  * char is '\0';
  */
-static inline enum cell_state next_state(state current_state,
+static inline enum cell_state check_next_state(state current_state,
 					 uint8 * key,
 					 int offset,
 					 code * _next_code,
@@ -89,9 +89,10 @@ static inline enum cell_state next_state(state current_state,
 					 double_arrary * da)
 {
   /* TODO use mask to implement */
-  if('\0' == *(key + offset))
+  uint8 input_char = *(key + offset);
+  if('\0' == input_char)
     return eok;
-  *_next_code = get_code(*(key + offset++));
+  *_next_code = get_code(*(input_char));
   *_next_state = da->cells[current_state].base + *_next_code;
   if(unlikely(*_next_state > da->cell_nums))
     return overflow;
@@ -175,10 +176,10 @@ void da_insert(uint8 * key, void * data,
 	       double_array * da)
 {
   int32 offset = 0;
-  state s = ROOT_STATE;
+  state _current_state = ROOT_STATE, _next_state;
   code _next_code;
   do{
-    _cell_state = next_state(s, key, offset, &_next_code, &s, da);
+    _cell_state = check_next_state(s, key, offset, &_next_code, &s, da);
     switch(_cell_state){
     case in_da:
       /* s = next state */
@@ -195,6 +196,7 @@ void da_insert(uint8 * key, void * data,
        * current state. Then base[next_state]
        * = -dt_push_tail("c");
        */
+      
       break;
     case occupied_by_other:
       break;
@@ -222,19 +224,23 @@ void * da_get_data(uint8 * key, double_array * da)
   void * to_return;
   state _current_state = ROOT_STATE, _next_state;
   code _next_code;
+  int32 offset = 0;
   while(1){
     _cell_state = 
-      next_state(_current_state, key, offset,
+      check_next_state(_current_state, key, offset++,
 		 &_next_code, &next_state, da);
     switch(_cell_state){
     case in_da:
-      /* s = next state */
+      /* move to next state */
+      _current_state = _next_state;
       break;
     case in_tail:
-      /* s = next state */
+      /* return the next state's data */
+      return da->cells[_next_state].user_data;
     case eok:
-      /* s not changed */
-      return da->cells[s].user_data;
+      /* state not changed 
+       * return the data. */
+      return da->cells[current_state].user_data;
     case invalid:
     case overflow:
     case occupied_by_other:
