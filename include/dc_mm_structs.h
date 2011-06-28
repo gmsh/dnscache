@@ -14,9 +14,12 @@
 #define POW2(x) (0x0000000000000001 << x)
 #define	LOG2(x) ffs(x)
 #define DEFAULT_EXTRA 4	/* default number of each type of extra chunks  */
+#define BIGGEST_CAP 30
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
+#include <pthread.h>
 #include "typedefs.h"
 #include "slist.h"
 
@@ -31,7 +34,7 @@ struct extra_list_manager{	/* manager the extra list of chunks */
 	uint16 idle_num;	/* idle number */
 	uint16 total_num;	/* total alloc num */
 	struct slist * chunks_list;/* pointer to the list */
-}	* elm_table[30];/* as the name shows that num in []  presents the cap*/
+}	* elm_table[BIGGEST_CAP + 1];/* as the name shows that num in []  presents the cap*/
 
 uint16 num_each_chunks[]={ 64, 64, 64, 64, 64,
                            32, 32, 32, 32, 32,
@@ -72,4 +75,6 @@ uint64 ffs(uint32 n)
   	return (uint64)c;
 }
 
+pthread_mutex_t * pre_alloc_mutex[CHUNK_TYPE_NUM];
+pthread_mutex_t * extra_mutex[BIGGEST_CAP + 1];
 #endif
