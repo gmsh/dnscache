@@ -7,7 +7,8 @@
 
 #include "double_arrary.h"
 #include "dc_mm.h"
-#incldue "dc_set.h"
+#include "dc_set.h"
+#include "datrie_tail_pool.h"
 
 typedef int32 state;
 typedef uint8 code;
@@ -66,34 +67,48 @@ struct _dobule_array {
    */
   int32 cell_num;
   da_cell * cells;
+  datire_tail_pool * tails;
 };
 
-static inline code next_code(uint8 * key,
-			     int index)
-{
-  return get_code(*(key + index++));   
-}
-
-static inline enum cell_state next_state(state s,
-					 code _next_code, double_arrary * da)
+/*
+ * check the next to the current state by input char *(key
+ * + offset).
+ * Note that if next state is invalid the _next_state
+ * will be set but useless.
+ * On another condition, next state is overflowed, the 
+ * _next_state and _next_code are set but the double array
+ * need to expand.
+ * _next_code and _next_state will not be set if the input
+ * char is '\0';
+ */
+static inline enum cell_state check_next_state(state current_state,
+					 uint8 * key,
+					 int offset,
+					 code * _next_code,
+					 state * _next_state,
+					 double_arrary * da)
 {
   /* TODO use mask to implement */
-  state t = da->cells[s].base + _next_code;
-  if(unlikely(t > da->cell_nums))
+  uint8 input_char = *(key + offset);
+  if('\0' == input_char)
+    return eok;
+  *_next_code = get_code(*(input_char));
+  *_next_state = da->cells[current_state].base + *_next_code;
+  if(unlikely(*_next_state > da->cell_nums))
     return overflow;
-  if(da->cells[t].check == s){
-    if (da->cells[t].base < 0)
+  if(da->cells[_next_state].check == s){
+    if (da->cells[_next_state].base < 0)
       return in_tail;
     else
       return in_da;
   }else{
-    if(da->cells[t].check < 0){
-      if(unlikely(da->cells[t].base > 0))
+    if(da->cells[_next_state].check < 0){
+      if(unlikely(da->cells[_next_state].base > 0))
 	return invalid;
       else
 	return idle;
     }else{
-      if(unlikely(da->cells[t].base < 0))
+      if(unlikely(da->cells[_next_state].base < 0))
 	return invalid;
       else
 	return occupied_by_other;
@@ -131,7 +146,7 @@ double_array * new_double_array()
     to_return->-(to_return->cellnum - 1);
   to_return->cells[to_return->cellnum -1]
     = 0;
-  
+  to_return->tails = new_datrie_tail_pool();
   return to_return;
 }
 
@@ -160,17 +175,51 @@ static void expand_double_array(double_arrary * da)
 void da_insert(uint8 * key, void * data, 
 	       double_array * da)
 {
-  int32 index = 0;
-  int32 state = ROOT_STATE;
-  code c;
+  int32 offset = 0;
+  state _current_state = ROOT_STATE, _next_state;
+  code _next_code;
   do{
-    c = next_code(key, index);
-    switch(c){
-    case overflow:
-      break;
-    case occupied_by_othre:
-      break;
+    _cell_state =
+      check_next_state(_current_state, key,
+		       offset++, &_next_code,
+		       &_next_state, da);
+    switch(_cell_state){
     case in_da:
+      /* move ahead */
+      _current_state = _next_state;
+      break;
+    case idle:
+      /*
+       * Considering the following scenario, 
+       * the key is abc and the input char
+       *             ^
+       * is b. 
+       * next_state = base[current_state] + code(b)
+       * and the next state cell is idle.
+       * We let the check[next_state] equal to
+       * current state. Then base[next_state]
+       * = -dt_push_tail("c");
+       * We save the data in the next state.
+       */
+      da->cells[_next_state].check = _current_state;
+      da->cells[_next_state].base =
+	-(dt_push_tail(key + offset, da->tails));
+      da->cells[_next_state].userdata = data.
+      return;
+    case occupied_by_other:
+      break;/*TODO*/
+    case eok:
+      /*
+       * In this scenario, we save the data
+       * in the current state.
+       */
+      da->cells[_current_state].userdata = data;
+      break;
+    case overflow:
+      /* s = next state  */
+      do{
+	expand_double_array(da);
+      }while(s > da->cell_num);
       break;
     case in_tail:
       break;
@@ -179,7 +228,43 @@ void da_insert(uint8 * key, void * data,
     default:
       return;
     }
-  }while(END_CODE != c);
+  }while(1);/**/
    
 }
 
+void * da_get_data(uint8 * key, double_array * da)
+{
+  void * to_return;
+  state _current_state = ROOT_STATE, _next_state;
+  code _next_code;
+  int32 offset = 0;
+  while(1){
+    _cell_state = 
+      check_next_state(_current_state, key, offset++,
+		 &_next_code, &next_state, da);
+    switch(_cell_state){
+    case in_da:
+      /* move to next state */
+      _current_state = _next_state;
+      break;
+    case in_tail:
+      /* compare the tail & the remanent. */
+      uint8 * tail = dt_get_tail(
+				 -(da->cells[_next_state].base)
+				 da->tails
+				 );
+      if(0 == strcmp(tail, key + offset))
+	return da->cells[_next_state].user_data;
+      else
+	return NULL;
+    case eok:
+      /* state not changed 
+       * return the data. */
+      return da->cells[current_state].user_data;
+    case invalid:
+    case overflow:
+    case occupied_by_other:
+      return NULL;
+    }
+  }
+}
