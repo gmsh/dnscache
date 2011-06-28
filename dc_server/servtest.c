@@ -25,16 +25,19 @@ main()
         else    printf("conneted \n");
 	
 	
-        uint8 *buf = (uint8 *)malloc(10*sizeof(uint8));
-	uint32 totallength=10;
-	*buf = totallength;
-	*(buf+4) = 'a';
-	*(buf+5) = 'b';
-	*(buf+6) = 'c';
-	*(buf+7) = 'd';
-	*(buf+8) = 'e';
-	*(buf+9) = 'f';
-	write(sockfd, buf, 10);
+	uint32 total_length=13;
+        uint8 *buf = (uint8 *)malloc(total_length*sizeof(uint8));
+	uint32 magic_number = MAGIC_NUMBER;
+	uint32 request_number= 1;
+	uint8  reserved_byte = 'F';
+
+	*((uint32 *)buf) = total_length;
+	*((uint32 *)(buf + TOTAL_LENGTH)) = magic_number;
+	*((uint32 *)(buf + TOTAL_LENGTH + MAGIC_NUMBER_LENGTH)) = request_number;
+	*((uint8 *)(buf + TOTAL_LENGTH + MAGIC_NUMBER_LENGTH +
+		REQUEST_NUMBER_LENGTH))=reserved_byte;
+
+	write(sockfd, buf, total_length);
 
         //read(sockfd, buf, 100);
         close(sockfd);

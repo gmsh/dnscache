@@ -10,6 +10,7 @@ TARGETC = dns_thread_make.o
 TARGETD = moveport
 TARGETE = mainserver
 TARGETF = serv_thread_make.o
+TARGETG = init.o
 
 
 CC = gcc
@@ -44,11 +45,14 @@ $(TARGETD): $(TARGETD).o
 
 $(TARGETE).o: $(TARGETE).c
 	$(CC) $(CFLAGS) -c $^
-$(TARGETE): $(TARGETE).o $(TARGETF)
-	$(CC) $(CFLAGS) -o $@ $^ $(LIB)
+$(TARGETE): $(TARGETE).o $(TARGETF) $(TARGETG)
+	$(CC) $(CFLAGS) -o $@ $^ $(LIB) 
 	mv $@ $(DESTDIR)
 
 $(TARGETF): serv_thread_make.c $(TARGETB)
+	$(CC) $(CFLAGS) -c  $^	$(LIB)
+
+$(TARGETG): init.c 
 	$(CC) $(CFLAGS) -c  $^	$(LIB)
 
 

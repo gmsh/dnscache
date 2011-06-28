@@ -13,6 +13,10 @@
 int
 main(int argc, char **argv)
 {
+	
+	init();			//init the server
+
+
 	int 	i;
 	socklen_t addrlen;
 	struct sockaddr_in servaddr;
