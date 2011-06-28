@@ -36,7 +36,7 @@
 #define MAXDNSTHREADS   20  			/* the number of DNS threads  */
 #define MAXSERVTHREADS  200    			/* the number of work threads */
 
-
+#define MAXLISTENQ	4096
 //synckey
 
 #endif /* CONSTANTS_H_ */

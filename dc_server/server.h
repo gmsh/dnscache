@@ -60,8 +60,8 @@ typedef struct{
 thread_t *dns_thread_tptr;	/* point to the memory alloc for 
 				   dns threads	
 				 */
-thread_t *work_thread_tptr;	/* point to the memory alloc for 
-				   work threads	
+thread_t *serv_thread_tptr;	/* point to the memory alloc for 
+				   connect threads	
 				 */
 dns_thread_t dns_array[MAXDNSTHREADS];		
 				/*
@@ -76,14 +76,22 @@ pthread_mutex_t dns_array_mutex;/*
 pthread_cond_t	dns_array_cond; /*
 				 *  notify the dns threads;
 				 */
+pthread_mutex_t serv_thread_mutex;
+				/*
+				 * server threads'  lock
+				 */
 
 int iget, iput;			/* 
 				 * iget, next idex to put in dns array,
 				 * iput, next to read 
 				 */
+
+int serv_listenfd;
 void thread_make_dns(int i);
 void *thread_main_dns(void *arg);
-
+void thread_make_serv(int i);
+void *thread_main_serv(void * arg);
+void init(void);
 
 /* wraped functions */
 void	Pthread_create(pthread_t *, const pthread_attr_t *,
