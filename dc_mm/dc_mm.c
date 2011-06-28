@@ -44,7 +44,13 @@ int mm_init()
 		chunks_manager_table[i]->idle_num = num_each_chunks[i];
 		chunks_manager_table[i]->idle_chunks = idle_chunks_table[i];
 		chunks_manager_table[i]->alloced_chunks = NULL;
+		pre_alloc_mutex[i] = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+		pthread_mutex_init(pre_alloc_mutex[i] , NULL);
 	}
+	int j = BIGGEST_CAP + 1;
+	while(--j)
+		extra_mutex[j] = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+		pthread_mutex_init(extra_mutex[j] , NULL);
 	return 0;	
 }
 
@@ -55,9 +61,11 @@ void * select_pre_alloced(uint64 cap)
 	void * ptr , * chunk_ptr;
 	if(0 == chunks_manager_table[pos]->idle_num)
 		return dc_alloc(POW2(cap));
+	pthread_mutex_lock(pre_alloc_mutex[pos]);
 	ptr = pop(chunks_manager_table[pos]->idle_chunks);
 	push(ptr,chunks_manager_table[pos]->alloced_chunks);
 	--(chunks_manager_table[pos]->idle_num);
+	pthread_mutex_unlock(pre_alloc_mutex[pos]);
 	chunk_ptr = (void *)((uint64 *)ptr + 1);
 	return chunk_ptr; 
 } 
@@ -68,9 +76,11 @@ void * select_extra(uint64 cap)
 	void * ptr , * chunk_ptr;
 	if(0 == elm_table[cap]->idle_num)
 		return dc_alloc(POW2(cap));
+	pthread_mutex_lock(extra_mutex[cap]);
 	ptr = pop(elm_table[cap]->chunks_list);
 	append(ptr,elm_table[cap]->chunks_list);
 	--(elm_table[cap]->idle_num);
+	pthread_mutex_unlock(extra_mutex[cap]);
 	chunk_ptr = (void *)((uint64 *)ptr + 1);
 	return chunk_ptr;
 }
@@ -78,6 +88,8 @@ void * select_extra(uint64 cap)
 /* make a new extra list with specific capacity */
 void mk_el(uint64 cap){
 	struct slist * list_ptr;
+	if(!elm_table[cap])
+		return;
 	elm_table[cap] = (struct extra_list_manager *)malloc(sizeof(struct extra_list_manager));
 	list_ptr = mm_pre_alloc(cap , DEFAULT_EXTRA);
 	elm_table[cap]->idle_num = DEFAULT_EXTRA;
@@ -114,12 +126,16 @@ void * dc_alloc(size_t size)
 	if( cap < SMALL || cap > BIG){ 
 		/* if hasn't extra list */
 		if(NULL == elm_table[cap]){
+			pthread_mutex_lock(extra_mutex[cap]);
 			mk_el(cap);	
+			pthread_mutex_unlock(extra_mutex[cap]);
 			return select_extra(cap);
 		}
 		/* if has extra list but full,then expand */
 		if(0 == elm_table[cap]->idle_num)
+			pthread_mutex_lock(extra_mutex[cap]);
 			expand_el(cap);	
+			pthread_mutex_unlock(extra_mutex[cap]);
 		return select_extra(cap);
 	}
 	/* capacity chunks pre-allocated .*/
@@ -127,22 +143,20 @@ void * dc_alloc(size_t size)
 	if(0 == chunks_manager_table[position]->idle_num){
 		/* if hasn't extra list ,then create it */
 		if(NULL == elm_table[cap]){
+			pthread_mutex_lock(extra_mutex[cap]);
 			mk_el(cap);            
+			pthread_mutex_unlock(extra_mutex[cap]);
 			return select_extra(cap);
         } 
 		/* if has extra list ,but full ,then expand it */
 		if(0 == elm_table[cap]->idle_num)
+			pthread_mutex_lock(extra_mutex[cap]);
 			expand_el(cap);
+			pthread_mutex_unlock(extra_mutex[cap]);
 		return select_extra(cap);
 	}
 	/* if has idle chunck */
 	return select_pre_alloced(cap);
-}
-
-void free_extra(uint64 cap){
-	struct slist * sl_ptr;
-	sl_ptr = elm_table[cap]->chunks_list;
-	
 }
 
 void dc_free(void * ptr){
@@ -157,11 +171,13 @@ void dc_free(void * ptr){
 	/* if chunks wasn't pre-allocated */
 	if(cap < SMALL || cap > BIG){
 		sl_ptr = elm_table[cap]->chunks_list;
+		pthread_mutex_lock(extra_mutex[cap]);
 		mv2head(word_before_ptr,sl_ptr);
 		if(++(elm_table[cap]->idle_num) == elm_table[cap]->total_num ){
 			sl_free(free,elm_table[cap]->chunks_list);		
 			free(elm_table[cap]);	
 		}
+		pthread_mutex_unlock(extra_mutex[cap]);
 		return;				
 	}
 	/* if chunks was pre-allocated */
@@ -169,17 +185,21 @@ void dc_free(void * ptr){
 	sl_ptr = chunks_manager_table[pos]->alloced_chunks;
 	int found = find(word_before_ptr,sl_ptr);
 	if(found){
+		pthread_mutex_lock(pre_alloc_mutex[pos]);
 		push(pop(sl_ptr),chunks_manager_table[pos]->idle_chunks);
 		++(chunks_manager_table[pos]->idle_num);
+		pthread_mutex_unlock(pre_alloc_mutex[pos]);
 	}		
 	/* if chunk to be freed in the extra-list */
 	sl_ptr = elm_table[cap]->chunks_list;
+	pthread_mutex_lock(extra_mutex[cap]);
 	mv2head(word_before_ptr,sl_ptr);
 	(elm_table[cap]->idle_num)++;
 	if(elm_table[cap]->idle_num == elm_table[cap]->total_num ){
 		sl_free(free,elm_table[cap]->chunks_list);		
 		free(elm_table[cap]);	
 	}
+	pthread_mutex_unlock(extra_mutex[cap]);
 }
 
 void * dc_realloc(void * ptr, size_t size)
@@ -193,5 +213,6 @@ void * dc_realloc(void * ptr, size_t size)
 		return ptr;
 	new_ptr = dc_alloc(size);
 	memcpy(new_ptr,ptr,POW2(cap));
+	dc_free(ptr);
 	return new_ptr;
 }
