@@ -71,8 +71,8 @@ struct _dobule_array {
 };
 
 /*
- * change current state to next state by input char *(key + 
- * offset).
+ * check the next to the current state by input char *(key
+ * + offset).
  * Note that if next state is invalid the _next_state
  * will be set but useless.
  * On another condition, next state is overflowed, the 
@@ -179,10 +179,14 @@ void da_insert(uint8 * key, void * data,
   state _current_state = ROOT_STATE, _next_state;
   code _next_code;
   do{
-    _cell_state = check_next_state(s, key, offset, &_next_code, &s, da);
+    _cell_state =
+      check_next_state(_current_state, key,
+		       offset++, &_next_code,
+		       &_next_state, da);
     switch(_cell_state){
     case in_da:
-      /* s = next state */
+      /* move ahead */
+      _current_state = _next_state;
       break;
     case idle:
       /*
@@ -196,8 +200,10 @@ void da_insert(uint8 * key, void * data,
        * current state. Then base[next_state]
        * = -dt_push_tail("c");
        */
-      
-      break;
+      da->cells[_next_state].check = _current_state;
+      da->cells[_next_state].base =
+	-(dt_push_tail(key + offset, da->tails));
+      return;
     case occupied_by_other:
       break;
     case eok:
@@ -235,8 +241,15 @@ void * da_get_data(uint8 * key, double_array * da)
       _current_state = _next_state;
       break;
     case in_tail:
-      /* return the next state's data */
-      return da->cells[_next_state].user_data;
+      /* compare the tail & the remanent. */
+      uint8 * tail = dt_get_tail(
+				 -(da->cells[_next_state].base)
+				 da->tails
+				 );
+      if(0 == strcmp(tail, key + offset))
+	return da->cells[_next_state].user_data;
+      else
+	return NULL;
     case eok:
       /* state not changed 
        * return the data. */
