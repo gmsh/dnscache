@@ -199,14 +199,21 @@ void da_insert(uint8 * key, void * data,
        * We let the check[next_state] equal to
        * current state. Then base[next_state]
        * = -dt_push_tail("c");
+       * We save the data in the next state.
        */
       da->cells[_next_state].check = _current_state;
       da->cells[_next_state].base =
 	-(dt_push_tail(key + offset, da->tails));
+      da->cells[_next_state].userdata = data.
       return;
     case occupied_by_other:
-      break;
+      break;/*TODO*/
     case eok:
+      /*
+       * In this scenario, we save the data
+       * in the current state.
+       */
+      da->cells[_current_state].userdata = data;
       break;
     case overflow:
       /* s = next state  */
