@@ -35,15 +35,27 @@ void output(datrie_tail_pool * pool)
 int main()
 {
 	datrie_tail_pool * dtp = new_datrie_tail_pool();
-	FILE * domains = fopen("./uniq_domain.list", "r");
+	FILE * domains = fopen("./out.list", "r");
 	while(NULL != fgets(buff, 80, domains)){
 	  replace_n();
 	  dt_push_tail(buff, dtp);
 	}
 	fclose(domains);
-	FILE * to_save = fopen("./out.tail", "rw");
+	FILE * to_save = fopen("./out.tail", "w+");
 	long val = write_datp_to_file(to_save, 0, dtp);
 	fclose(to_save);
-	output(dtp);
+	//	output(dtp);
+	FILE * to_read = fopen("./out.tail", "r");
+	datrie_tail_pool *dtp2 = read_datp_from_file(to_read, 0);
+	/*
+	 * test whether the two are same
+	 */
+	int a = memcmp( (uint8 *)(*(uint8 **)dtp),
+			(uint8 *)(*(uint8 **)dtp2),
+			(uint32)*(uint32 *)((uint8 **)dtp2 + 1)
+			);
+	int b = (uint32)*(uint32 *)((uint8 **)dtp2 + 1)
+	  - (uint32)*(uint32 *)((uint8 **)dtp + 1);
+	output(dtp2);
       	return 0;
 }
