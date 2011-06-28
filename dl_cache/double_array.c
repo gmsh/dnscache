@@ -12,6 +12,12 @@
 typedef int32 state;
 typedef uint8 code;
 
+#define likely(x)       __builtin_expect((x),1)
+#define unlikely(x)     __builtin_expect((x),0)
+#define ROOT_STATE 1 /* root cell */
+#define IDLE_LIST 0 /* use cell[0] as idle list */
+#define END_CODE get_code('\0')
+
 typedef struct _da_cell {
   /*
    * state is int32 actually.
@@ -37,36 +43,64 @@ typedef struct _da_cell {
    *     check > 0;
    * }
    */
-	state base;
-	state check;
-	void * user_data;
+  state base;
+  state check;
+  void * user_data;
 } da_cell;
 
-static enum cell_state{in_use, idle, in_tail,invalid};
+static enum cell_state{
+  overflow,
+  occupied_by_other,
+  idle,
+  in_tail, /* the remanent is in tail pool, that is a tail*/
+  in_da, /* the remanent is in double_array */
+  eok, /* end of the key */
+  ininvalid
+} _cell_state;
 
 struct _dobule_array {
-	/*
-	 *	In  order to  keep a  node  number  from  exceeding the
-	 *  maximum index of the double-array,  we define the  size,
-	 *	denoted by cell_nums.
-	 */
-	int32 cell_num;
-	da_cell * cells;
+  /*
+   *	In  order to  keep a  node  number  from  exceeding the
+   *  maximum index of the double-array,  we define the  size,
+   *	denoted by cell_nums.
+   */
+  int32 cell_num;
+  da_cell * cells;
 };
 
 static inline code next_code(uint8 * key,
-			      int index)
+			     int index)
 {
   return get_code(*(key + index++));   
 }
 
-static inline enum cell_state is_walkable(state s,
-			      code _next_code)
+static inline enum cell_state next_state(state s,
+					 code _next_code, double_arrary * da)
 {
-  
+  /* TODO use mask to implement */
+  state t = da->cells[s].base + _next_code;
+  if(unlikely(t > da->cell_nums))
+    return overflow;
+  if(da->cells[t].check == s){
+    if (da->cells[t].base < 0)
+      return in_tail;
+    else
+      return in_da;
+  }else{
+    if(da->cells[t].check < 0){
+      if(unlikely(da->cells[t].base > 0))
+	return invalid;
+      else
+	return idle;
+    }else{
+      if(unlikely(da->cells[t].base < 0))
+	return invalid;
+      else
+	return occupied_by_other;
+    }
+  }
 }
 
- 
 
 double_array * new_double_array()
 {
@@ -101,11 +135,51 @@ double_array * new_double_array()
   return to_return;
 }
 
+static void expand_double_array(double_arrary * da)
+{
+  int32 origin_cell_num = da->cell_num;
+  da->cell_num *= DOUBLE_ARRARY_INCREASING_RATE;
+  da->cells = 
+    dc_realloc(sizeof(dc_cell) * da->cell_num);
+  int32 i;
+  /* initial the new memory  */
+  for(i = origin_cell_num; i < da->cell_num; i++){
+    da->cells[i].base = -(i - 1);
+    da->cells[i].check = -(i + 1);
+  }
+  /* combine the two part */ 
+  da->cells[da->cell_num - 1].check = IDLE_LIST;
+  da->cells[origin_cell_num].base = 
+    da->cells[IDLE_LIST].base;
+  da->cells[IDLE_LIST].base =
+    da->cells[da->cell_num - 1];
+  da->cells[da->cells[IDLE_LIST]].check
+    = origin_cell_num;
+}
+
 void da_insert(uint8 * key, void * data, 
 	       double_array * da)
 {
   int32 index = 0;
-  int32 state = 1;
-  
+  int32 state = ROOT_STATE;
+  code c;
+  do{
+    c = next_code(key, index);
+    switch(c){
+    case overflow:
+      break;
+    case occupied_by_othre:
+      break;
+    case in_da:
+      break;
+    case in_tail:
+      break;
+    case invalid:
+      return;
+    default:
+      return;
+    }
+  }while(END_CODE != c);
+   
 }
 

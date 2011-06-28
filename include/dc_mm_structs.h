@@ -20,6 +20,11 @@
 #include "typedefs.h"
 #include "slist.h"
 
+struct chunk { /* manage the chunk */
+	uint64 chunk_cap; /* the capacity of a chunk */
+	void * mem;		/* the pointer to the memory */ 
+}
+
 struct chunks_manager {	/* manage the chunks with small capacity. */
 	uint32	chunks_cap;	/* the defined n for the capacity of  2^n-bytes chunks */
 	uint16	idle_num;	/*  the count of pre-alllocated chunks */

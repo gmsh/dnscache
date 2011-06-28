@@ -5,7 +5,7 @@
  * decription:	dnscache's memory management
  */
 
-#include "dc_mm.h"
+#include "dc_mm_structs.h"
 
 void * dc_alloc(size_t size);
 
@@ -17,10 +17,12 @@ void * dc_alloc(size_t size);
 struct slist * mm_pre_alloc(uint32 capacity, uint16 counts)
 {
 	struct slist * init_idle_list;
-	void * chunk_ptr;
+	struct chunk * chunk_ptr;
 	init_idle_list = mk_slist(malloc,counts);  /* 构造链表 */
 	while(counts--){
-		chunk_ptr = malloc(POW2(capacity));/* 申请空间 */
+		chunk_ptr = malloc(sizeof(chunk));/* 申请空间 */
+		chunk_ptr->chunk_cap = capacity;
+		chunk_ptr->mem = malloc(POW2(capacity));
 		push(chunk_ptr,init_idle_list);  /* 压入链表中*/
 	}
 	return init_idle_list;	
@@ -51,22 +53,26 @@ void * select_pre_alloced(uint32 cap)
 {
 	int pos = cap - SMALL;  /* position of the pointer in the array. */
 	void * ptr;
-	if(0 == chunks_manager_table[pos])
+	struct chunk * chunk_ptr;
+	if(0 == chunks_manager_table[pos]->idle_num)
 		return dc_alloc(POW2(cap));
-	ptr = pop(chunks_manager_table[pos]->idle_chunks);
-	push(ptr,chunks_manager_table[pos]->alloced_chunks);
+	chunk_ptr = pop(chunks_manager_table[pos]->idle_chunks);
+	ptr = chunk_ptr->mem;
+	push(chunk_ptr,chunks_manager_table[pos]->alloced_chunks);
 	--(chunks_manager_table[pos]->idle_num);
-	return ptr; 
+	return chunk_ptr->mem; 
 } 
 
 /* select a node frome the extra idle list */
 void * select_extra(uint32 cap)
 {
 	void * ptr;
+	struct chunk * chunk_ptr;
 	if(0 == elm_table[cap]->idle_num)
-		return dc_alloc(POW2(cap));	
-	ptr = pop(elm_table[cap]->chunks_list);
-	append(ptr,elm_table[cap]->chunks_list);
+		return dc_alloc(POW2(cap));
+	chunk_ptr = pop(elm_table[cap]->chunks_list);
+	ptr = chunk_ptr->mem;
+	append(chunk_ptr,elm_table[cap]->chunks_list);
 	--(elm_table[cap]->idle_num);
 	return ptr;
 }
@@ -85,14 +91,14 @@ void mk_el(uint32 cap){
 void expand_el(uint32 cap)
 {
 	struct slist * list_ptr;
-	struct sl_node * sn_ptr;
+	struct chunk * chunk_ptr;
 	list_ptr = elm_table[cap]->chunks_list;
 	list_ptr = sl_expand(list_ptr,malloc,DEFAULT_EXTRA);
-	list_ptr = mm_pre_alloc(cap , DEFAULT_EXTRA);
 	int i = DEFAULT_EXTRA;	
 	while(i--){
-		sn_ptr->data = malloc(POW2(cap));
-		push(sn_ptr->data , list_ptr);
+		chunk_ptr->cap = cap;
+		chunk_ptr->mem = malloc(POW2(cap));
+		push(chunk_ptr , list_ptr);
 	}
 	elm_table[cap]->idle_num += DEFAULT_EXTRA;
 	elm_table[cap]->total_num += DEFAULT_EXTRA;
@@ -125,7 +131,7 @@ void * dc_alloc(size_t size)
 		if(NULL == elm_table[cap]){
 			mk_el(cap);            
 			return select_extra(cap);
-        	} 
+        } 
 		/* if has extra list ,but full ,then expand it */
 		if(0 == elm_table[cap]->idle_num)
 			expand_el(cap);
@@ -136,7 +142,7 @@ void * dc_alloc(size_t size)
 }
 
 void dc_free(void * ptr){
-	uint32 cap = LOG2(sizeof(ptr));
+	uint32 cap;// = LOG2(sizeof(ptr));
 	int pos = cap - SMALL;
 	struct sl_node * sn_ptr;
 	struct slist * sl_ptr;
