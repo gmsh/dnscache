@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include "typedefs.h"
 #include "slist.h"
+#include "dc_mm_structs.h"
 
 /* dc_alloc() allocates size bytes and returns a pointer  to  the  allocated
  * memory.   The  memory  is  not  cleared.   If  size is 0, then dc_alloc()
@@ -17,7 +18,7 @@
  */
 void * dc_alloc(size_t size)
 {
-	return malloc(size);
+  return malloc(size);
 }
 
 
@@ -29,7 +30,7 @@ void * dc_alloc(size_t size)
  */
 void dc_free(void * ptr)
 {
-	free(ptr);
+ free(ptr);
 }
 
 
@@ -44,9 +45,9 @@ void dc_free(void * ptr)
  * NULL, it must have been returned by an earlier call to  dc_alloc(),
  * dc_realloc().  If the area pointed to was moved, a dc_free(ptr) is done.
  */
-void * dc_realloc(void * ptr, size_t size);
-/*{
- *	return realloc(ptr, size);
- *}
- */
+void * dc_realloc(void * ptr, size_t size)
+{
+  return realloc(ptr, size);
+}
+
 #endif
