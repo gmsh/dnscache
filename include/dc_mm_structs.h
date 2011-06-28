@@ -11,7 +11,7 @@
 #define SMALL 8			                /* the 2^SMALL is the smallese chunks */
 #define	BIG	20			        /* the 2^BIG is the biggest chunks */
 #define CHUNK_TYPE_NUM ( BIG - SMALL + 1 )	/* counts of  chunk's type */
-#define POW2(x) ((uint32)1 << x)
+#define POW2(x) (0x00000001 << x)
 #define	LOG2(x) ffs(x)
 #define DEFAULT_EXTRA 4	/* default number of each type of extra chunks  */
 
