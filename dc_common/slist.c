@@ -119,15 +119,15 @@ int push(void * data, struct slist *sl)
   }
 }
 
-struct sl_node * find(void * data,struct slist * sl){
+int find(void * data,struct slist * sl){
 	struct sl_node * ptr;
 	ptr = sl->head;
 	while(ptr){
 		if(ptr->data == data)
-			return ptr;
+			return 1;
 		ptr=ptr->next;	
 	}
-	return NULL;
+	return 0;
 }
 
 int mv2head(void * data,struct slist * sl){
