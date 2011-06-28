@@ -32,8 +32,12 @@
 #include <fcntl.h>
 
 #define MAXLINE		4096
-//#define	MAXDNSTHREADS	8192	/* the number of DNS threads  */
-//#define	MAXSERVTHREADS	4096	/* the number of work threads */
+
+struct dm_node{
+	char	*domain;	/* point to the domain */
+	struct dm_node	*next;		/* point to the next node */
+};
+
 
 typedef struct{
 	pthread_t thread_tid;	/* thread ID */
@@ -85,6 +89,9 @@ int iget, iput;			/*
 				 * iget, next idex to put in dns array,
 				 * iput, next to read 
 				 */
+
+
+
 
 int serv_listenfd;
 void thread_make_dns(int i);
