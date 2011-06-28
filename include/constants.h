@@ -10,6 +10,9 @@
 
 #define DATRIE_TAIL_POOL_INITIAL_SIZE 512
 #define DATRIE_TAIL_POOL_INCREASING_RATE 2
+#define DOUBLE_ARRARY_INITIAL_SIZE 512
+#define DOUBLE_ARRARY_INCREASING_RATE 2
+
 
 //sycnkey
 #define TOTAL_LENGTH		4		// total length of the messages
@@ -33,7 +36,7 @@
 #define MAXDNSTHREADS   20  			/* the number of DNS threads  */
 #define MAXSERVTHREADS  200    			/* the number of work threads */
 
-
+#define MAXLISTENQ	4096
 //synckey
 
 #endif /* CONSTANTS_H_ */

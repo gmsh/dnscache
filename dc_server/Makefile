@@ -3,23 +3,26 @@ DESTDIR = ./bin
 
 TEST = test
 TESTC = testclient
+TESTD = servtest
 TARGETA = dnsrequest
 TARGETB = libwraps.a
-TARGETC = thread_make.o 
+TARGETC = dns_thread_make.o
 TARGETD = moveport
 TARGETE = mainserver
+TARGETF = serv_thread_make.o
+TARGETG = init.o
 
 
 CC = gcc
 
 #for debug
 CFLAGS =  -I../include/  -g -Wall 
-LIB = -Llib -lwraps -lpthread
+LIB = -Llib -L../lib -lwraps -lpthread  -ldc_mm
 #for release
 #CFLAGS = -o -ansi  
 
 
-all: $(TEST) $(TARGETB) $(TARGETC) $(TESTC)  $(TARGETD) $(TARGETE)
+all: $(TEST) $(TARGETB) $(TARGETC) $(TESTC)  $(TARGETD) $(TARGETE) $(TESTD)
 
 $(TARGETA).o:$(TARGETA).c 
 	$(CC) $(CFLAGS) -c  $^  $(LIB)
@@ -29,7 +32,7 @@ $(TARGETB): wraps.c errors.c
 	ar rs $@ wraps.o errors.o
 	cp $@ ./lib
 
-$(TARGETC):thread_make.c $(TARGETA).o 
+$(TARGETC): dns_thread_make.c $(TARGETA).o 
 	$(CC) $(CFLAGS) -c  $^	$(LIB)
 
 $(TARGETD).o: $(TARGETD).c
@@ -42,9 +45,15 @@ $(TARGETD): $(TARGETD).o
 
 $(TARGETE).o: $(TARGETE).c
 	$(CC) $(CFLAGS) -c $^
-$(TARGETE): $(TARGETE).o
-	$(CC) $(CFLAGS) -o $@ $^
+$(TARGETE): $(TARGETE).o $(TARGETF) $(TARGETG)
+	$(CC) $(CFLAGS) -o $@ $^ $(LIB) 
 	mv $@ $(DESTDIR)
+
+$(TARGETF): serv_thread_make.c $(TARGETB)
+	$(CC) $(CFLAGS) -c  $^	$(LIB)
+
+$(TARGETG): init.c 
+	$(CC) $(CFLAGS) -c  $^	$(LIB)
 
 
 $(TEST).o: $(TEST).c $(TARGETB)
@@ -60,6 +69,11 @@ $(TESTC): $(TESTC).o
 	mv $@ $(DESTDIR)
 
 
+$(TESTD).o: $(TESTD).c
+	$(CC) $(CFLAGS) -c $^
+$(TESTD): $(TESTD).o  
+	$(CC) $(CLAGS) -o $@  $^ $(LIB)
+	mv $@ $(DESTDIR)
 	
 .PHONY:clean
 clean:

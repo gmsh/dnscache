@@ -1,4 +1,3 @@
- == elm_table[cap]->total_num )
  /*
  * Single linked list using static memory allocation
  * Author gmsh
