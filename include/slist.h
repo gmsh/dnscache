@@ -71,9 +71,9 @@ void traverse(
 /*
  * return pointer to sl_node whose data point to
  * datai.
- * return null if not exist.
+ * return 0 if not exists and 1 if exists.
  */
-struct sl_node * find(void * data,struct slist * sl);
+int find(void * data,struct slist * sl);
 
 /*
  * Move a node to slist's head
