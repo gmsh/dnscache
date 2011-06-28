@@ -11,8 +11,8 @@
 #define SMALL 8			                /* the 2^SMALL is the smallese chunks */
 #define	BIG	20			        /* the 2^BIG is the biggest chunks */
 #define CHUNK_TYPE_NUM ( BIG - SMALL + 1 )	/* counts of  chunk's type */
-#define POW2(x) pow(2,x)
-#define	LOG2(x) (log(x)/log(2))
+#define POW2(x) ((uint32)1 << x)
+#define	LOG2(x) ffs(x)
 #define DEFAULT_EXTRA 4	/* default number of each type of extra chunks  */
 
 #include <stdlib.h>
@@ -37,17 +37,52 @@ uint16 num_each_chunks[]={ 64, 64, 64, 64, 64,
                            32, 32, 32, 32, 32,
 			   16, 16,  8 };
 			   /* number of each type of chunks */
-uint16 num_extra_chunks[]={  8,  8,  8,  8,  8,
-                            4,  4,  4,  4,  4,
-			    2,  2,  2 };
+
+/* uint16 num_extra_chunks[]={  8,  8,  8,  8,  8,
+ *                            4,  4,  4,  4,  4,
+ * 			    2,  2,  2 };
+ */
 				/* number of each type of extra chunks */
 
 struct slist * idle_chunks_table[CHUNK_TYPE_NUM];  /* array of pointers to
                                                  * idle chunks lists.
 						 */
-struct slist * alloced_chunks_table[CHUNK_TYPE_NUM]; /* array of pointers 
+/*
+ * struct slist * alloced_chunks_table[CHUNK_TYPE_NUM]; 
+ */			
+  			/* array of pointers 
                                                    * to allocated chunks
 						   * lists.
 						   */
+
+/*
+ * return the first bit filled with 1's place.
+ */
+uint32 ffs(uint32 n)
+{
+	if(n==0)
+		return 0;
+	uint8 c = 32;
+	if (!(n & 0xffff0000)){
+   		c -= 16;
+  		n <<= 16;
+  	}
+  	if (!(n & 0xff000000)){
+  		c -= 8;
+  		n <<= 8;
+  	}
+  	if (!(n & 0xf0000000)){
+  		c -= 4;
+  		n <<= 4;
+  	}
+ 	 if (!(n & 0xc0000000)){
+  		c -= 2;
+  		n <<= 2;
+  	}
+  	if (!(n & 0x80000000)){
+  		c -= 1;
+  	}
+  	return c;
+}
 
 #endif
