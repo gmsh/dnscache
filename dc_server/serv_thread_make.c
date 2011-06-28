@@ -5,12 +5,13 @@
  * author: 		synckey
  * version:		v1.0
  * datetime:		2011-06-27 20:17:28
- * description:		create accept threads
+ * description:		create accept threads and some methods
  ********************************************************************/
 #include "server.h"
 #include "dc_mm.h"
-#include "dl_cache_stub.h"
+//#include "dl_cache_stub.h"
 void serv(int connfd);
+void do_search(char *headptr, char *requestptr, int rbuflen ,int conndfd);
 
 void thread_make_serv(int i)
 {
@@ -44,15 +45,19 @@ void  * thread_main_serv(void * arg)
 void serv(int connfd)
 {	
 	printf("%d is serving\n", pthread_self());
+	int readcount;
+	int n;
 	uint32 total_length, magic_number, request_number;
 	uint8 reserved_byte;
 	uint32 buf_length = TOTAL_LENGTH + MAGIC_NUMBER_LENGTH +
 		REQUEST_NUMBER_LENGTH +RESERVED_BYTE_LENGTH;
-	char	buf[buf_length];
+	char	*buf =(char *)dc_alloc(buf_length*sizeof(uint8)); /*head bufptr*/
+
 	if( read(connfd, buf, buf_length*sizeof(uint8)) != buf_length*sizeof(uint8)){
 		close(connfd);
 		return;
 	}
+
 	total_length = *((uint32 *)buf);
 	magic_number = *((uint32 *)(buf + TOTAL_LENGTH));
 	int i;
@@ -65,30 +70,40 @@ void serv(int connfd)
 		close(connfd);
 		return;
 	}
+	printf(" %d , %c, %d, %d\n", total_length, reserved_byte,
+	request_number, magic_number);
+	
 	if(total_length == 0)
 		close(connfd);
-
 	
+	char *request_ptr =(char *)dc_alloc((total_length - buf_length ) * sizeof(uint8));
+	char *read_ptr = request_ptr;
+	readcount = buf_length;	/* head length */
+	while( (i = read(connfd , read_ptr, (total_length - buf_length))) > 0){
+		readcount += i;
+		read_ptr += i;
+		if((readcount == total_length) || (readcount > total_length)){
+			*(request_ptr + total_length) = '\0';
+			break;	
+		}
+	}
+	do_search(buf, request_ptr, total_length - buf_length ,connfd);
+}
 
+/* search the cache ,and build the return message */
 
-	//printf("totallength :%d\n magicnumber: %x\n request_number:%d\nreservedbyte: %c\n",
-	//total_length, magic_number,request_number, reserved_byte);
-
-
-/*	uint8 *requestptr = (uint8 *)dc_alloc(totallength*sizeof(uint8) + 1);
-	* requestptr = total_length;
-	int count = 0;
-	int total= TOTAL_LENGTH;
-
-	while( (count = read(connfd, requestptr + TOTAL_LENGTH +  count ,
-			100*sizeof(uint8))) > 0){
-		total += count;
-		if(total == totallength)
+void do_search(char *headptr, char *requestptr, int rbuflen, int connfd)
+{	
+	char *currentptr = requestptr;
+	int readcount ;
+	for(;;){
+	readcount += strlen(currentptr) + 1;
+	printf("%s\n", currentptr);
+	if(rbuflen == readcount )
 			break;
 	}
-	printf("%d bytes reserved\n",total);
-	requestptr[total] = 0;
 
-*/
+	return;
 }
+
 /***************  END OF serv_thread_make.c  **************/

@@ -25,7 +25,7 @@ main()
         else    printf("conneted \n");
 	
 	
-	uint32 total_length=13;
+	uint32 total_length=13+14;
         uint8 *buf = (uint8 *)malloc(total_length*sizeof(uint8));
 	uint32 magic_number = MAGIC_NUMBER;
 	uint32 request_number= 1;
@@ -36,6 +36,9 @@ main()
 	*((uint32 *)(buf + TOTAL_LENGTH + MAGIC_NUMBER_LENGTH)) = request_number;
 	*((uint8 *)(buf + TOTAL_LENGTH + MAGIC_NUMBER_LENGTH +
 		REQUEST_NUMBER_LENGTH))=reserved_byte;
+	strcpy(buf+13,"www.baidu.com");
+	strcpy(buf+ 13 + 14,"www.baidu.com");
+	*( buf+ 13 + 13 + 13) = 0;
 
 	write(sockfd, buf, total_length);
 
