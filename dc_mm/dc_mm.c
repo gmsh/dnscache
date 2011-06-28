@@ -18,11 +18,10 @@ struct slist * mm_pre_alloc(uint32 capacity, uint16 counts)
 {
 	struct slist * init_idle_list;
 	void * chunk_ptr;
-	//todo
-	init_idle_list=mk_slist(malloc,counts);
+	init_idle_list=mk_slist(malloc,counts);  /* 构造链表 */
 	while(counts--){
-		chunk_ptr=malloc(POW2(capacity));
-		push(chunk_ptr,init_idle_list);
+		chunk_ptr=malloc(POW2(capacity));/* 申请空间 */
+		push(chunk_ptr,init_idle_list);  /* 压入链表中*/
 	}
 	return init_idle_list;	
 }
@@ -43,7 +42,6 @@ int mm_init()
 		chunks_manager_table[i]->idle_num = num_each_chunks[i];
 		chunks_manager_table[i]->idle_chunks = idle_chunks_table[i];
 		chunks_manager_table[i]->alloced_chunks = NULL;
-//		chunks_manager_table[i]->extra_chunks=NULL;
 	}
 	return 0;	
 }
