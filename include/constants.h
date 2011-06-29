@@ -35,8 +35,8 @@
 #define	PORT	8888				//server port
 
 //modify 
-#define MAXDNSTHREADS   20  			/* the number of DNS threads  */
-#define MAXSERVTHREADS  20    			/* the number of work threads */
+#define MAXDNSTHREADS   100			/* the number of DNS threads  */
+#define MAXSERVTHREADS  50    			/* the number of work threads */
 
 #define MAXLISTENQ	4096
 //synckey

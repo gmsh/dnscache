@@ -17,8 +17,8 @@
  * meet the demand.
  */
 struct {
-	uint32 a;
-	uint16 b;
+	uint32 ip;
+	uint16 time;
 } fake_data;
 
 /*
@@ -40,8 +40,8 @@ void dl_cache_init(size_t size_per_data){
  */
 void * get_data_and_lock(uint8 * key){
 	if ('w' == *key)
-		return NULL; /* stub for miss */
-	return &fake_data; /* hit */
+		return &fake_data; /* stub for miss */
+	return NULL; /* hit */
 }
 
 /*
