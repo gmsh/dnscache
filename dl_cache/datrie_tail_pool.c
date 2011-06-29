@@ -4,8 +4,6 @@
  *  Created on: Jun 26, 2011
  *      Author: gmsh
  */
-#define likely(x)       __builtin_expect((x),1)
-#define unlikely(x)     __builtin_expect((x),0)
 #include "dc_mm.h"
 #include "constants.h"
 #include "datrie_tail_pool.h"

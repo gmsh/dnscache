@@ -13,8 +13,6 @@
 typedef int32 state;
 typedef uint8 code;
 
-#define likely(x)       __builtin_expect((x),1)
-#define unlikely(x)     __builtin_expect((x),0)
 #define ROOT_STATE 1 /* root cell */
 #define IDLE_LIST 0 /* use cell[0] as idle list */
 #define END_CODE get_code('\0')
