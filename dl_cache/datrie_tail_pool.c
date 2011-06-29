@@ -8,7 +8,6 @@
 #define unlikely(x)     __builtin_expect((x),0)
 #include "dc_mm.h"
 #include "constants.h"
-#include "dc_utils.h"
 #include "datrie_tail_pool.h"
 #include <string.h>
 struct _datrie_tail_pool{
@@ -31,7 +30,7 @@ datrie_tail_pool * new_datrie_tail_pool()
 int32 dt_push_tail(uint8 * tail, datrie_tail_pool * pool)
 {
   uint32 index = pool->next_free;
-  while(unlikely(dc_strlen((char*) tail) + 1 /* +1 for '\0'
+  while(unlikely(strlen((char*) tail) + 1 /* +1 for '\0'
 					      * may _not_ use to -1 in the right
 					      * part because the result is uint32
 					      */
@@ -40,7 +39,7 @@ int32 dt_push_tail(uint8 * tail, datrie_tail_pool * pool)
     pool->pool = dc_realloc(pool->pool, pool->pool_size);
   }
   strcpy(pool->pool + pool->next_free, tail);
-  pool->next_free = pool->next_free + dc_strlen((char *)tail) + 1;
+  pool->next_free = pool->next_free + strlen((char *)tail) + 1;
 #ifdef _DC_DEBUG
   printf("%d\t%d\n", pool->next_free, pool->pool_size);
 #endif
