@@ -25,7 +25,7 @@ thread_main_dns(void *arg)
 {
 	int dnsrequest(const char *name, uint32 *ipaddr);
 	int connfd, *number, count, total;
-	char *domain ;
+	char  *domain ;
 	uint32 *ipptr;
 	pthread_mutex_t *mutex;
 	printf("dns thread %d starting \n", (int)arg );
@@ -57,7 +57,6 @@ thread_main_dns(void *arg)
 		if(dnsrequest(domain, ipptr + count) != 0) 
 			inet_pton(AF_INET, "127.0.0.1", ipptr+count);
 		dc_free(domain);	//dc_free the memory of domain
-	
 		Pthread_mutex_lock(mutex);
 		(*number)--;
 		Pthread_mutex_unlock(mutex);

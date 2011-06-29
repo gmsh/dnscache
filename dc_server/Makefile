@@ -22,7 +22,7 @@ LIB = -Llib -L../lib -lwraps -lpthread  -ldc_mm
 #CFLAGS = -o -ansi  
 
 
-all: $(TEST) $(TARGETB) $(TARGETC) $(TESTC)  $(TARGETD) $(TARGETE) $(TESTD)
+all: $(TARGETB) $(TARGETC) $(TESTC)  $(TARGETD) $(TARGETE) $(TESTD) $(TEST)
 
 $(TARGETA).o:$(TARGETA).c 
 	$(CC) $(CFLAGS) -c  $^  $(LIB)

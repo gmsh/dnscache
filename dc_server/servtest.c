@@ -30,7 +30,6 @@ main()
         } 
 	total_length += HEAD_LENGTH;
 	fseek(fp, 0, SEEK_SET);
-	printf("aa\n");
 
 
 

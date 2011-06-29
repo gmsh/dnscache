@@ -32,14 +32,13 @@
 #include <fcntl.h>
 
 #define MAXLINE		4096
-#define ARRAYSIZE	512
+#define ARRAYSIZE	102400
 #define  LINES      	1024
 
-
-struct dm_node{
+typedef struct dmnode{
 	char	*domain;	/* point to the domain */
-	struct dm_node	*next;		/* point to the next node */
-};
+	struct dmnode	*next;		/* point to the next node */
+} dm_node;
 
 
 typedef struct{
