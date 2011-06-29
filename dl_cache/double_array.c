@@ -109,8 +109,6 @@ static inline enum cell_state check_next_state(state current_state,
 	return idle;
     }else{
       if(unlikely(da->cells[_next_state].base < 0))
-	return invalid;
-      else
 	return occupied_by_other;
     }
   }
@@ -172,13 +170,81 @@ static void expand_double_array(double_arrary * da)
     = origin_cell_num;
 }
 
+static inline int32 num_of_state_next_to(state s, double_arrary * da)
+{
+  int32 to_return = 0;
+  int32 i;
+  for(i = 0; i < MAX_CODE; i++){
+    /*check[base[s] + c] = s*/
+    if(da->cells[da->cells[s].base + i].check == s)
+      to_return++;
+  }
+  return to_return;
+}
+
+/*after_this > IDLE_LIST*/
+static inline state occupy_next_free(int32 size, state after_this){
+  state to_return, _previous, _next;
+  int32 offset;
+ DA_NEXT_FREE_START:
+  to_return = IDLE_LIST;
+  do{
+    to_return = -(da->cells[to_return].check);
+  }while(to_return < after_this && to_return != IDLE_LIST);
+  if(unlikely(to_return == IDLE_LIST)){
+    /* da needs to be expand, but i think it should never
+     * happen.
+     */
+    expand_double_array(da);
+    goto DA_NEXT_FREE_START;
+  }
+  /**/
+ DA_FIND_CONTINOUS_IDLE_CELLS:
+  for(offset = 0;
+      offset < size - 1
+	&& 
+	da->cells[to_return + offset].check == -(to_return + offset + 1);
+      offset++);
+  if(offset == size - 1){
+    /* occupy state ... state + size -1*/
+    _previous = -(da->cells[to_return].base);
+    _next = -(da->cells[to_return + size -1].check);
+    da->cells[_previous].check = -_next;
+    da->cells[_next].base = -_previous;
+    return to_return;
+  }else{
+    if(da->cells[to_return + offset -1].check == IDLE_LIST){
+      /* da need to be expand */
+      expand_double_array(da);
+      goto DA_FIND_CONTINOUS_IDLE_CELLS;/*TODO*/
+    }else{
+      /* change to_return and find again.  */
+      to_return = da->cells[to_return + offset - 1];
+      goto DA_FIND_CONTINOUS_IDLE_CELLS;
+    }
+  }
+}
+
+static inline void relocate(state s, double_array * da)
+{
+  
+}
+
+static inline void occupy_state(state s, double_array *)
+{
+  state _next = -da->cells[s].check;
+  state _previous = -da->cells[s].base;
+  da->cells[_previous].check = -_next;
+  da->cells[_next].base = -_previous;
+}
+
 void da_insert(uint8 * key, void * data, 
 	       double_array * da)
 {
   int32 offset = 0;
   state _current_state = ROOT_STATE, _next_state;
   code _next_code;
-  do{
+  while(1){
     _cell_state =
       check_next_state(_current_state, key,
 		       offset++, &_next_code,
@@ -189,6 +255,7 @@ void da_insert(uint8 * key, void * data,
       _current_state = _next_state;
       break;
     case idle:
+    _IDLE:
       /*
        * Considering the following scenario, 
        * the key is abc and the input char
@@ -201,34 +268,51 @@ void da_insert(uint8 * key, void * data,
        * = -dt_push_tail("c");
        * We save the data in the next state.
        */
+      occupy_state(_next_state, da);
       da->cells[_next_state].check = _current_state;
       da->cells[_next_state].base =
 	-(dt_push_tail(key + offset, da->tails));
       da->cells[_next_state].userdata = data.
       return;
     case occupied_by_other:
+      /*
+       * occupied_by_other
+       * the 'other' is check[next_state].
+       * Comparing the num_of_state_next_to(current_state)
+       * with num_of_state_next_to(other), we relocate
+       * current state if the former plus one is less than
+       * the latter.
+       */
+      int32 num1 = num_of_state_next_to(_current_state);
+      int32 num2 = 
+	num_of_state_next_to(da->cells[_next_state].check];
+      if(num1 + 1 < num2)
+	;
       break;/*TODO*/
     case eok:
       /*
        * In this scenario, we save the data
        * in the current state.
+       * we don't need occupy it, because it is
+       * not idle.
        */
       da->cells[_current_state].userdata = data;
-      break;
+      return;
     case overflow:
       /* s = next state  */
       do{
 	expand_double_array(da);
       }while(s > da->cell_num);
-      break;
+      goto _IDLE;
     case in_tail:
+      /**/
       break;
     case invalid:
       return;
     default:
       return;
     }
-  }while(1);/**/
+  }
    
 }
 
@@ -241,20 +325,19 @@ void * da_get_data(uint8 * key, double_array * da)
   while(1){
     _cell_state = 
       check_next_state(_current_state, key, offset++,
-		 &_next_code, &next_state, da);
+		 &_next_code, &_current_state, da);
     switch(_cell_state){
     case in_da:
       /* move to next state */
-      _current_state = _next_state;
       break;
     case in_tail:
       /* compare the tail & the remanent. */
       uint8 * tail = dt_get_tail(
-				 -(da->cells[_next_state].base)
+				 -(da->cells[_current_state].base)
 				 da->tails
 				 );
       if(0 == strcmp(tail, key + offset))
-	return da->cells[_next_state].user_data;
+	return da->cells[_current_state].user_data;
       else
 	return NULL;
     case eok:
