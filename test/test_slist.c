@@ -14,6 +14,17 @@
 
 
 int main(){
+	struct slist * sl;
+	struct sl_node * ptr;
+	size_t i = 5;
+	sl = mk_slist(malloc,i);	
+	while(i--){
+		ptr->data = malloc(sizeof(int));
+		*(int *)(ptr->data)=i;	
+		push(ptr->data,sl);	
+	}/* 依次遍历赋值 */
+	traverse(print_data,sl);
+=======
 	printf("---------测试一开始-----------\n");
 	struct slist * test_list= mk_slist((uint32 *)malloc(sizeof(uint32)),CAPACITY);	
 	struct sl_node * ptr;//=(struct sl_node *)dc_alloc(sizeof(struct sl_node ));
@@ -47,12 +58,10 @@ int main(){
 	traverse(print_data(ptr),test_list);
 	//traverse((* visit)(*ptr),test_list);	
 	
+>>>>>>> 0c505330203b20e964a84507308a7b3880f3d3b3
 }
 
 /* print the data */
 void print_data(struct sl_node * sn){
 	printf("%d\n",*(uint32 *)(sn->data));	
 }
-
-
-

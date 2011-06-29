@@ -7,6 +7,7 @@
 #define _DC_MM_H
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "typedefs.h"
 #include "slist.h"
 //#include "dc_mm_structs.h"
