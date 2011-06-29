@@ -10,6 +10,11 @@
 
 #include "server.h"
 //#include "dc_mm.h"
+
+pthread_mutex_t dns_array_mutex= PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t  dns_array_cond= PTHREAD_COND_INITIALIZER;
+
+
 int
 main(int argc, char **argv)
 {
@@ -30,7 +35,7 @@ main(int argc, char **argv)
 		printf("bind error\n");
 		exit(0);
 	}
-	
+	 dns_thread_tptr = calloc(MAXDNSTHREADS, sizeof(dns_thread_t));
 	serv_thread_tptr = calloc(MAXSERVTHREADS, sizeof(thread_t));
 	
 	int backlog;
@@ -41,8 +46,12 @@ main(int argc, char **argv)
 		backlog = MAXLISTENQ ;
 	
 	listen(serv_listenfd, backlog);
+	
+	iget = iput = 0;
+	for(i = 0; i < MAXDNSTHREADS; i ++ )
+	           thread_make_dns(i);
 
-	for(i = 0; i < MAXSERVTHREADS; i++ ){
+	for(i = 0; i < MAXSERVTHREADS- 100; i++ ){
 		thread_make_serv(i);
 	}
 	

@@ -43,13 +43,13 @@ $(TARGETD): $(TARGETD).o
 	mv $@ $(DESTDIR)
 
 
-$(TARGETE).o: $(TARGETE).c
+$(TARGETE).o: $(TARGETE).c $(TARGETA).c
 	$(CC) $(CFLAGS) -c $^
-$(TARGETE): $(TARGETE).o $(TARGETF) $(TARGETG)
+$(TARGETE): $(TARGETE).o $(TARGETF) $(TARGETG) $(TARGETA).o $(TARGETC)
 	$(CC) $(CFLAGS) -o $@ $^ $(LIB) 
 	mv $@ $(DESTDIR)
 
-$(TARGETF): serv_thread_make.c $(TARGETB)
+$(TARGETF): serv_thread_make.c dns_thread_make.c $(TARGETB) 
 	$(CC) $(CFLAGS) -c  $^	$(LIB)
 
 $(TARGETG): init.c 
