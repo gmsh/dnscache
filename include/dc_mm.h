@@ -7,9 +7,10 @@
 #define _DC_MM_H
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "typedefs.h"
 #include "slist.h"
-#include "dc_mm_structs.h"
+//#include "dc_mm_structs.h"
 
 /* dc_alloc() allocates size bytes and returns a pointer  to  the  allocated
  * memory.   The  memory  is  not  cleared.   If  size is 0, then dc_alloc()

@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 	socklen_t addrlen, clilen;
 	struct sockaddr_in cliaddr, servaddr;
 	int  *number, count, total;
-	char *cptr[5];
+	char *cptr[LINES];
 	uint32 *ipptr;
 	pthread_mutex_t *mutex;
 	
@@ -51,8 +51,8 @@ int main(int argc, char **argv)
 				&clilen);
 		printf("client connected\n");
 		number= (int *)dc_alloc(sizeof(int)); 
-		*number = 5;
-		ipptr = (uint32 *)dc_alloc(5*sizeof(uint32));
+		*number = LINES;
+		ipptr = (uint32 *)dc_alloc(LINES*sizeof(uint32));
 		mutex = (pthread_mutex_t *)dc_alloc(sizeof(pthread_mutex_t));
 		Pthread_mutex_init(mutex, NULL);
 		cptr[0] = (char *)dc_alloc(64*sizeof(char));
@@ -60,14 +60,24 @@ int main(int argc, char **argv)
 		cptr[2] = (char *)dc_alloc(64*sizeof(char));
 		cptr[3] = (char *)dc_alloc(64*sizeof(char));
 		cptr[4] = (char *)dc_alloc(64*sizeof(char));
+		cptr[5] = (char *)dc_alloc(64*sizeof(char));
+		cptr[6] = (char *)dc_alloc(64*sizeof(char));
+		cptr[7] = (char *)dc_alloc(64*sizeof(char));
+		cptr[8] = (char *)dc_alloc(64*sizeof(char));
+		cptr[9] = (char *)dc_alloc(64*sizeof(char));
 		
 		strcpy(cptr[0],"qq.com");
 		strcpy(cptr[1],"baidu.com");
 		strcpy(cptr[2],"cnbeta.com");
 		strcpy(cptr[3],"sina.com");
 		strcpy(cptr[4],"google.com");
+		strcpy(cptr[5],"ubuntu.org.cn");
+		strcpy(cptr[6],"office.live.com");
+		strcpy(cptr[7],"google.com");
+		strcpy(cptr[8],"google.com");
+		strcpy(cptr[9],"google.com");
 
-		for(i=0; i < 5 ; i++){
+		for(i=0; i < LINES ; i++){
 			Pthread_mutex_lock(&dns_array_mutex);
 //		while((iget!=0)&&((iget + 1) % MAXDNSTHREADS == iput))
 //			sleep(0.02);
@@ -76,7 +86,7 @@ int main(int argc, char **argv)
 			dns_array[iput].sockfd = connfd;
 			dns_array[iput].number = number;
 			dns_array[iput].count  = i;
-			dns_array[iput].total  = 5;
+			dns_array[iput].total  = LINES;
 			dns_array[iput].ipptr  = ipptr;
 			dns_array[iput].mutex  = mutex;
 			if(++iput == MAXDNSTHREADS)

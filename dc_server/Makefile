@@ -43,7 +43,7 @@ $(TARGETD): $(TARGETD).o
 	mv $@ $(DESTDIR)
 
 
-$(TARGETE).o: $(TARGETE).c $(TARGETA).c
+$(TARGETE).o: $(TARGETE).c $(TARGETA).c server.h
 	$(CC) $(CFLAGS) -c $^
 $(TARGETE): $(TARGETE).o $(TARGETF) $(TARGETG) $(TARGETA).o $(TARGETC)
 	$(CC) $(CFLAGS) -o $@ $^ $(LIB) 
@@ -69,7 +69,7 @@ $(TESTC): $(TESTC).o
 	mv $@ $(DESTDIR)
 
 
-$(TESTD).o: $(TESTD).c
+$(TESTD).o: $(TESTD).c  server.h
 	$(CC) $(CFLAGS) -c $^
 $(TESTD): $(TESTD).o  
 	$(CC) $(CLAGS) -o $@  $^ $(LIB)

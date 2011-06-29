@@ -21,6 +21,8 @@
 #define REQUEST_NUMBER_LENGTH	4		// length of the request NO.
 #define	RESERVED_BYTE_LENGTH	1		// length of the reserved byte in
 						// request message
+#define HEAD_LENGTH		(TOTAL_LENGTH + MAGIC_NUMBER_LENGTH +\
+				MAGIC_NUMBER_LENGTH + RESERVED_BYTE_LENGTH )
 #define SERIAL_NUMBER_MASK	0x80		// 0 means first return message.
 						// 1 means second return messag
 #define	ERROR_CONTRL_MASK	0x40		// 0 means no errors in the
@@ -34,7 +36,7 @@
 
 //modify 
 #define MAXDNSTHREADS   20  			/* the number of DNS threads  */
-#define MAXSERVTHREADS  200    			/* the number of work threads */
+#define MAXSERVTHREADS  20    			/* the number of work threads */
 
 #define MAXLISTENQ	4096
 //synckey

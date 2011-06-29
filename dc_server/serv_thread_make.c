@@ -10,7 +10,6 @@
 #include "server.h"
 //#include "dc_mm.h"
 //#include "dl_cache_stub.h"
-#define LINES  5
 void serv(int connfd);
 void do_search(uint8 *headptr, uint8 *requestptr, int rbuflen ,int conndfd);
 
@@ -113,14 +112,15 @@ void do_search(uint8 *headptr, uint8 *requestptr, int rbuflen, int connfd)
 	Pthread_mutex_init(mutex, NULL);
 
 	int i = 0;
-//	char buf[16];
 	for(;;){
 		printf("%s\n", currentptr);
-//		dnsrequest(currentptr, ipptr);
-//		inet_ntop(AF_INET, (in_addr_t *)(ipptr), buf, 16);
-//		printf("%s\n", buf);
-		domain =  (uint *)dc_alloc(strlen(currentptr)*sizeof(uint8));
+		domain =  (uint *)dc_alloc((strlen(currentptr) +  1)*sizeof(uint8));
                 strcpy(domain, currentptr);
+                while((iput != 0)&& iget == iput  ){
+                 	printf("iget == iput\n");
+			sleep(0.002);
+		 //	exit(0);
+		}
                 Pthread_mutex_lock(&dns_array_mutex);
 //              while((iget!=0)&&((iget + 1) % MAXDNSTHREADS == iput))
 //                      sleep(0.02);
@@ -131,11 +131,12 @@ void do_search(uint8 *headptr, uint8 *requestptr, int rbuflen, int connfd)
                 dns_array[iput].total  = LINES;
                 dns_array[iput].ipptr  = ipptr;
                 dns_array[iput].mutex  = mutex;
-                if(++iput == MAXDNSTHREADS)
+                if(++iput == ARRAYSIZE)
                            iput = 0;
-                if(iget == iput )
-                           exit(0);
-
+                if( iget == iput ){
+                 	printf("iget == iput\n");
+		 	exit(0);
+		}
                 Pthread_cond_signal(&dns_array_cond);
                 Pthread_mutex_unlock(&dns_array_mutex);
 		i++;
