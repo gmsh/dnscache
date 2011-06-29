@@ -1,5 +1,5 @@
-libdl_cache.a:dc_set.o datrie_tail_pool.o
-	ar rs libdl_cache.a dc_set.o datrie_tail_pool.o
+libdl_cache.a:dc_set.o datrie_tail_pool.o dl_cache_stub.o
+	ar rs libdl_cache.a dc_set.o datrie_tail_pool.o  dl_cache_stub.o
 	cp libdl_cache.a ../lib
 .PHONY:clean
 clean:

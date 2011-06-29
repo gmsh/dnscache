@@ -9,7 +9,7 @@
  ********************************************************************/
 #include "server.h"
 //#include "dc_mm.h"
-//#include "dl_cache_stub.h"
+#include "dl_cache_stub.h"
 static void serv(int connfd);
 static void do_search(uint8 *headptr, uint8 *requestptr, int rbuflen ,int conndfd);
 static void do_dns_search(int total, dm_node * firstnode, int connfd);
@@ -103,20 +103,19 @@ static void do_search(uint8 *headptr, uint8 *requestptr, int rbuflen, int connfd
 	dm_node *curr = dc_alloc(sizeof(dm_node));
 	dm_node *firstnode = curr;
 	uint32 *curenip = (uint32 *)requestptr ;
-	struct fake_data *result;
-	if(NULL == get_data_and_lock("www.baidu.com")){
-		printf("Miss\n");
-	}
-	else
-		printf("hit\n");
+	fake_data_t *result;
 
 	for(;;){
-		if( (result = get_data_and_lock(currentptr)) == NULL){
+		result = (fake_data_t *)get_data_and_lock(currentptr);
+		if( (NULL == result) || (result -> timestamp + TIME_OUT <
+		time(NULL)) ){
 			misscount++;
 			curr -> domain =(dm_node *) dc_alloc((strlen(currentptr) + 1) 
 						* sizeof(uint8));
 			strcpy(curr -> domain, currentptr);
 		
+		} else {
+			
 		}
 
 		readcount += strlen(currentptr) + 1;
@@ -183,4 +182,6 @@ static void do_dns_search(int total, dm_node * firstnode, int connfd)
 	
 	}
 }
+
+ 
 /***************  END OF serv_thread_make.c  **************/

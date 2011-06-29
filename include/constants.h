@@ -39,6 +39,8 @@
 #define MAXSERVTHREADS  50    			/* the number of work threads */
 
 #define MAXLISTENQ	4096
+
+#define TIME_OUT	86400			/* 24 hours in seconds*/
 //synckey
 
 #endif /* CONSTANTS_H_ */
