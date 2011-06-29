@@ -62,7 +62,6 @@ thread_main_dns(void *arg)
 		(*number)--;
 		Pthread_mutex_unlock(mutex);
 		if((*number) == 0){
-			printf("nimei a \n");
 			write(connfd, ipptr, total*sizeof(uint32));
 			printf("sended\n");
 	//		close(connfd);	//todo
