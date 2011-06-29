@@ -77,8 +77,8 @@ int find(void * data,struct slist * sl);
 
 /*
  * Move a node to slist's head
- * RETURN 0 if success
- * RETURN 1 if failed
+ * RETURN 0 if found the data and mv2head
+ * RETURN 1 if not found
  */
 int mv2head(void * data,struct slist * sl);
  

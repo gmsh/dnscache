@@ -46,7 +46,7 @@ struct slist *sl_expand(struct slist *sl,
     sl->blank = (struct sl_node *)p;
   }else{
 	ptr->next = sl->blank;
-	sl->blank = ptr;
+	sl->blank = (struct sl_node *)p;  /* modified by wakemecn */
   }
   ptr = my_alloc(sizeof(struct sl_node));
   ptr->data = p;
@@ -85,6 +85,7 @@ int append(void * data, struct slist * sl)
       sl->end->next = ptr;
       sl->end = ptr;
     }
+	ptr->next = NULL; /* added by wakemecn */
     sl->length++;
     return 0;
   }
@@ -146,13 +147,13 @@ int mv2head(void * data,struct slist * sl){
 			if(cur == sl->end)
 				sl->end = pre;
 			pre->next = cur->next;
-			cur = sl->head;
+			cur->next = sl->head;i/* modified by wakemecn*/
 			sl->head = cur;
 			return 0;
 		}
 		pre = cur;
 		cur = cur->next;
-		return 0;
+		/* deleted by wakemecn */
 	}
 	return 1;	
 }
