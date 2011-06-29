@@ -190,7 +190,8 @@ static inline uint64 bitmap_of_state(state s, double_arrary * da)
 {
   uint64 to_return = 0;
   int32 i;
-  for(i = 0; i < MAX_CODE; i++){
+  /* 1 is the first code */
+  for(i = 1; i <= MAX_CODE; i++){
     /*check[base[s] + c] = s*/
     if(da->cells[da->cells[s].base + i].check == s)
       return = (return&0x1) << 1;
@@ -202,21 +203,33 @@ static inline uint64 bitmap_of_state(state s, double_arrary * da)
 
 static inline int8 num_of_1(uint64 bitmap)
 {
-  int8 to_return = 0, i = 0;
-  while(to_return < MAX_CODE){
+  int8 to_return = 0, i = 1;
+  while(to_return <= MAX_CODE){
     if(bitmap>>i&0x1)
       to_return++;
   }
   return to_return;
 }
 
+static inline int8 first_of_1(uint64 bm)
+{
+  int8 to_return;
+  /* -1 for code 0*/
+  bm = bm << (sizeof(uint64) - MAX_CODE - 1);
+  for(to_return = 0;
+      0 == (bm << to_return)&8000000000000000;
+      to_return++);
+  return ++to_return;
+}
+
 /*after_this > IDLE_LIST*/
-static inline state occupy_next_free(int32 size, state after_this){
-  state to_return, _previous, _next;
+static inline state occupy_next_free(uint64 bm,
+				     state after_this){
+  state to_return, s, _previous, _next;
   int8 i; 
   code c;
  DA_NEXT_FREE_START:
-  to_return = IDLE_LIST;
+  to_return = IDLE_LIST/*TODO  base index may not idle*/;
   do{
     to_return = -(da->cells[to_return].check);
   }while(to_return < after_this && to_return != IDLE_LIST);
@@ -231,8 +244,9 @@ static inline state occupy_next_free(int32 size, state after_this){
  DA_FIND_SUIT_SLOT:
   for(i = 0; i < MAX_CODE; i++){
     if((bm>>i)&0x1){
-      c = da->cells[to_return].base + (MAX_CODE - i);
-      switch(check_state(c, da)){
+      c =  MAX_CODE - i;
+      s = da->cells[to_return].base + c;
+      switch(check_state(s, da)){
       case occupied_by_other:
 	/*not idle, move ahead*/
 	to_return = -(da->cells[to_return].check);
@@ -249,12 +263,31 @@ static inline state occupy_next_free(int32 size, state after_this){
     }
   }
   /*a slot is found.*/
-  return to_return;
+  for(i = 0; (bm>>i) & 0x1 == 0; i++);
+  c = MAX_CODE - i;
+  _previous = -(da->cells[to_return].base);
+  _next = -(da->cells[da->cells[to_return] + c].check);
+  da->cells[_previous].check = -_next;
+  da->cells[_next].base = -_previous;
+  return to_return - first_of_1(bm);
 }
 
-static inline void relocate(state s, uint64 bm, double_array * da)
+static inline void relocate(state to_relocate, uint64 bm, 
+			    double_array * da)
 {
-  state b = 
+  /*
+   * dest base index
+   */
+  state b = occupy_next_free(bm, ROOT_STATE);
+  
+  int8 i;
+  code c;
+  for(i = 1; i < MAX_CODE; i++){
+    if((bm>>i)&0x1){
+      //c = MAX_CODE - i;
+      da->cells[b /*TODO*/
+    }
+  }
 }
 
 static inline void occupy_state(state s, double_array *)
