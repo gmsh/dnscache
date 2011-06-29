@@ -12,6 +12,7 @@ int main()
 {
 	
 	int sockfd;
+	int i;
 	struct sockaddr_in servaddr;
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	bzero(&servaddr, sizeof(servaddr));
@@ -24,12 +25,14 @@ int main()
 	else 	printf("conneted \n");
 
 	uint32 buf[100];
-	read(sockfd, buf, 100);
+	i = 0 ;
+	int readcount=0;
+	while(i = read(sockfd, buf+readcount, 100) >0)
+		readcount+=i;
 	char ipstr[16];
-	int i;
 	for(i = 0 ; i < 16 ;i++)
 		ipstr[i] = '\0';
-	for(i = 0; i<5; i++){
+	for(i = 0; i<LINES; i++){
 		inet_ntop(AF_INET, (in_addr_t *)(buf+i), ipstr , 16);
 		printf("%s\n", ipstr);
 	}

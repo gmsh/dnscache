@@ -32,6 +32,9 @@
 #include <fcntl.h>
 
 #define MAXLINE		4096
+#define ARRAYSIZE	4096
+#define  LINES      	1024
+
 
 struct dm_node{
 	char	*domain;	/* point to the domain */
@@ -67,7 +70,7 @@ thread_t *dns_thread_tptr;	/* point to the memory alloc for
 thread_t *serv_thread_tptr;	/* point to the memory alloc for 
 				   connect threads	
 				 */
-dns_thread_t dns_array[MAXDNSTHREADS];		
+dns_thread_t dns_array[ARRAYSIZE];		
 				/*
 				 *  dns threads read it and know
 				 *  how to server

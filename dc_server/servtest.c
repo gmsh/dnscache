@@ -9,23 +9,28 @@
  ********************************************************************/
 #include "server.h"
 
-#define  INPUTFILE "out.list"
-#define  LINES      5
+#define  INPUTFILE "domain.list"
+#define  OUTPUTFILE "domainip.list"
 int
 main()
 {
-	FILE *fp ;
+	FILE *fp;
         int i =0 ;
-        fp = fopen(INPUTFILE, "r");
+       	if( (fp = fopen(INPUTFILE, "r")) == NULL)	
+		printf("file open error\n");
+
+     //   fp = fopen(OUTPUTFILE, "rw");
 	uint32 total_length = 0;
         char readbuff[4096];
-        while(fgets(readbuff, 4096, fp) != NULL){
+        while( fgets(readbuff, 4096, fp) != NULL){
         	total_length += strlen(readbuff);
-		if (LINES == ++i)
+		i++;
+		if (LINES == i)
 			break;
         } 
 	total_length += HEAD_LENGTH;
 	fseek(fp, 0, SEEK_SET);
+	printf("aa\n");
 
 
 
@@ -59,20 +64,29 @@ main()
 			break;
         } 
 	
-
 	write(sockfd, buf, total_length);
 	uint32 *retbuf = (uint32 *)malloc(LINES*sizeof(uint32));
- 	read(sockfd, buf, LINES*sizeof(uint32));
-        char ipstr[16];
+ 	
+	int retcount = 0;
+	while( (i = read(sockfd, retbuf + retcount, LINES*sizeof(uint32))) > 0){
+		printf("I am reading\n");
+		retcount += i;
+		if(LINES*sizeof(uint32) <= retcount)
+			break;
+	}
+	printf("recieved \n");
+        char ipstr[16]; 
         for(i = 0 ; i < 16 ;i++)
                 ipstr[i] = '\0';
-        for(i = 0; i<LINES; i++){
-        inet_ntop(AF_INET, (in_addr_t *)(buf+i), ipstr , 16);
+	int len = HEAD_LENGTH ; 
+       for(i = 0; i<LINES; i++){
+		printf("%s   ", buf + len);
+		len += strlen (buf + len) + 1;
+ 		inet_ntop(AF_INET, (in_addr_t *)(retbuf+i), ipstr , 16);
                 printf("%s\n", ipstr);
         }   
     
 
-        //read(sockfd, buf, 100);
         close(sockfd);
 	fclose(fp);
 

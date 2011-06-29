@@ -28,7 +28,7 @@ thread_main_dns(void *arg)
 	char *domain ;
 	uint32 *ipptr;
 	pthread_mutex_t *mutex;
-	printf("thread %d starting \n", (int)arg );
+	printf("dns thread %d starting \n", (int)arg );
 
 	for(;;){
 
@@ -48,22 +48,24 @@ thread_main_dns(void *arg)
 		ipptr	= dns_array[iget].ipptr;
 		mutex	= dns_array[iget].mutex;
 		
-		if(++iget == MAXDNSTHREADS)
+		if(++iget == ARRAYSIZE)
 			iget = 0;		
 
 		Pthread_mutex_unlock(&dns_array_mutex);
 
 		//do our job 
-		dnsrequest(domain, ipptr + count);
+		if(dnsrequest(domain, ipptr + count) != 0) 
+			inet_pton(AF_INET, "127.0.0.1", ipptr+count);
 		dc_free(domain);	//dc_free the memory of domain
 	
 		Pthread_mutex_lock(mutex);
 		(*number)--;
 		Pthread_mutex_unlock(mutex);
-
 		if((*number) == 0){
+			printf("nimei a \n");
 			write(connfd, ipptr, total*sizeof(uint32));
-		//	close(connfd);	//todo
+			printf("sended\n");
+	//		close(connfd);	//todo
 			dc_free(ipptr);
 			dc_free(number);
 			dc_free(mutex);

@@ -51,7 +51,7 @@ main(int argc, char **argv)
 	for(i = 0; i < MAXDNSTHREADS; i ++ )
 	           thread_make_dns(i);
 
-	for(i = 0; i < MAXSERVTHREADS- 100; i++ ){
+	for(i = 0; i < MAXSERVTHREADS; i++ ){
 		thread_make_serv(i);
 	}
 	
