@@ -20,14 +20,14 @@ struct slist * mk_slist(void * ( *my_alloc) (size_t),
   to_return->memlist->next = NULL;
   to_return->blank = (struct sl_node *)(p + sizeof(struct slist));
   struct sl_node * ptr = to_return->blank;
-  while(capacity>0){
-    ptr->next = (struct sl_node *)(ptr + sizeof(struct sl_node));
+  while(capacity > 1){
+    ptr->next = (struct sl_node *)((void *)ptr + sizeof(struct sl_node));
+	ptr = ptr->next;
     capacity--;
   }
   ptr->next = NULL;
   return to_return;
 }
-
 struct slist *sl_expand(struct slist *sl,
 			void * (* my_alloc)(size_t),
 			size_t delta)
@@ -35,15 +35,19 @@ struct slist *sl_expand(struct slist *sl,
   void * p = my_alloc(delta * sizeof(struct sl_node));
   /* append mem to the blank list*/
   struct sl_node * ptr = (struct sl_node *)p;
-  if(sl->blank == NULL)
-    sl->blank = ptr;
-  else
-    sl->blank->next = ptr;
-  while(delta > 0){
-    ptr->next = (struct sl_node *)(ptr + sizeof(struct sl_node));
-    delta--;
+  sl->capacity += delta; 
+  while(delta > 1){
+    ptr->next = (struct sl_node *)((void *)ptr + sizeof(struct sl_node));
+    ptr = ptr->next;
+	delta--;
   }
-  ptr->next = NULL;
+  if(sl->blank == NULL){
+    ptr->next = NULL;
+    sl->blank = (struct sl_node *)p;
+  }else{
+	ptr->next = sl->blank;
+	sl->blank = ptr;
+  }
   ptr = my_alloc(sizeof(struct sl_node));
   ptr->data = p;
   ptr->next = sl->memlist;

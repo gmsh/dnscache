@@ -12,53 +12,34 @@
 #include <stdlib.h>
 #include "dc_mm.h" 
 
+void print_data(struct sl_node * sn);
 
 int main(){
 	struct slist * sl;
-	struct sl_node * ptr;
-	size_t i = 5;
-	sl = mk_slist(malloc,i);	
+	void * ptr;
+	size_t i = 10;
+	sl = mk_slist(malloc,3);	
 	while(i--){
-		ptr->data = malloc(sizeof(int));
-		*(int *)(ptr->data)=i;	
-		push(ptr->data,sl);	
+		ptr = malloc(sizeof(int));
+		*(int *)(ptr)=i;
+		if(push(ptr,sl))
+			break;	
 	}/* 依次遍历赋值 */
 	traverse(print_data,sl);
-=======
-	printf("---------测试一开始-----------\n");
-	struct slist * test_list= mk_slist((uint32 *)malloc(sizeof(uint32)),CAPACITY);	
-	struct sl_node * ptr;//=(struct sl_node *)dc_alloc(sizeof(struct sl_node ));
-	size_t i=0;
-	size_t delta=5;
-
-	for(i=0; i < CAPACITY; i++){
-		int *data = malloc(sizeof(int));
-		*data = i;
-		//ptr = malloc(sizeof(sl_node));
-		//ptr->data = data;
-		append(data, test_list);
-
-		
+	void * x;
+	while(x = (pop(sl))){
+		printf("pop %d\n",*(int *)x);
 	}
-
-	/* 依次遍历赋值 */
-	//print_data(*ptr);
-	printf("test pop result\n");
-	pop(test_list);
-	printf("test push result\n");
-	push(100,test_list);
-	printf("test append result\n");	
-	append(101,test_list);
-	printf("test expand result\n");
-	sl_expand(test_list,(uint32 *)malloc(sizeof(uint32)),delta);
-	printf("test traverse result\n");
-	traverse(print_data(ptr),test_list);
-	printf("test sl_free result\n");
-	sl_free(free,test_list);
-	traverse(print_data(ptr),test_list);
-	//traverse((* visit)(*ptr),test_list);	
-	
->>>>>>> 0c505330203b20e964a84507308a7b3880f3d3b3
+	*(int *) ptr = 100;
+	append(ptr,sl);
+    sl = sl_expand(sl,malloc,2);
+	int a[] = {
+		99, 98, 97, 96, 95
+		};
+	append(&a[1],sl);
+	append(&a[2],sl);
+	traverse(print_data,sl);
+	printf("cap: %d, len : %d\n",sl->capacity,sl->length);
 }
 
 /* print the data */
