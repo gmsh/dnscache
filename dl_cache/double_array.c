@@ -148,7 +148,19 @@ double_array * new_double_array()
   return to_return;
 }
 
-static void expand_double_array(double_arrary * da)
+static inline enum cell_state 
+check_state(state s, double_arrary * da)
+{
+  if(s > da->cell_num)
+    return overflow;
+  if(da->cells[s].check < 0)
+    return idle;
+  /* note that it may occupied by itself,
+   * so here is a waste a memory.
+   */
+  return occupied_by_other;
+}
+static inline void expand_double_array(double_arrary * da)
 {
   int32 origin_cell_num = da->cell_num;
   da->cell_num *= DOUBLE_ARRARY_INCREASING_RATE;
@@ -170,13 +182,29 @@ static void expand_double_array(double_arrary * da)
     = origin_cell_num;
 }
 
-static inline int32 num_of_state_next_to(state s, double_arrary * da)
+/*
+ * return a bitmap(uint64). If check[base[s] + c] = s then bitmap[s]
+ * is 1, otherwise 0.
+ */
+static inline uint64 bitmap_of_state(state s, double_arrary * da)
 {
-  int32 to_return = 0;
+  uint64 to_return = 0;
   int32 i;
   for(i = 0; i < MAX_CODE; i++){
     /*check[base[s] + c] = s*/
     if(da->cells[da->cells[s].base + i].check == s)
+      return = (return&0x1) << 1;
+    else
+      return = return << 1;
+  }
+  return to_return;
+}
+
+static inline int8 num_of_1(uint64 bitmap)
+{
+  int8 to_return = 0, i = 0;
+  while(to_return < MAX_CODE){
+    if(bitmap>>i&0x1)
       to_return++;
   }
   return to_return;
@@ -185,7 +213,8 @@ static inline int32 num_of_state_next_to(state s, double_arrary * da)
 /*after_this > IDLE_LIST*/
 static inline state occupy_next_free(int32 size, state after_this){
   state to_return, _previous, _next;
-  int32 offset;
+  int8 i; 
+  code c;
  DA_NEXT_FREE_START:
   to_return = IDLE_LIST;
   do{
@@ -198,36 +227,59 @@ static inline state occupy_next_free(int32 size, state after_this){
     expand_double_array(da);
     goto DA_NEXT_FREE_START;
   }
-  /**/
- DA_FIND_CONTINOUS_IDLE_CELLS:
-  for(offset = 0;
-      offset < size - 1
-	&& 
-	da->cells[to_return + offset].check == -(to_return + offset + 1);
-      offset++);
-  if(offset == size - 1){
-    /* occupy state ... state + size -1*/
-    _previous = -(da->cells[to_return].base);
-    _next = -(da->cells[to_return + size -1].check);
-    da->cells[_previous].check = -_next;
-    da->cells[_next].base = -_previous;
-    return to_return;
-  }else{
-    if(da->cells[to_return + offset -1].check == IDLE_LIST){
-      /* da need to be expand */
-      expand_double_array(da);
-      goto DA_FIND_CONTINOUS_IDLE_CELLS;/*TODO*/
-    }else{
-      /* change to_return and find again.  */
-      to_return = da->cells[to_return + offset - 1];
-      goto DA_FIND_CONTINOUS_IDLE_CELLS;
+  
+ DA_FIND_SUIT_SLOT:
+  for(i = 0; i < MAX_CODE; i++){
+    if((bm>>i)&0x1){
+      c = da->cells[to_return].base + (MAX_CODE - i);
+      switch(check_state(c, da)){
+      case occupied_by_other:
+	/*not idle, move ahead*/
+	to_return = -(da->cells[to_return].check);
+	goto DA_FIND_SUIT_SLOT;
+	  break;/*useless*/
+      case idle:
+	/* check next code*/
+	break;
+      case overflow:
+	  expand_double_array(da);
+	  goto DA_FIND_SUIT_SLOT;
+	  break; /* useless */
+      }
     }
   }
+  /*a slot is found.*/
+  return to_return;
+
+ /* DA_FIND_CONTINOUS_IDLE_CELLS: */
+ /*  for(offset = 0; */
+ /*      offset < size - 1 */
+ /* 	&&  */
+ /* 	da->cells[to_return + offset].check == -(to_return + offset + 1); */
+ /*      offset++); */
+ /*  if(offset == size - 1){ */
+ /*    /\* occupy state ... state + size -1*\/ */
+ /*    _previous = -(da->cells[to_return].base); */
+ /*    _next = -(da->cells[to_return + size -1].check); */
+ /*    da->cells[_previous].check = -_next; */
+ /*    da->cells[_next].base = -_previous; */
+ /*    return to_return; */
+ /*  }else{ */
+ /*    if(da->cells[to_return + offset -1].check == IDLE_LIST){ */
+ /*      /\* da need to be expand *\/ */
+ /*      expand_double_array(da); */
+ /*      goto DA_FIND_CONTINOUS_IDLE_CELLS;/\*TODO*\/ */
+ /*    }else{ */
+ /*      /\* change to_return and find again.  *\/ */
+ /*      to_return = da->cells[to_return + offset - 1]; */
+ /*      goto DA_FIND_CONTINOUS_IDLE_CELLS; */
+ /*    } */
+ /*  } */
 }
 
-static inline void relocate(state s, double_array * da)
+static inline void relocate(state s, uint64 bm, double_array * da)
 {
-  
+  state b = 
 }
 
 static inline void occupy_state(state s, double_array *)
@@ -283,11 +335,15 @@ void da_insert(uint8 * key, void * data,
        * current state if the former plus one is less than
        * the latter.
        */
-      int32 num1 = num_of_state_next_to(_current_state);
-      int32 num2 = 
-	num_of_state_next_to(da->cells[_next_state].check];
+      uint64 bm1 = bitmap_of_state(_current_state, da);
+      uint64 bm2 = bitmap_of_state(da->cells[_next_state].check);
+      int8 num1 = num_of_1(bm1);
+      int8 num2 = num_of_1(bm2);
       if(num1 + 1 < num2)
-	;
+	relocate(_current_state, bm1, da);
+      else
+	relocate(da->cells[_next_state].check, bm2, da);
+      
       break;/*TODO*/
     case eok:
       /*
