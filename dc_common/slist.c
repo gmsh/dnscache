@@ -147,7 +147,7 @@ int mv2head(void * data,struct slist * sl){
 			if(cur == sl->end)
 				sl->end = pre;
 			pre->next = cur->next;
-			cur->next = sl->head;i/* modified by wakemecn*/
+			cur->next = sl->head; /* modified by wakemecn*/
 			sl->head = cur;
 			return 0;
 		}

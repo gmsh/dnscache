@@ -38,12 +38,12 @@ int main(){
 		};
 	append(&a[1],sl);
 	append(&a[2],sl);
-	push(&a[0],sl);
-	push(&a[3],sl);
 	traverse(print_data,sl);
-	mv2head(&a[2],sl);
+	mv2head(&a[1],sl);
 	traverse(print_data,sl);
 	printf("cap: %d, len : %d\n",sl->capacity,sl->length);
+	sl_free(free,sl);
+	traverse(print_data,sl);
 }
 
 /* print the data */
