@@ -70,7 +70,7 @@ main()
 	while( (i = read(sockfd, retbuf + retcount, LINES*sizeof(uint32))) > 0){
 		printf("I am reading\n");
 		retcount += i;
-		if(LINES*sizeof(uint32) <= retcount)
+		if( HEAD_LENGTH+ LINES*sizeof(uint32) <= retcount)
 			break;
 	}
 	printf("recieved \n");

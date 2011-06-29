@@ -35,10 +35,18 @@
 #define ARRAYSIZE	102400
 #define  LINES      	1024
 
+#define  DNS_ERROR	"127.0.0.1"
+#define	 CACHE_MISS	"127.0.0.2"
+#define  FIRST_WITH_ERROR	0x3f	//0011 1111
+#define  FIRST_WITHOUT_ERROR 	0x7f	//0111 1111
+#define	 SECONDE_WITH_ERROR	0xbf	//1011 1111
+#define	 SECONDE_WITHOUT_ERROR	0xff	//1111 1111
+
 typedef struct dmnode{
 	char	*domain;	/* point to the domain */
 	struct dmnode	*next;		/* point to the next node */
 } dm_node;
+
 /*
 typedef struct {
         uint32 ip; 

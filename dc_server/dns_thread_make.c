@@ -55,7 +55,7 @@ thread_main_dns(void *arg)
 
 		//do our job 
 		if(dnsrequest(domain, ipptr + count) != 0) 
-			inet_pton(AF_INET, "127.0.0.1", ipptr+count);
+			inet_pton(AF_INET,  DNS_ERROR, ipptr+count);
 		dc_free(domain);	//dc_free the memory of domain
 		Pthread_mutex_lock(mutex);
 		(*number)--;

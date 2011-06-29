@@ -102,39 +102,52 @@ static void do_search(uint8 *headptr, uint8 *requestptr, int rbuflen, int connfd
 	int readcount = 0, misscount = 0;
 	dm_node *curr = dc_alloc(sizeof(dm_node));
 	dm_node *firstnode = curr;
-	uint32 *curenip = (uint32 *)requestptr ;
+	uint32 *ipptr = (uint32 *)requestptr ;
 	fake_data_t *result;
-
+	int ipcount = 0;
 	for(;;){
+		
 		result = (fake_data_t *)get_data_and_lock(currentptr);
-		if( (NULL == result) || (result -> timestamp + TIME_OUT <
-		time(NULL)) ){
+		if( (NULL == result) || (result -> timestamp + 
+					TIME_OUT < time(NULL)) ){
 			misscount++;
-			curr -> domain =(dm_node *) dc_alloc((strlen(currentptr) + 1) 
+			curr -> domain = (uint8 *) dc_alloc((strlen(currentptr) + 1) 
 						* sizeof(uint8));
 			strcpy(curr -> domain, currentptr);
-		
+			//inet_pton(AF_INET,  DNS_ERROR, ipptr + ipcount);
 		} else {
-			
+			*(ipptr + ipcount) = result -> ip;
 		}
-
+		ipcount++;
 		readcount += strlen(currentptr) + 1;
 		currentptr  += strlen(currentptr) + 1;	
 		printf("misscount %d\n", misscount);
 	
 		if(readcount >= rbuflen)
 			break;
-
+		
 		if( NULL == result ){
 			curr -> next = (dm_node *)dc_alloc(sizeof(dm_node));
 			curr = curr -> next;
 			printf("add an node \n");
-			curr->next =NULL;
+			curr -> next =NULL;
 		}
 	}
 
-	if(0 < misscount )	
+	if(0 == misscount){
+		*((uint8 *)(headptr + HEAD_LENGTH - 1 )) = FIRST_WITHOUT_ERROR;
+		write(connfd, headptr, HEAD_LENGTH);
+		write(connfd, requestptr, ipcount * sizeof(uint32));
+		dc_free(headptr);
+		dc_free(requestptr);
+		close( connfd );
+	}else {
+		*((uint8 *)(headptr + HEAD_LENGTH - 1 )) = FIRST_WITHOUT_ERROR;
+		write(connfd, headptr, HEAD_LENGTH);
+		write(connfd, requestptr, ipcount * sizeof(uint32));
+		dc_free(headptr);
 		do_dns_search(misscount, firstnode, connfd);
+	}
 
 	return;
 }
@@ -155,7 +168,6 @@ static void do_dns_search(int total, dm_node * firstnode, int connfd)
 
 	i = 0;
 	while(NULL != currnode){
-		
 		Pthread_mutex_lock(&dns_array_mutex);
 		dns_array[iput].domain = currnode -> domain;
                 dns_array[iput].sockfd = connfd;
