@@ -5,7 +5,7 @@
  *      Author: gmsh
  */
 
-#include "double_arrary.h"
+#include "double_array.h"
 #include "dc_mm.h"
 #include "dc_set.h"
 #include "datrie_tail_pool.h"
