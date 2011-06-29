@@ -2,4 +2,6 @@ bin
 *.o
 lib
 *.list
+*.a
+*.gch
 

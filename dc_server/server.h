@@ -32,7 +32,7 @@
 #include <fcntl.h>
 
 #define MAXLINE		4096
-#define ARRAYSIZE	4096
+#define ARRAYSIZE	512
 #define  LINES      	1024
 
 
