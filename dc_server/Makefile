@@ -17,7 +17,7 @@ CC = gcc
 
 #for debug
 CFLAGS =  -I../include/  -g -Wall 
-LIB = -Llib -L../lib -lwraps -lpthread  -ldc_mm
+LIB = -Llib -L../lib -lwraps -lpthread  -ldc_mm  -ldl_cache
 #for release
 #CFLAGS = -o -ansi  
 
@@ -43,16 +43,16 @@ $(TARGETD): $(TARGETD).o
 	mv $@ $(DESTDIR)
 
 
-$(TARGETE).o: $(TARGETE).c $(TARGETA).c server.h
+$(TARGETE).o: $(TARGETE).c $(TARGETA).c server.h $(TARGETG)
 	$(CC) $(CFLAGS) -c $^
 $(TARGETE): $(TARGETE).o $(TARGETF) $(TARGETG) $(TARGETA).o $(TARGETC)
 	$(CC) $(CFLAGS) -o $@ $^ $(LIB) 
 	mv $@ $(DESTDIR)
 
-$(TARGETF): serv_thread_make.c dns_thread_make.c $(TARGETB) 
+$(TARGETF): serv_thread_make.c dns_thread_make.c $(TARGETB)  
 	$(CC) $(CFLAGS) -c  $^	$(LIB)
 
-$(TARGETG): init.c 
+$(TARGETG): init.c  
 	$(CC) $(CFLAGS) -c  $^	$(LIB)
 
 

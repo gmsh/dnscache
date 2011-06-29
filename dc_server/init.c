@@ -10,10 +10,18 @@
 #include "server.h"
 #include "dl_cache_stub.h"
 
+
+
+
+
+
+
+
+
 void init()
 {	
 	//init the dl_cache
-	dl_cache_init(sizeof(fake_data));	
+	dl_cache_init(sizeof(fake_data_t));	
 }	
 
 /***************  END OF init.c  **************/

@@ -39,8 +39,12 @@ typedef struct dmnode{
 	char	*domain;	/* point to the domain */
 	struct dmnode	*next;		/* point to the next node */
 } dm_node;
-
-
+/*
+typedef struct {
+        uint32 ip; 
+        time_t timestamp ; 
+} fake_data_t;
+*/
 typedef struct{
 	pthread_t thread_tid;	/* thread ID */
 //	unsigned long	thread_count;	/* works handled, just for test */
