@@ -250,31 +250,6 @@ static inline state occupy_next_free(int32 size, state after_this){
   }
   /*a slot is found.*/
   return to_return;
-
- /* DA_FIND_CONTINOUS_IDLE_CELLS: */
- /*  for(offset = 0; */
- /*      offset < size - 1 */
- /* 	&&  */
- /* 	da->cells[to_return + offset].check == -(to_return + offset + 1); */
- /*      offset++); */
- /*  if(offset == size - 1){ */
- /*    /\* occupy state ... state + size -1*\/ */
- /*    _previous = -(da->cells[to_return].base); */
- /*    _next = -(da->cells[to_return + size -1].check); */
- /*    da->cells[_previous].check = -_next; */
- /*    da->cells[_next].base = -_previous; */
- /*    return to_return; */
- /*  }else{ */
- /*    if(da->cells[to_return + offset -1].check == IDLE_LIST){ */
- /*      /\* da need to be expand *\/ */
- /*      expand_double_array(da); */
- /*      goto DA_FIND_CONTINOUS_IDLE_CELLS;/\*TODO*\/ */
- /*    }else{ */
- /*      /\* change to_return and find again.  *\/ */
- /*      to_return = da->cells[to_return + offset - 1]; */
- /*      goto DA_FIND_CONTINOUS_IDLE_CELLS; */
- /*    } */
- /*  } */
 }
 
 static inline void relocate(state s, uint64 bm, double_array * da)
