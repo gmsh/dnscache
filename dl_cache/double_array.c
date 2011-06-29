@@ -249,6 +249,12 @@ static inline state occupy_next_free(int32 size, state after_this){
     }
   }
   /*a slot is found.*/
+  for(i = 0; (bm>>i) & 0x1 == 0; i++);
+  c = MAX_CODE - i;
+  _previous = -(da->cells[to_return].base);
+  _next = -(da->cells[da->cells[to_return] + c].check);
+  da->cells[_previous].check = -_next;
+  da->cells[_next].base = -_previous;
   return to_return;
 }
 
