@@ -1,5 +1,5 @@
 /*
- * test_typdef.c
+ * test__typdef.c
  *
  *  Created on: Jun 25, 2011
  *      Author: gmsh
