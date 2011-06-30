@@ -209,7 +209,10 @@ static inline int8 num_of_1(uint64 bitmap)
   return to_return;
 }
 
-/*return first 1 of bm, if touch end return -1 */
+/*
+ * get first code
+ * return first 1 of bm, if touch end return -1 
+ */
 static inline int8 first_of_1(uint64 bm)
 {
   int8 to_return;
@@ -237,54 +240,60 @@ static inline int8 next_1_of_bm(int8 curr, uint64 bm)
     return -1;
 }
 
-/*after_this > IDLE_LIST*/
+/*
+ * according given bitmap, to find a suit slot to occupy.
+ * after_this > IDLE_LIST.
+ * retutn a possible base value of bm.
+ */
 static inline state occupy_next_free(uint64 bm,
-				     state after_this){
-  state to_return, s, _previous, _next;
-  int8 i; 
-  code c;
+				     double_arrary * da){
+  state next_idle, to_return, last_idle_to_occupy,
+    _previous, _next;
+  int8 _next_code = first_of_1(bm);
+  int8 first_code = _next_code;
+
+  /* ensure the return base is not negative. */
  DA_NEXT_FREE_START:
-  to_return = IDLE_LIST/*TODO  base index may not idle*/;
+  next_idle = IDLE_LIST;
   do{
-    to_return = -(da->cells[to_return].check);
-  }while(to_return < after_this && to_return != IDLE_LIST);
-  if(unlikely(to_return == IDLE_LIST)){
-    /* da needs to be expand, but i think it should never
-     * happen.
+    next_idle = -(da->cells[to_return].check);
+  }while(next_idle < _first_code && next_idle != IDLE_LIST);
+  if(unlikely(next_idle == IDLE_LIST)){
+    /* 
+     * da needs to be expand.
      */
     expand_double_array(da);
     goto DA_NEXT_FREE_START;
   }
   
  DA_FIND_SUIT_SLOT:
-  for(i = 0; i < MAX_CODE; i++){
-    if((bm>>i)&0x1){
-      c =  MAX_CODE - i;
-      s = da->cells[to_return].base + c;
-      switch(check_state(s, da)){
+  to_return = next_idle - first_code;
+  while(-1 != (_next_code = next_1_of_bm(_next_code, bm))){
+      last_idle_to_occupy 
+	= da->cells[to_return].base + _next_code;
+      switch(check_state(last_idle_to_occupy, da)){
       case occupied_by_other:
 	/*not idle, move ahead*/
-	to_return = -(da->cells[to_return].check);
+	next_idle = -(da->cells[next_idle].check);
+	_next_code = first_code;
 	goto DA_FIND_SUIT_SLOT;
-	  break;/*useless*/
+	break;/*useless*/
       case idle:
 	/* check next code*/
 	break;
       case overflow:
-	  expand_double_array(da);
-	  goto DA_FIND_SUIT_SLOT;
-	  break; /* useless */
+	expand_double_array(da);
+	goto DA_FIND_SUIT_SLOT;
+	break; /* useless */
       }
-    }
   }
   /*a slot is found.*/
-  for(i = 0; (bm>>i) & 0x1 == 0; i++);
-  c = MAX_CODE - i;
-  _previous = -(da->cells[to_return].base);
-  _next = -(da->cells[da->cells[to_return] + c].check);
+  _next_code = first_code;
+  _previous = -(da->cells[next_idle].base);
+  _next = -(da->cells[last_idle_to_occupy].check);
   da->cells[_previous].check = -_next;
   da->cells[_next].base = -_previous;
-  return to_return - first_of_1(bm);
+  return to_return;
 }
 
 /* free the state */
@@ -307,12 +316,13 @@ void free_state(state to_free, double_arrary * da)
 /*
  * move base for state to_relocate to a new place beginning 
  * at b.
- * bm is bitmap of to_relocate */
+ * bm is bitmap of to_relocate.
+ */
 static inline void relocate(state to_relocate, uint64 bm, 
 			    double_array * da)
 {
   /* dest base index */
-  state b = occupy_next_free(bm, ROOT_STATE);
+  state b = occupy_next_free(bm, ROOT_STATE, da);
   /*_code is not code because -1 may return*/
   /* for each input code for state to_relocate */
   int8 _code = first_of_1(bm), _code2;
@@ -486,18 +496,23 @@ void da_insert(uint8 * key, void * data,
 	da->cells[_next_state].userdata = data;
 	return;
       }
+      void * tail_data = da->cells[_next_state].userdata;
       if(0 != s_d_o){
-	/* + 1 for \0 */
-	strncmp();
-	/* insert _temp_key into da not tail */
-	da_insert_temp_key(/*_next_state*/, _temp_key, da);
-	/* after do that free the _temp_key */
-	dc_free(_temp_key);
+	/* insert same str into da not tail */
+	_current_state = da_insert_without_tail(tail, s_d_o, _next_state, da);
       }
-      /* insert the remanent tail &  the remanent current key
-       * into da, respectively*/
+      /* 
+       * insert the remanent tail &  the remanent current key
+       * into da, respectively. i.e. put the different in tail. 
+       * one is key + offset + s_d_o;
+       * the other is tail + s_d_o;
+       * next_code1 = *(one); next_code2 = *(the other); form 
+       * a bitmap and use occupy_next_free function to get base;
+       */
+      
+
       /* after do that remove the tail from tail pool */
-      dt_remove_tail(-(da->cells[_cell_state].base), da->tails);
+      dt_remove_tail(-(da->cells[_next_state].base), da->tails);
       /*TODO*/
       break;
     case invalid:
