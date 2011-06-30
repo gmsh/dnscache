@@ -355,6 +355,22 @@ static inline void occupy_state(state s, double_array *)
   da->cells[_next].base = -_previous;
 }
 
+/* return the offset of the first different char 
+ * if the two are same, return -1;
+ */
+static inline uint32 str_diff_offset(uint8 * str1, uint8 * str2)
+{
+  uint32 to_return = 0;
+  while(str1[to_return] == str2[to_return]){
+    if(str1[to_return] == '\0')
+      return -1;
+    to_return++;
+  }
+  return to_return;
+}
+
+state da_insert_temp_key()
+
 void da_insert(uint8 * key, void * data, 
 	       double_array * da)
 {
@@ -428,7 +444,28 @@ void da_insert(uint8 * key, void * data,
       }while(s > da->cell_num);
       goto _IDLE;
     case in_tail:
-      /**/
+      uint8 * tail 
+	= dt_get_tail(-(da->cells[_next_state].base), da->tails);
+      uint32 s_d_o = str_diff_offset(tail, key + offset);
+      if(s_d_o == -1){
+	/* the two are same, change the userdata to data */
+	da->cells[_next_state].userdata = data;
+	return;
+      }
+      if(0 != s_d_o){
+	/* + 1 for \0 */
+	unit8 * _temp_key = (uint8 *)dc_alloc(s_d_o + 1);
+	strncmp();
+	/* insert _temp_key into da not tail */
+	da_insert_temp_key(/*_next_state*/, _temp_key, da);
+	/* after do that free the _temp_key */
+	dc_free(_temp_key);
+      }
+      /* insert the remanent tail &  the remanent current key
+       * into da, respectively*/
+      /* after do that remove the tail from tail pool */
+      dt_remove_tail(-(da->cells[_cell_state].base), da->tails);
+      /*TODO*/
       break;
     case invalid:
       return;
@@ -436,7 +473,6 @@ void da_insert(uint8 * key, void * data,
       return;
     }
   }
-   
 }
 
 void * da_get_data(uint8 * key, double_array * da)
