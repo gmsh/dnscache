@@ -11,7 +11,7 @@
 #define SMALL 8			                /* the 2^SMALL is the smallese chunks */
 #define	BIG	20			        /* the 2^BIG is the biggest chunks */
 #define CHUNK_TYPE_NUM ( BIG - SMALL + 1 )	/* counts of  chunk's type */
-#define DEFAULT_EXTRA 4	/* default number of each type of extra chunks  */
+#define DEFAULT_EXTRA 2	/* default number of each type of extra chunks  */
 #define BIGGEST_CAP 30
 
 #include <stdlib.h>
