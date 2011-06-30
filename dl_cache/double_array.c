@@ -404,12 +404,14 @@ void da_insert(uint8 * key, void * data,
       uint64 bm2 = bitmap_of_state(da->cells[_next_state].check);
       int8 num1 = num_of_1(bm1);
       int8 num2 = num_of_1(bm2);
-      if(num1 + 1 < num2)
+      if(num1 + 1 < num2){
 	relocate(_current_state, bm1, da);
-      else
+      }else{
 	relocate(da->cells[_next_state].check, bm2, da);
-      
-      break;/*TODO*/
+      }
+      /* move back the input char & rechek */
+      offset--;
+      break;
     case eok:
       /*
        * In this scenario, we save the data
