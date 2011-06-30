@@ -1,13 +1,23 @@
 #include "dc_mm.h"
+#include <math.h>
+
+#define POW2(x) (0x0000000000000001 << x)
 
 main(){
 	mm_init();
-	void * ptr[18];
-	int i, j;
-	for(i = 0; i < 18; i++)
-		ptr[i] = dc_alloc(1048576);
-	for(j = 0; j < 18; j++ )
+	void * ptr[2000];
+	int i, j;int count=25;
+	while(--count < 25 && count > 1){
+		for(i = 0; i < 40; i++)
+			ptr[i] = dc_alloc(POW2(count));
+		print_statics();
+		for(j = 0; j < 40; j++ )
 			dc_free(ptr[j]);
-	ptr[i] = dc_alloc(256);
-	dc_free(ptr[i]);
+		for(i = 0; i < 40; i++)
+			ptr[i] = dc_alloc(POW2(count));
+		print_statics();
+		for(j = 0; j < 40; j++ )
+			dc_free(ptr[j]);
+	}
+	print_statics();
 }

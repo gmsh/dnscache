@@ -8,17 +8,12 @@
 #ifndef _MM_STUCT_H
 #define _MM_STUCT_H
 
-#define SMALL 8			                /* the 2^SMALL is the smallese chunks */
-#define	BIG	20			        /* the 2^BIG is the biggest chunks */
-#define CHUNK_TYPE_NUM ( BIG - SMALL + 1 )	/* counts of  chunk's type */
-#define DEFAULT_EXTRA 2	/* default number of each type of extra chunks  */
-#define BIGGEST_CAP 30
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <pthread.h>
 #include "typedefs.h"
+#include "constants.h"
 #include "slist.h"
 
 struct chunks_manager {	/* manage the chunks with small capacity. */
@@ -34,10 +29,8 @@ struct extra_list_manager{	/* manager the extra list of chunks */
 	struct slist * chunks_list;/* pointer to the list */
 }	* elm_table[BIGGEST_CAP + 1];/* as the name shows that num in []  presents the cap*/
 
-
-struct slist * idle_chunks_table[CHUNK_TYPE_NUM];  /* array of pointers to
-                                                 * idle chunks lists.
-						 */
+uint64 pre_alloc_apply[CHUNK_TYPE_NUM], pre_alloc_free[CHUNK_TYPE_NUM];
+uint64 extra_apply[BIGGEST_CAP + 1], extra_free[BIGGEST_CAP + 1];
 
 pthread_mutex_t * pre_alloc_mutex[CHUNK_TYPE_NUM];
 pthread_mutex_t * extra_mutex[BIGGEST_CAP + 1];
