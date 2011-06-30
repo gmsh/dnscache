@@ -1,4 +1,4 @@
 dnsKache
-The dl_cache module in dnscache will never be maintained before dnsKache is complete.
+The dl_cache module in dnscache's master branch will never be maintained before dnsKache is complete.
 But the dnsKache will be finally merged into dnscache project as libdnsKache.
 The initial version only works under x86_64.
