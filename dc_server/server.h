@@ -33,7 +33,7 @@
 
 #define MAXLINE		4096
 #define ARRAYSIZE	102400
-#define  LINES      	1024
+#define  LINES      	5
 
 #define  DNS_ERROR	"127.0.0.1"
 #define	 CACHE_MISS	"127.0.0.2"

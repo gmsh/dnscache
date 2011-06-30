@@ -11,7 +11,7 @@
 //#include "dc_mm.h"
 #include "dl_cache_stub.h"
 static void serv(int connfd);
-static void do_search(uint8 *headptr, uint8 *requestptr, int rbuflen ,int conndfd);
+static void do_search(uint8* headptr, uint8 *requestptr, int rbuflen ,int conndfd);
 static void do_dns_search(int total, dm_node * firstnode, int connfd);
 
 void thread_make_serv(int i)
@@ -31,6 +31,7 @@ void  * thread_main_serv(void * arg)
 	socklen_t	addrlen;
 
 	cliaddr = dc_alloc(addrlen);
+
 	printf("thread %d string \n", (int) arg);
 	for(;;){
 		clilen = addrlen;
@@ -76,15 +77,14 @@ static void serv(int connfd)
 	if(total_length == 0)
 		close(connfd);
 	
-	uint8 *request_ptr =(uint8 *)dc_alloc((total_length - HEAD_LENGTH ) * sizeof(uint8));
-	uint8 *read_ptr = request_ptr;
+	uint8 *request_ptr =(uint8 *)dc_alloc((total_length - HEAD_LENGTH) * sizeof(uint8));
+	uint8 *read_ptr = request_ptr ;
 	
 	readcount = HEAD_LENGTH;	/* head length */
 	while( (i = read(connfd , read_ptr, (total_length - HEAD_LENGTH))) > 0){
 		readcount += i;
 		read_ptr += i;
 		if(readcount >= total_length){
-			//printf("%d\n", readcount);
 			*(request_ptr + total_length - HEAD_LENGTH - 1) = '\0';
 			break;	
 		}
@@ -96,15 +96,17 @@ static void serv(int connfd)
  * rbuflen  means the length of the message(except headlength)
  */
 
-static void do_search(uint8 *headptr, uint8 *requestptr, int rbuflen, int connfd)
+static void do_search(uint8 * headptr, uint8 *requestptr, int rbuflen, int connfd)
 {	
 	uint8 *currentptr = requestptr;
 	int readcount = 0, misscount = 0;
 	dm_node *curr = dc_alloc(sizeof(dm_node));
 	dm_node *firstnode = curr;
-	uint32 *ipptr = (uint32 *)requestptr ;
+	uint32 *ipptr = (uint32 *)requestptr;
 	fake_data_t *result;
 	int ipcount = 0;
+	char ipstr[16];
+
 	for(;;){
 		
 		result = (fake_data_t *)get_data_and_lock(currentptr);
@@ -114,24 +116,25 @@ static void do_search(uint8 *headptr, uint8 *requestptr, int rbuflen, int connfd
 			curr -> domain = (uint8 *) dc_alloc((strlen(currentptr) + 1) 
 						* sizeof(uint8));
 			strcpy(curr -> domain, currentptr);
-			//inet_pton(AF_INET,  DNS_ERROR, ipptr + ipcount);
+			readcount += strlen(currentptr) + 1;
+			currentptr  += strlen(currentptr) + 1;	
+			inet_pton(AF_INET,  CACHE_MISS, ipptr + ipcount);
+
 		} else {
 			*(ipptr + ipcount) = result -> ip;
+			readcount += strlen(currentptr) + 1;
+			currentptr  += strlen(currentptr) + 1;	
 		}
+		
 		ipcount++;
-		readcount += strlen(currentptr) + 1;
-		currentptr  += strlen(currentptr) + 1;	
-		printf("misscount %d\n", misscount);
-	
 		if(readcount >= rbuflen)
 			break;
-		
 		if( NULL == result ){
 			curr -> next = (dm_node *)dc_alloc(sizeof(dm_node));
 			curr = curr -> next;
-			printf("add an node \n");
 			curr -> next =NULL;
 		}
+
 	}
 
 	if(0 == misscount){
@@ -141,10 +144,12 @@ static void do_search(uint8 *headptr, uint8 *requestptr, int rbuflen, int connfd
 		dc_free(headptr);
 		dc_free(requestptr);
 		close( connfd );
+	
 	}else {
-		*((uint8 *)(headptr + HEAD_LENGTH - 1 )) = FIRST_WITHOUT_ERROR;
+		*((uint8 *)(headptr + HEAD_LENGTH - 1 )) = FIRST_WITH_ERROR;
+	
 		write(connfd, headptr, HEAD_LENGTH);
-		write(connfd, requestptr, ipcount * sizeof(uint32));
+		write(connfd, requestptr,ipcount *sizeof(uint32));
 		dc_free(headptr);
 		do_dns_search(misscount, firstnode, connfd);
 	}

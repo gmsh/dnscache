@@ -64,13 +64,16 @@ main()
         } 
 	
 	write(sockfd, buf, total_length);
-	uint32 *retbuf = (uint32 *)malloc(LINES*sizeof(uint32));
+	uint8 *retbuf = (uint8 *)malloc(LINES*sizeof(uint32) +
+			HEAD_LENGTH * sizeof(uint8));
  	
 	int retcount = 0;
-	while( (i = read(sockfd, retbuf + retcount, LINES*sizeof(uint32))) > 0){
-		printf("I am reading\n");
+	while( (i = read(sockfd, retbuf + retcount,
+		HEAD_LENGTH*sizeof(uint8) + LINES*sizeof(uint32))) > 0){
 		retcount += i;
-		if( HEAD_LENGTH+ LINES*sizeof(uint32) <= retcount)
+		printf("i %d", i);
+		printf("retcount %d\n", retcount);
+		if(( HEAD_LENGTH + LINES*sizeof(uint32)) <= retcount)
 			break;
 	}
 	printf("recieved \n");
@@ -78,13 +81,31 @@ main()
         for(i = 0 ; i < 16 ;i++)
                 ipstr[i] = '\0';
 	int len = HEAD_LENGTH ; 
-       for(i = 0; i<LINES; i++){
+        for(i = 0; i < LINES; i++){
 		printf("%s   ", buf + len);
 		len += strlen (buf + len) + 1;
- 		inet_ntop(AF_INET, (in_addr_t *)(retbuf+i), ipstr , 16);
+ 		inet_ntop(AF_INET, (in_addr_t *)( (uint32 *)(retbuf +HEAD_LENGTH) + i), ipstr , 16);
                 printf("%s\n", ipstr);
-        }   
-    
+        } 
+
+    	
+	retcount = 0;
+	while( (i = read(sockfd, retbuf + retcount,(LINES)*sizeof(uint32))) > 0){
+		retcount += i;
+		printf("retcount %d\n", retcount);
+		if((LINES*sizeof(uint32)) <= retcount)
+			break;
+	}
+	printf("recieved \n");
+        for(i = 0 ; i < 16 ;i++)
+                ipstr[i] = '\0';
+	len = HEAD_LENGTH ; 
+        for(i = 0; i < LINES; i++){
+		printf("%s   ", buf + len);
+		len += strlen (buf + len) + 1;
+ 		inet_ntop(AF_INET, (in_addr_t *)((uint32 *)retbuf + i), ipstr , 16);
+                printf("%s\n", ipstr);
+	}
 
         close(sockfd);
 	fclose(fp);
