@@ -5,7 +5,7 @@
  * decription:	dnscache's memory management
  */
 
-#define	LOG2(x) ffs(x)
+#define	LOG2(x) (ffs(x) - 1)
 #define POW2(x) (0x0000000000000001 << x)
 
 #include "slist.h"
@@ -128,7 +128,7 @@ void * select_extra(uint64 cap)
 
 /* make a new extra list with specific capacity */
 void mk_el(uint64 cap){
-	printf("dc_mm : %s%ld%s\n.","start to generate extra chunks list of chunks with specific capacity ", POW2(cap), " Bytes.");
+	printf("dc_mm : %s%ld%s\n","start to generate extra chunks list of chunks with specific capacity ", POW2(cap), " Bytes.");
 	struct slist * list_ptr;
 	if(elm_table[cap])
 		return;
@@ -143,7 +143,7 @@ void mk_el(uint64 cap){
 /* expand a extra list with specific capacity */
 void expand_el(uint64 cap)
 {
-	printf("dc_mm : %s%ld%s\n.","start to expand extra chunks list of chunks with specific capacity ", POW2(cap), " Bytes.");
+	printf("dc_mm : %s%ld%s\n","start to expand extra chunks list of chunks with specific capacity ", POW2(cap), " Bytes.");
 	struct slist * list_ptr;
 	void * ptr , * chunk_ptr;
 	list_ptr = elm_table[cap]->chunks_list;
@@ -156,13 +156,13 @@ void expand_el(uint64 cap)
 	}
 	elm_table[cap]->idle_num += DEFAULT_EXTRA;
 	elm_table[cap]->total_num += DEFAULT_EXTRA;
-	printf("dc_mm : %s%ld%s\n.","finish to expand extra chunks list of chunks with specific capacity ", POW2(cap), " Bytes.");
+	printf("dc_mm : %s%ld%s\n","finish to expand extra chunks list of chunks with specific capacity ", POW2(cap), " Bytes.");
 }
 
 void * dc_alloc(size_t size)
 {
 	uint64 cap = (uint64)LOG2((uint64)size); /* */
-	if((uint64)size > (0x000000000000001 << cap))
+	if((uint64)size > (POW2(cap)))
 		cap++;
 	struct slist * list_ptr;
 	struct sl_node * node_ptr;
@@ -194,10 +194,11 @@ void * dc_alloc(size_t size)
 			return select_extra(cap);
         } 
 		/* if has extra list ,but full ,then expand it */
-		if(0 == elm_table[cap]->idle_num)
+		if(0 == elm_table[cap]->idle_num){
 			pthread_mutex_lock(extra_mutex[cap]);
 			expand_el(cap);
 			pthread_mutex_unlock(extra_mutex[cap]);
+		}
 		return select_extra(cap);
 	}
 	/* if has idle chunck */
