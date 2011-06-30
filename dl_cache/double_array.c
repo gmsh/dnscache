@@ -9,13 +9,14 @@
 #include "dc_mm.h"
 #include "dc_set.h"
 #include "datrie_tail_pool.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 typedef int32 state;
 typedef uint8 code;
 
 #define ROOT_STATE 1 /* root cell */
 #define IDLE_LIST 0 /* use cell[0] as idle list */
-#define END_CODE get_code('\0')
 
 typedef struct _da_cell {
   /*
@@ -132,18 +133,25 @@ double_array * new_double_array()
    *		base[ri] = -r( i - 1)
    */  
   int32 i;
-  for(i = 0; i < to_return->cellnum; i++){
+  for(i = 0; i < to_return->cell_num; i++){
     to_return->cells[i].base = -(i - 1);
     to_return->cells[i].check = -(i + 1); 
   }
   /*base[i] is the previous free cell*/
   /*check[i] is the next free cell*/
   to_return->cells[0].base = 
-    to_return->-(to_return->cellnum - 1);
-  to_return->cells[to_return->cellnum -1]
+    to_return->-(to_return->cell_num - 1);
+  to_return->cells[to_return->cell_num -1]
     = 0;
   to_return->tails = new_datrie_tail_pool();
   return to_return;
+}
+
+void free_da(double_array * da)
+{
+  dc_free(da->cells);
+  free_datp(da->tails);
+  dc_free(da);
 }
 
 static inline enum cell_state 
@@ -187,7 +195,7 @@ static inline void expand_double_array(double_arrary * da)
 static inline uint64 bitmap_of_state(state s, double_arrary * da)
 {
   uint64 to_return = 0;
-  int32 i;
+  int8 i;
   /* 1 is the first code */
   for(i = 1; i <= MAX_CODE; i++){
     /*check[base[s] + c] = s*/
@@ -197,6 +205,14 @@ static inline uint64 bitmap_of_state(state s, double_arrary * da)
       return = return << 1;
   }
   return to_return;
+}
+
+static inline uint64 set_1_of_code(uint64 bm, code c)
+{
+  uint64 mask
+    = 0x8000000080000000 >> (sizeof(uint64) - MAX_CODE
+			     - c - 1);
+  return bm & mask;
 }
 
 static inline int8 num_of_1(uint64 bitmap)
@@ -499,21 +515,58 @@ void da_insert(uint8 * key, void * data,
       void * tail_data = da->cells[_next_state].userdata;
       if(0 != s_d_o){
 	/* insert same str into da not tail */
-	_current_state = da_insert_without_tail(tail, s_d_o, _next_state, da);
+	_current_state = da_insert_without_tail(tail, s_d_o,
+						_next_state, da);
+      }else{
+	_current_state = _next_state;
       }
       /* 
        * insert the remanent tail &  the remanent current key
        * into da, respectively. i.e. put the different in tail. 
        * one is key + offset + s_d_o;
        * the other is tail + s_d_o;
-       * next_code1 = *(one); next_code2 = *(the other); form 
-       * a bitmap and use occupy_next_free function to get base;
+       * next_code1 = get_code(*(one));
+       * next_code2 = get_code(*(the other)); form a bitmap and 
+       * use occupy_next_free function to get base;
        */
+      uint64 bm3 = 0;
+      uint8 * tail1 = key + offset + s_d_o;
+      code next_code1 = get_code(*(tail1));
+      uint8 * tail2 = tail + s_d_o;      
+      code next_code2 = get_code(*(tail2));
+      /* Note that only one of the two can be '\0' */
+      if(*tail1 != '\0')
+	bm3 = set_1_of_code(next_code1, bm3);
+      if(*tail2 != '\0')
+	bm3 = set_1_of_code(next_code2, bm3);
+      da->cells[_current_state].base = 
+	_current_stateoccupy_next_free(bm3, da);
       
-
+      if(*tail1 != '\0'){
+	_next_state = da->cells[_current_state].base + next_code1;
+	da->cells[_next_state].check
+	  = _current_state;
+	da->cells[_next_state].base
+	= dt_push_tail(tail1 + 1, da->tails);
+	da->cells[_next_state].userdata
+	  = data;
+      }else{
+	da->cells[_current_state].userdata = data;
+      }
+      
+      if(*tail2 != '\0'){
+	_next_state = da->cells[_current_state].base + next_code2;
+	da->cells[_next_state].check
+	  = _current_state;
+	da->cells[_next_state].base
+	= dt_push_tail(tail2 + 1, da->tails);
+	da->cells[_next_state].userdata = tail_data;
+      }else{
+	da->cells[_current_state].userdata = data;
+      }
       /* after do that remove the tail from tail pool */
       dt_remove_tail(-(da->cells[_next_state].base), da->tails);
-      /*TODO*/
+      return;
       break;
     case invalid:
       return;
@@ -557,4 +610,72 @@ void * da_get_data(uint8 * key, double_array * da)
       return NULL;
     }
   }
+}
+
+void da_delete(uint8 * key, double_array * da)
+{
+  /* In initial implementation, this function do nothing. */
+}
+
+void da_set_data(uint8 * key, void * data, double_array * da)
+{
+  da_insert(key, data, da);
+}
+
+
+long write_da_to_file(FILE * f, long offset, double_array * da)
+{
+  /* 
+   * write the cell_num first
+   * write cell_num * state * 2,
+   * base 0, check 0, base 1, check 1,...
+   * Note that we don't write the tail pool, write_datp_to_file
+   * function should be called by a datrie, not double_arary.
+   * so when we read we don't set tails, either.
+   */
+  if(NULL == f)
+    return -1;
+  size_t temp = fseek(f, offset, SEEK_SET);
+  if(unlikely(temp == 0)){
+    return -1;
+  }
+  temp = fwrite(&da->cell_num, sizeof(uint32), 1, f);
+  if(unlikely(temp != 1))
+    return -1;
+  
+  uint32 i;
+  for(i = 0; i < da->cell_num){
+    temp = fwrite(&da->cells[i].base, sizeof(state), 1, f);
+    temp += fwrite(&da->cells[i].check, size(state), 1, f);
+    if(unlikely(temp != 2))
+      return -1;
+  }
+  return (1 + 2 * da->cell_num) * sizeof(uin32);
+}
+
+double_array * read_da_from_file(FILE * f, long offset)
+{
+  /* Note that when we have read we don't set tails */
+  double_arrary * to_return = dc_alloc(sizeof(double_arrary));
+  
+  if(NULL == f)
+    return NULL;
+  size_t temp = fseek(f, offset, SEEK_SET);
+  if(unlikely(temp == 0)){
+    return NULL;
+  }
+  temp = fread(&da->cell_num, sizeof(uint32), 1, f);
+  if(unlikely(temp != 1)){
+    return NULL;
+  }
+  to_return->cells
+    = (da_cell *)dc_alloc(sizeof(da_cell) * to_return->cell_num);
+  uint32 i;
+  for(i = 0; i < to_return->cells; i++){
+    temp = fread(&da->cells[i].base, sizeof(state), 1, f);
+    temp += fwrite(&da->cells[i].check, size(state), 1, f);
+    if(unlikely(temp != 2))
+      return NULL;
+  }
+  return to_return;
 }
