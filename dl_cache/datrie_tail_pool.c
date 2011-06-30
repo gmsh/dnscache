@@ -20,7 +20,8 @@ datrie_tail_pool * new_datrie_tail_pool()
 {
   datrie_tail_pool * to_return = dc_alloc(sizeof(datrie_tail_pool));
   to_return->pool = dc_alloc(sizeof(uint8) * DATRIE_TAIL_POOL_INITIAL_SIZE);
-  to_return->next_free = 0;
+  /*index start from 1*/
+  to_return->next_free = 1;
   to_return->pool_size = DATRIE_TAIL_POOL_INITIAL_SIZE;
   return to_return;
 }

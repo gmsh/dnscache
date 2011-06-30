@@ -274,12 +274,15 @@ static inline int8 next_1_of_bm(int8 curr, uint64 bm)
  * according given bitmap, to find a suit slot to occupy.
  * after_this > IDLE_LIST.
  * retutn a possible base value of bm.
+ * return -1 if bm is empty.
  */
 static inline state occupy_next_free(uint64 bm,
 				     double_array * da){
   state next_idle, to_return, last_idle_to_occupy,
     _previous, _next;
   int8 _next_code = first_of_1(bm);
+  if(unlikely(_next_code == -1))
+    return -1;
   int8 _first_code = _next_code;
 
   /* ensure the return base is not negative. */
@@ -545,7 +548,9 @@ void da_insert(uint8 * key, void * data,
       code next_code1 = get_code(*(tail1));
       uint8 * tail2 = tail + s_d_o;      
       code next_code2 = get_code(*(tail2));
-      /* Note that only one of the two can be '\0' */
+      /* Note that only one of the two can be '\0' 
+       * so bm3 should not by empty;
+       */
       if(*tail1 != '\0')
 	bm3 = set_1_of_code(next_code1, bm3);
       if(*tail2 != '\0')
