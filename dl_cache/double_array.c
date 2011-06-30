@@ -209,15 +209,32 @@ static inline int8 num_of_1(uint64 bitmap)
   return to_return;
 }
 
+/*return first 1 of bm, if touch end return -1 */
 static inline int8 first_of_1(uint64 bm)
 {
   int8 to_return;
-  /* -1 for code 0*/
-  bm = bm << (sizeof(uint64) - MAX_CODE - 1);
+  bm = bm << (sizeof(uint64) - MAX_CODE);
   for(to_return = 0;
       0 == (bm << to_return)&8000000000000000;
-      to_return++);
-  return ++to_return;
+      to_return++)
+    {
+      if(to_return == MAX_CODE)
+	return -1;
+    }
+  return 1 + to_return;
+}
+
+/*return next 1 of bm, if touch end return -1 */
+static inline int8 next_1_of_bm(int8 curr, uint64 bm)
+{
+  int8 to_return;
+  bm = bm << (sizeof(uint64) - MAX_CODE);
+  for(to_return = curr;to_return <MAX_CODE; to_return++){
+    if(1 == ((bm << to_return)&8000000000000000))
+      return 1 + to_return;
+  }
+  if(to_return = MAX_CODE)
+    return -1;
 }
 
 /*after_this > IDLE_LIST*/
@@ -270,22 +287,64 @@ static inline state occupy_next_free(uint64 bm,
   return to_return - first_of_1(bm);
 }
 
+/* free the state */
+void free_state(state to_free, double_arrary * da)
+{
+  state s = to_free, temp;
+  while(s != IDLE_LIST){
+    s--;
+    if(da->cells[s].check < 0)
+      break;
+    /* break if idle */
+  }
+  temp = -(da->cells[s].check);
+  da->cells[s].check = -to_free;
+  da->cells[to_free].check = -temp;
+  da->cells[to_free].base = -s;
+  da->cells[temp].base = -to_free;
+}
+
+/*
+ * move base for state to_relocate to a new place beginning 
+ * at b.
+ * bm is bitmap of to_relocate */
 static inline void relocate(state to_relocate, uint64 bm, 
 			    double_array * da)
 {
-  /*
-   * dest base index
-   */
+  /* dest base index */
   state b = occupy_next_free(bm, ROOT_STATE);
-  
-  int8 i;
-  code c;
-  for(i = 1; i < MAX_CODE; i++){
-    if((bm>>i)&0x1){
-      //c = MAX_CODE - i;
-      da->cells[b /*TODO*/
+  /*_code is not code because -1 may return*/
+  /* for each input code for state to_relocate */
+  int8 _code = first_of_1(bm), _code2;
+  uint64 bm2;
+  while(_code != -1){
+    /* mark owner */
+    da->cells[b + _code] = to_relocate;
+    /* base[b + c] = base[base[s] + c] */
+    state base_s_c = da->cells[to_relocate].base + _code;
+    da->cells[b + _code].base 
+      = da->cells[da->cells[base_s_c]].base;
+    /* copy data.*/
+    da->cells[b + _code].user_data
+      = da->cells[da->cells[base_s_c]].user_data;
+    _code = next_1_of_bm(_code, bm);
+    
+    /* 
+     * the node base[s] + c is to be moved to b + c. Hence, for any
+     * i for which check[i] = base[s] + c, update check[i] to b + c;
+     */
+    bm2 = bitmap_of_state(base_s_c, da);    
+    /* for eache input code for state (base[to_relocate] + c) */
+    _code2 = first_of_1(bm2);
+    while(_code2 != -1){
+      /* check[base[base[s] + c] + d] = b + c */
+      /* check[base[base_s_c] + _code2] = b + code */
+      da->cells[da->cells[base_s_c].base + _code2].check = b + _code;
     }
+    /* free the cell */
+    free_state(base_s_c, da);
   }
+  da->cells[to_relocate] = b;
 }
 
 static inline void occupy_state(state s, double_array *)
@@ -330,7 +389,7 @@ void da_insert(uint8 * key, void * data,
       da->cells[_next_state].check = _current_state;
       da->cells[_next_state].base =
 	-(dt_push_tail(key + offset, da->tails));
-      da->cells[_next_state].userdata = data.
+      da->cells[_next_state].user_data = data.
       return;
     case occupied_by_other:
       /*
@@ -358,7 +417,7 @@ void da_insert(uint8 * key, void * data,
        * we don't need occupy it, because it is
        * not idle.
        */
-      da->cells[_current_state].userdata = data;
+      da->cells[_current_state].user_data = data;
       return;
     case overflow:
       /* s = next state  */
