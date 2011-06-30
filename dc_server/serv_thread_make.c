@@ -12,7 +12,7 @@
 #include "dl_cache_stub.h"
 static void serv(int connfd);
 static void do_search(uint8* headptr, uint8 *requestptr, int rbuflen ,int conndfd);
-static void do_dns_search(int total, dm_node * firstnode, int connfd);
+static void do_dns_search(uint8 * headptr,int total, dm_node * firstnode, int connfd);
 
 void thread_make_serv(int i)
 {
@@ -104,7 +104,7 @@ static void do_search(uint8 * headptr, uint8 *requestptr, int rbuflen, int connf
 	dm_node *firstnode = curr;
 	uint32 *ipptr = (uint32 *)requestptr;
 	fake_data_t *result;
-	int ipcount = 0;
+	uint32 ipcount = 0;
 	char ipstr[16];
 
 	for(;;){
@@ -115,6 +115,7 @@ static void do_search(uint8 * headptr, uint8 *requestptr, int rbuflen, int connf
 			misscount++;
 			curr -> domain = (uint8 *) dc_alloc((strlen(currentptr) + 1) 
 						* sizeof(uint8));
+			curr -> index = ipcount;
 			strcpy(curr -> domain, currentptr);
 			readcount += strlen(currentptr) + 1;
 			currentptr  += strlen(currentptr) + 1;	
@@ -137,7 +138,7 @@ static void do_search(uint8 * headptr, uint8 *requestptr, int rbuflen, int connf
 
 	}
 
-	if(0 == misscount){
+	if( 0 == misscount){
 		*((uint8 *)(headptr + HEAD_LENGTH - 1 )) = FIRST_WITHOUT_ERROR;
 		write(connfd, headptr, HEAD_LENGTH);
 		write(connfd, requestptr, ipcount * sizeof(uint32));
@@ -150,38 +151,45 @@ static void do_search(uint8 * headptr, uint8 *requestptr, int rbuflen, int connf
 	
 		write(connfd, headptr, HEAD_LENGTH);
 		write(connfd, requestptr,ipcount *sizeof(uint32));
-		dc_free(headptr);
-		do_dns_search(misscount, firstnode, connfd);
+		do_dns_search(headptr, misscount, firstnode, connfd);
 	}
 
 	return;
 }
 
-static void do_dns_search(int total, dm_node * firstnode, int connfd)
+/*
+ * call up the dns threads to do dns search.
+ */
+
+static void do_dns_search(uint8* headptr, int total, dm_node * firstnode, int connfd)
 {
 	dm_node *currnode = firstnode, *tempnode ;
 	int i;
 	
 	int  *number, count;
-	uint32 *ipptr;
+	uint32 *ipptr, index;
+	uint8	*miss = dc_alloc(sizeof(uint8));
+	*miss = NO_ERROR;
 	pthread_mutex_t *mutex;
 	number= (int *)dc_alloc(sizeof(int)); 
-	*number = LINES;
-	ipptr = (uint32	*)dc_alloc(LINES * sizeof(uint32));
+	*number = total;
+	ipptr = (uint32	*)dc_alloc(total * 2 * sizeof(uint32));
 	mutex = (pthread_mutex_t*)dc_alloc(sizeof(pthread_mutex_t));
 	Pthread_mutex_init(mutex, NULL);
 
 	i = 0;
 	while(NULL != currnode){
 		Pthread_mutex_lock(&dns_array_mutex);
-		dns_array[iput].domain = currnode -> domain;
-                dns_array[iput].sockfd = connfd;
-                dns_array[iput].number = number;
-                dns_array[iput].count  = i;
-                dns_array[iput].total  = total;
-                dns_array[iput].ipptr  = ipptr;
-                dns_array[iput].mutex  = mutex;
-                
+		dns_array[iput].domain 	= currnode -> domain;
+                dns_array[iput].index  	= currnode -> index;
+                dns_array[iput].sockfd 	= connfd;
+                dns_array[iput].number 	= number;
+                dns_array[iput].count  	= i;
+                dns_array[iput].total  	= total;
+                dns_array[iput].ipptr  	= ipptr;
+                dns_array[iput].mutex  	= mutex;
+                dns_array[iput].headptr	= headptr;
+                dns_array[iput].miss	= miss;
 		if(++iput == ARRAYSIZE)
                            iput = 0;
                 if( iget == iput ){

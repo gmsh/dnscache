@@ -10,8 +10,8 @@
 #include "server.h"
 
 #define  INPUTFILE "domain.list"
-#define  OUTPUTFILE "domainip.list"
-#define  IPFILE "ip.list"
+#define  OUTPUTFILE "testdomainip.list"
+#define  IPFILE "testip.list"
 int
 main()
 {
@@ -19,7 +19,7 @@ main()
         int i =0 ;
        	if( (fp = fopen(INPUTFILE, "r")) == NULL)	
 		printf("file open error\n");
- 
+ /*
  	if( (outfp = fopen(OUTPUTFILE, "w+")) == NULL){
 		printf("file open error\n");
 		exit(0);
@@ -28,7 +28,7 @@ main()
 		printf("file open error\n");
 		exit(0);
 	}
-	
+*/	
      //   fp = fopen(OUTPUTFILE, "rw");
 	uint32 total_length = 0;
         char readbuff[4096];
@@ -74,14 +74,15 @@ main()
         } 
 	
 	write(sockfd, buf, total_length);
-	uint8 *retbuf = (uint8 *)malloc(LINES*sizeof(uint32) +
+	uint8 *retbuf = (uint8 *)malloc(LINES * 2 * sizeof(uint32) +
 			HEAD_LENGTH * sizeof(uint8));
  	
+	//first return
 	int retcount = 0;
 	while( (i = read(sockfd, retbuf + retcount,
-		HEAD_LENGTH*sizeof(uint8) + LINES*sizeof(uint32))) > 0){
+		HEAD_LENGTH * sizeof(uint8) + LINES*sizeof(uint32))) > 0){
 		retcount += i;
-		printf("i %d", i);
+		printf("i %ld", i);
 		printf("retcount %d\n", retcount);
 		if(( HEAD_LENGTH + LINES*sizeof(uint32)) <= retcount)
 			break;
@@ -98,12 +99,12 @@ main()
                 printf("%s\n", ipstr);
         } 
 
-    	
+    	//second return
 	retcount = 0;
-	while( (i = read(sockfd, retbuf + retcount,(LINES)*sizeof(uint32))) > 0){
+	while( (i = read(sockfd, retbuf + retcount,HEAD_LENGTH * sizeof(uint8)
+					+ LINES * 2 * sizeof(uint32))) > 0){
 		retcount += i;
-		printf("retcount %d\n", retcount);
-		if((LINES*sizeof(uint32)) <= retcount)
+		if((LINES * 2 * sizeof(uint32) +  HEAD_LENGTH) <= retcount)
 			break;
 	}
 	printf("recieved \n");
@@ -111,19 +112,21 @@ main()
                 ipstr[i] = '\0';
 	len = HEAD_LENGTH ; 
         for(i = 0; i < LINES; i++){
-		fprintf(outfp,"%s\t", buf + len);
+	//	fprintf(outfp,"%s\t", buf + len);
+		printf("index %d   ", *(uint32 *)((uint32 *) (retbuf + HEAD_LENGTH ) + i * 2   ));
 		printf("%s\t", buf + len);
 		len += strlen (buf + len) + 1;
- 		inet_ntop(AF_INET, (in_addr_t *)((uint32 *)retbuf + i), ipstr , 16);
+ 		inet_ntop(AF_INET, (in_addr_t *)((uint32 *)(retbuf + HEAD_LENGTH) + i * 2 + 1), ipstr , 16);
                 printf("%s\n", ipstr);
-                fprintf(outfp, "%s\n", ipstr);
-                fprintf(ipfp, "%s\n", ipstr);
+          //      fprintf(outfp, "%s\n", ipstr);
+          //    fprintf(ipfp, "%s\n", ipstr);
 	}
+
 	printf("done\n");
         close(sockfd);
 	fclose(fp);
-	fclose(ipfp);
-	fclose(outfp);
+	//fclose(ipfp);
+	//fclose(outfp);
 
 }
 /***************  END OF servtest.c  **************/

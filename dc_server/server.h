@@ -32,28 +32,28 @@
 #include <fcntl.h>
 
 #define MAXLINE		4096
-#define ARRAYSIZE	10240000
-#define  LINES      	1843314
+#define ARRAYSIZE	1024000
+#define  LINES      	100000
 
 
 #define  DNS_ERROR	"127.0.0.1"
 #define	 CACHE_MISS	"127.0.0.2"
-#define  FIRST_WITH_ERROR	0x3f	//0011 1111
+#define  FIRST_WITH_ERROR	0x3f	//0011 1111  0 with error , 
+					//	     1 without error
 #define  FIRST_WITHOUT_ERROR 	0x7f	//0111 1111
-#define	 SECONDE_WITH_ERROR	0xbf	//1011 1111
-#define	 SECONDE_WITHOUT_ERROR	0xff	//1111 1111
+#define	 SECOND_WITH_ERROR	0xbf	//1011 1111
+#define	 SECOND_WITHOUT_ERROR	0xff	//1111 1111
+
+#define	 HAVE_ERROR	0	
+#define	 NO_ERROR	1	
 
 typedef struct dmnode{
 	char	*domain;	/* point to the domain */
-	struct dmnode	*next;		/* point to the next node */
+	uint32  index;		/* the index in the first message */
+	struct dmnode	*next;	/* point to the next node */
 } dm_node;
 
-/*
-typedef struct {
-        uint32 ip; 
-        time_t timestamp ; 
-} fake_data_t;
-*/
+
 typedef struct{
 	pthread_t thread_tid;	/* thread ID */
 //	unsigned long	thread_count;	/* works handled, just for test */
@@ -68,12 +68,17 @@ typedef struct{
 	int sockfd;		/* the connected fd */
 	int *number;		/* domains to search reduce 1 when one dns
 				 * search is finished.		
-				 */
+	 			 */
+	uint32 index;
 	int count;		/* the order of the request*/
 	int total;		/* total domians */
 	char *domain;		/* point to the domain */
 	uint32 *ipptr;		/* first address to write ip */
 	pthread_mutex_t	*mutex;	/* lock the number */
+	uint8	*headptr;	/* point to the message head */
+	uint8	*miss;		/* if there is dns error in the second message
+				 * 0 if there is , 1 if	all is right
+				 */
 } dns_thread_t;
 
 thread_t *dns_thread_tptr;	/* point to the memory alloc for 

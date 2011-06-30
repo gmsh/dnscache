@@ -26,8 +26,10 @@ thread_main_dns(void *arg)
 	int dnsrequest(const char *name, uint32 *ipaddr);
 	int connfd, *number, count, total;
 	char  *domain ;
-	uint32 *ipptr;
+	uint32 *ipptr, index;
+	uint8 *headptr, *miss;
 	pthread_mutex_t *mutex;
+	uint8 missindex = NO_ERROR;
 	printf("dns thread %d starting \n", (int)arg );
 
 	for(;;){
@@ -47,6 +49,9 @@ thread_main_dns(void *arg)
 		total	= dns_array[iget].total;
 		ipptr	= dns_array[iget].ipptr;
 		mutex	= dns_array[iget].mutex;
+		index	= dns_array[iget].index;
+		headptr	= dns_array[iget].headptr;
+		miss	= dns_array[iget].miss;
 		
 		if(++iget == ARRAYSIZE)
 			iget = 0;		
@@ -54,20 +59,36 @@ thread_main_dns(void *arg)
 		Pthread_mutex_unlock(&dns_array_mutex);
 
 		//do our job 
-		if(dnsrequest(domain, ipptr + count) != 0) 
-			inet_pton(AF_INET,  DNS_ERROR, ipptr+count);
+		*(uint32 *)(ipptr + count * 2) = index;
+		printf("index %d", *(ipptr + count * 2  ));
+		if(dnsrequest(domain, ipptr + count * 2 + 1  ) != 0){
+			inet_pton(AF_INET,  DNS_ERROR, ipptr + count * 2 + 1);
+			missindex = HAVE_ERROR;
+		}
 		dc_free(domain);	//dc_free the memory of domain
-		printf(" dns thread %d  finished \n", pthread_self());
+		printf("index %d  finished \n", *(ipptr + count * 2) );
 		Pthread_mutex_lock(mutex);
+		if(HAVE_ERROR == missindex)
+			*miss = HAVE_ERROR;
 		(*number)--;
 		Pthread_mutex_unlock(mutex);
 		if((*number) == 0){
-			write(connfd, ipptr, total*sizeof(uint32));
+			if(HAVE_ERROR == *miss)
+				*((uint8 *)(headptr + HEAD_LENGTH - 1 )) 
+					= SECOND_WITH_ERROR;
+			else 
+				*((uint8 *)(headptr + HEAD_LENGTH - 1 )) =
+					SECOND_WITHOUT_ERROR;
+
+			write(connfd, headptr, HEAD_LENGTH);
+			write(connfd, ipptr, total * 2 * sizeof(uint32));
 			printf("sended\n");
 	//		close(connfd);	//todo
 			dc_free(ipptr);
 			dc_free(number);
 			dc_free(mutex);
+			dc_free(headptr);
+			dc_free(miss);
 		} 
 
 
