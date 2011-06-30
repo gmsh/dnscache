@@ -8,7 +8,7 @@
  * description:		must be called befor do other operations.
  ********************************************************************/
 #include "server.h"
-#include "dl_cache_stub.h"
+//#include "dl_cache_stub.h"
 
 
 

@@ -17,7 +17,7 @@
 #include "constants.h"
 #include "typedefs.h"
 //#include "dc_mm.h"
-//#include "dl_cache_stub.h"
+#include "dl_cache_stub.h"
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,8 +32,9 @@
 #include <fcntl.h>
 
 #define MAXLINE		4096
-#define ARRAYSIZE	1024000
-#define  LINES      	100000
+#define ARRAYSIZE	2024000
+#define  LINES     	500000
+//1843314
 
 
 #define  DNS_ERROR	"127.0.0.1"

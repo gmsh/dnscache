@@ -33,9 +33,8 @@ thread_main_dns(void *arg)
 	printf("dns thread %d starting \n", (int)arg );
 
 	for(;;){
-
+		
 		Pthread_mutex_lock(&dns_array_mutex);
-
 		while(iget == iput)
 			Pthread_cond_wait(&dns_array_cond,
 					&dns_array_mutex);
@@ -65,6 +64,10 @@ thread_main_dns(void *arg)
 			inet_pton(AF_INET,  DNS_ERROR, ipptr + count * 2 + 1);
 			missindex = HAVE_ERROR;
 		}
+		fake_data_t data;
+		data.ip = *(uint32 *)(ipptr + count *2 + 1 );
+		data.timestamp = time(NULL);
+		push_dc(domain, &data);
 		dc_free(domain);	//dc_free the memory of domain
 		printf("index %d  finished \n", *(ipptr + count * 2) );
 		Pthread_mutex_lock(mutex);

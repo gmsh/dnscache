@@ -105,13 +105,13 @@ static void do_search(uint8 * headptr, uint8 *requestptr, int rbuflen, int connf
 	uint32 *ipptr = (uint32 *)requestptr;
 	fake_data_t *result;
 	uint32 ipcount = 0;
-	char ipstr[16];
 
 	for(;;){
 		
 		result = (fake_data_t *)get_data_and_lock(currentptr);
 		if( (NULL == result) || (result -> timestamp + 
 					TIME_OUT < time(NULL)) ){
+			unlock_after_copy(currentptr);
 			misscount++;
 			curr -> domain = (uint8 *) dc_alloc((strlen(currentptr) + 1) 
 						* sizeof(uint8));
@@ -120,9 +120,11 @@ static void do_search(uint8 * headptr, uint8 *requestptr, int rbuflen, int connf
 			readcount += strlen(currentptr) + 1;
 			currentptr  += strlen(currentptr) + 1;	
 			inet_pton(AF_INET,  CACHE_MISS, ipptr + ipcount);
+			/*CACHE_MISS 127.0.0.2*/
 
 		} else {
 			*(ipptr + ipcount) = result -> ip;
+			unlock_after_copy(currentptr);
 			readcount += strlen(currentptr) + 1;
 			currentptr  += strlen(currentptr) + 1;	
 		}
@@ -148,9 +150,9 @@ static void do_search(uint8 * headptr, uint8 *requestptr, int rbuflen, int connf
 	
 	}else {
 		*((uint8 *)(headptr + HEAD_LENGTH - 1 )) = FIRST_WITH_ERROR;
-	
 		write(connfd, headptr, HEAD_LENGTH);
-		write(connfd, requestptr,ipcount *sizeof(uint32));
+		write(connfd, requestptr, ipcount *sizeof(uint32));
+		dc_free(requestptr);
 		do_dns_search(headptr, misscount, firstnode, connfd);
 	}
 

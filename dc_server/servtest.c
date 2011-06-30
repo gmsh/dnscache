@@ -10,8 +10,8 @@
 #include "server.h"
 
 #define  INPUTFILE "domain.list"
-#define  OUTPUTFILE "testdomainip.list"
-#define  IPFILE "testip.list"
+#define  OUTPUTFILE "domainip.list"
+#define  IPFILE "ip.list"
 int
 main()
 {
@@ -19,7 +19,7 @@ main()
         int i =0 ;
        	if( (fp = fopen(INPUTFILE, "r")) == NULL)	
 		printf("file open error\n");
- /*
+ 
  	if( (outfp = fopen(OUTPUTFILE, "w+")) == NULL){
 		printf("file open error\n");
 		exit(0);
@@ -28,7 +28,7 @@ main()
 		printf("file open error\n");
 		exit(0);
 	}
-*/	
+	
      //   fp = fopen(OUTPUTFILE, "rw");
 	uint32 total_length = 0;
         char readbuff[4096];
@@ -112,21 +112,21 @@ main()
                 ipstr[i] = '\0';
 	len = HEAD_LENGTH ; 
         for(i = 0; i < LINES; i++){
-	//	fprintf(outfp,"%s\t", buf + len);
+		fprintf(outfp,"%s\t", buf + len);
 		printf("index %d   ", *(uint32 *)((uint32 *) (retbuf + HEAD_LENGTH ) + i * 2   ));
 		printf("%s\t", buf + len);
 		len += strlen (buf + len) + 1;
  		inet_ntop(AF_INET, (in_addr_t *)((uint32 *)(retbuf + HEAD_LENGTH) + i * 2 + 1), ipstr , 16);
                 printf("%s\n", ipstr);
-          //      fprintf(outfp, "%s\n", ipstr);
-          //    fprintf(ipfp, "%s\n", ipstr);
+                fprintf(outfp, "%s\n", ipstr);
+              fprintf(ipfp, "%s\n", ipstr);
 	}
 
 	printf("done\n");
         close(sockfd);
 	fclose(fp);
-	//fclose(ipfp);
-	//fclose(outfp);
+	fclose(ipfp);
+	fclose(outfp);
 
 }
 /***************  END OF servtest.c  **************/
