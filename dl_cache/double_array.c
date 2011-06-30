@@ -9,6 +9,8 @@
 #include "dc_mm.h"
 #include "dc_set.h"
 #include "datrie_tail_pool.h"
+#include "constants.h"
+#include "typedefs.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -55,10 +57,10 @@ static enum cell_state{
   in_tail, /* the remanent is in tail pool, that is a tail*/
   in_da, /* the remanent is in double_array */
   eok, /* end of the key */
-  ininvalid
+  invalid
 } _cell_state;
 
-struct _dobule_array {
+struct _double_array{
   /*
    *	In  order to  keep a  node  number  from  exceeding the
    *  maximum index of the double-array,  we define the  size,
@@ -66,7 +68,7 @@ struct _dobule_array {
    */
   int32 cell_num;
   da_cell * cells;
-  datire_tail_pool * tails;
+  datrie_tail_pool * tails;
 };
 
 /*
@@ -85,29 +87,29 @@ static inline enum cell_state check_next_state(state current_state,
 					 int offset,
 					 code * _next_code,
 					 state * _next_state,
-					 double_arrary * da)
+					 double_array * da)
 {
   /* TODO use mask to implement */
   uint8 input_char = *(key + offset);
   if('\0' == input_char)
     return eok;
-  *_next_code = get_code(*(input_char));
+  *_next_code = get_code(input_char);
   *_next_state = da->cells[current_state].base + *_next_code;
-  if(unlikely(*_next_state > da->cell_nums))
+  if(unlikely(*_next_state > da->cell_num))
     return overflow;
-  if(da->cells[_next_state].check == s){
-    if (da->cells[_next_state].base < 0)
+  if(da->cells[*_next_state].check == current_state){
+    if (da->cells[*_next_state].base < 0)
       return in_tail;
     else
       return in_da;
   }else{
-    if(da->cells[_next_state].check < 0){
-      if(unlikely(da->cells[_next_state].base > 0))
+    if(da->cells[*_next_state].check < 0){
+      if(unlikely(da->cells[*_next_state].base > 0))
 	return invalid;
       else
 	return idle;
     }else{
-      if(unlikely(da->cells[_next_state].base < 0))
+      if(unlikely(da->cells[*_next_state].base < 0))
 	return occupied_by_other;
     }
   }
@@ -118,9 +120,9 @@ double_array * new_double_array()
 {
   double_array * to_return = 
     dc_alloc(sizeof(double_array));
-  to_return->cell_num = DOUBLE_ARRARY_INITIAL_SIZE;
+  to_return->cell_num = DOUBLE_ARRAY_INITIAL_SIZE;
   to_return->cells =
-    dc_alloc(sizeof(dc_cell) * DOUBLE_ARRARY_INITIAL_SIZE);
+    dc_alloc(sizeof(da_cell) * DOUBLE_ARRAY_INITIAL_SIZE);
   /*	In order to manage the free cells, let r1 r2 r3 ...
    *	rm be the free cells in the double-array structure,
    *	ordered by position.
@@ -140,8 +142,8 @@ double_array * new_double_array()
   /*base[i] is the previous free cell*/
   /*check[i] is the next free cell*/
   to_return->cells[0].base = 
-    to_return->-(to_return->cell_num - 1);
-  to_return->cells[to_return->cell_num -1]
+    -(to_return->cell_num - 1);
+  to_return->cells[to_return->cell_num -1].check
     = 0;
   to_return->tails = new_datrie_tail_pool();
   return to_return;
@@ -155,7 +157,7 @@ void free_da(double_array * da)
 }
 
 static inline enum cell_state 
-check_state(state s, double_arrary * da)
+check_state(state s, double_array * da)
 {
   if(s > da->cell_num)
     return overflow;
@@ -166,12 +168,12 @@ check_state(state s, double_arrary * da)
    */
   return occupied_by_other;
 }
-static inline void expand_double_array(double_arrary * da)
+static inline void expand_double_array(double_array * da)
 {
   int32 origin_cell_num = da->cell_num;
-  da->cell_num *= DOUBLE_ARRARY_INCREASING_RATE;
+  da->cell_num *= DOUBLE_ARRAY_INCREASING_RATE;
   da->cells = 
-    dc_realloc(sizeof(dc_cell) * da->cell_num);
+    dc_realloc(da->cells, sizeof(da_cell) * da->cell_num);
   int32 i;
   /* initial the new memory  */
   for(i = origin_cell_num; i < da->cell_num; i++){
@@ -180,19 +182,20 @@ static inline void expand_double_array(double_arrary * da)
   }
   /* combine the two part */ 
   da->cells[da->cell_num - 1].check = IDLE_LIST;
+  da->cells[da->cells[IDLE_LIST].base].check
+    = origin_cell_num;
   da->cells[origin_cell_num].base = 
     da->cells[IDLE_LIST].base;
   da->cells[IDLE_LIST].base =
-    da->cells[da->cell_num - 1];
-  da->cells[da->cells[IDLE_LIST]].check
-    = origin_cell_num;
+    da->cell_num - 1;
+
 }
 
 /*
  * return a bitmap(uint64). If check[base[s] + c] = s then bitmap[s]
  * is 1, otherwise 0.
  */
-static inline uint64 bitmap_of_state(state s, double_arrary * da)
+static inline uint64 bitmap_of_state(state s, double_array * da)
 {
   uint64 to_return = 0;
   int8 i;
@@ -200,9 +203,9 @@ static inline uint64 bitmap_of_state(state s, double_arrary * da)
   for(i = 1; i <= MAX_CODE; i++){
     /*check[base[s] + c] = s*/
     if(da->cells[da->cells[s].base + i].check == s)
-      return = (return&0x1) << 1;
+      to_return = (to_return&0x1) << 1;
     else
-      return = return << 1;
+      to_return = to_return << 1;
   }
   return to_return;
 }
@@ -210,7 +213,7 @@ static inline uint64 bitmap_of_state(state s, double_arrary * da)
 static inline uint64 set_1_of_code(uint64 bm, code c)
 {
   uint64 mask
-    = 0x8000000080000000 >> (sizeof(uint64) - MAX_CODE
+    = 0x8000000080000000 >> (64 - MAX_CODE
 			     - c - 1);
   return bm & mask;
 }
@@ -232,7 +235,7 @@ static inline int8 num_of_1(uint64 bitmap)
 static inline int8 first_of_1(uint64 bm)
 {
   int8 to_return;
-  bm = bm << (sizeof(uint64) - MAX_CODE - 1);
+  bm = bm << (64 - MAX_CODE - 1);
   for(to_return = 0;
       0 == (bm << to_return)&8000000000000000;
       to_return++)
@@ -247,7 +250,7 @@ static inline int8 first_of_1(uint64 bm)
 static inline int8 next_1_of_bm(int8 curr, uint64 bm)
 {
   int8 to_return;
-  bm = bm << (sizeof(uint64) - MAX_CODE - 1);
+  bm = bm << (64 - MAX_CODE - 1);
   for(to_return = curr;to_return <MAX_CODE; to_return++){
     if(1 == ((bm << to_return)&8000000000000000))
       return 1 + to_return;
@@ -262,11 +265,11 @@ static inline int8 next_1_of_bm(int8 curr, uint64 bm)
  * retutn a possible base value of bm.
  */
 static inline state occupy_next_free(uint64 bm,
-				     double_arrary * da){
+				     double_array * da){
   state next_idle, to_return, last_idle_to_occupy,
     _previous, _next;
   int8 _next_code = first_of_1(bm);
-  int8 first_code = _next_code;
+  int8 _first_code = _next_code;
 
   /* ensure the return base is not negative. */
  DA_NEXT_FREE_START:
@@ -283,7 +286,7 @@ static inline state occupy_next_free(uint64 bm,
   }
   
  DA_FIND_SUIT_SLOT:
-  to_return = next_idle - first_code;
+  to_return = next_idle - _first_code;
   while(-1 != (_next_code = next_1_of_bm(_next_code, bm))){
       last_idle_to_occupy 
 	= da->cells[to_return].base + _next_code;
@@ -291,7 +294,7 @@ static inline state occupy_next_free(uint64 bm,
       case occupied_by_other:
 	/*not idle, move ahead*/
 	next_idle = -(da->cells[next_idle].check);
-	_next_code = first_code;
+	_next_code = _first_code;
 	goto DA_FIND_SUIT_SLOT;
 	break;/*useless*/
       case idle:
@@ -304,7 +307,7 @@ static inline state occupy_next_free(uint64 bm,
       }
   }
   /*a slot is found.*/
-  _next_code = first_code;
+  _next_code = _first_code;
   _previous = -(da->cells[next_idle].base);
   _next = -(da->cells[last_idle_to_occupy].check);
   da->cells[_previous].check = -_next;
@@ -313,7 +316,7 @@ static inline state occupy_next_free(uint64 bm,
 }
 
 /* free the state */
-void free_state(state to_free, double_arrary * da)
+void free_state(state to_free, double_array * da)
 {
   state s = to_free, temp;
   while(s != IDLE_LIST){
@@ -338,21 +341,21 @@ static inline void relocate(state to_relocate, uint64 bm,
 			    double_array * da)
 {
   /* dest base index */
-  state b = occupy_next_free(bm, ROOT_STATE, da);
+  state b = occupy_next_free(bm, da);
   /*_code is not code because -1 may return*/
   /* for each input code for state to_relocate */
   int8 _code = first_of_1(bm), _code2;
   uint64 bm2;
   while(_code != -1){
     /* mark owner */
-    da->cells[b + _code] = to_relocate;
+    da->cells[b + _code].check = to_relocate;
     /* base[b + c] = base[base[s] + c] */
     state base_s_c = da->cells[to_relocate].base + _code;
     da->cells[b + _code].base 
-      = da->cells[da->cells[base_s_c]].base;
+      = da->cells[base_s_c].base;
     /* copy data.*/
     da->cells[b + _code].user_data
-      = da->cells[da->cells[base_s_c]].user_data;
+      = da->cells[base_s_c].user_data;
     
     
     /* 
@@ -371,10 +374,10 @@ static inline void relocate(state to_relocate, uint64 bm,
     free_state(base_s_c, da);
     _code = next_1_of_bm(_code, bm);
   }
-  da->cells[to_relocate] = b;
+  da->cells[to_relocate].base = b;
 }
 
-static inline void occupy_state(state s, double_array *)
+static inline void occupy_state(state s, double_array * da)
 {
   state _next = -da->cells[s].check;
   state _previous = -da->cells[s].base;
@@ -382,7 +385,7 @@ static inline void occupy_state(state s, double_array *)
   da->cells[_next].base = -_previous;
 }
 
-static inline state find_and_occupy(double_arrary * da){
+static inline state find_and_occupy(double_array * da){
   state to_return = IDLE_LIST;
  START_FIND_AND_OCCUPY:
   to_return = -(da->cells[to_return].check);
@@ -415,7 +418,7 @@ static inline uint32 str_diff_offset(uint8 * str1, uint8 * str2)
  * is not set.
  */
 static inline state da_insert_without_tail
-(uint8 * str, int32 length, state where, double_arrary da)
+(uint8 * str, int32 length, state where, double_array * da)
 {
   uint32 offset = 0;
   code _next_code;
@@ -437,6 +440,11 @@ void da_insert(uint8 * key, void * data,
   int32 offset = 0;
   state _current_state = ROOT_STATE, _next_state;
   code _next_code;
+  uint64 bm1, bm2, bm3;
+  uint8 * tail;
+  uint32 s_d_o;
+  void * tail_data;
+  int8 num1, num2;    
   while(1){
     _cell_state =
       check_next_state(_current_state, key,
@@ -465,7 +473,7 @@ void da_insert(uint8 * key, void * data,
       da->cells[_next_state].check = _current_state;
       da->cells[_next_state].base =
 	-(dt_push_tail(key + offset, da->tails));
-      da->cells[_next_state].user_data = data.
+      da->cells[_next_state].user_data = data;
       return;
     case occupied_by_other:
       /*
@@ -476,10 +484,10 @@ void da_insert(uint8 * key, void * data,
        * current state if the former plus one is less than
        * the latter.
        */
-      uint64 bm1 = bitmap_of_state(_current_state, da);
-      uint64 bm2 = bitmap_of_state(da->cells[_next_state].check);
-      int8 num1 = num_of_1(bm1);
-      int8 num2 = num_of_1(bm2);
+      bm1 = bitmap_of_state(_current_state, da);
+      bm2 = bitmap_of_state(da->cells[_next_state].check, da);
+      num1 = num_of_1(bm1);
+      num2 = num_of_1(bm2);
       if(num1 + 1 < num2){
 	relocate(_current_state, bm1, da);
       }else{
@@ -501,18 +509,17 @@ void da_insert(uint8 * key, void * data,
       /* s = next state  */
       do{
 	expand_double_array(da);
-      }while(s > da->cell_num);
+      }while(_next_state > da->cell_num);
       goto _IDLE;
     case in_tail:
-      uint8 * tail 
-	= dt_get_tail(-(da->cells[_next_state].base), da->tails);
-      uint32 s_d_o = str_diff_offset(tail, key + offset);
+      tail = dt_get_tail(-(da->cells[_next_state].base), da->tails);
+      s_d_o = str_diff_offset(tail, key + offset);
       if(s_d_o == -1){
 	/* the two are same, change the userdata to data */
-	da->cells[_next_state].userdata = data;
+	da->cells[_next_state].user_data = data;
 	return;
       }
-      void * tail_data = da->cells[_next_state].userdata;
+      tail_data = da->cells[_next_state].user_data;
       if(0 != s_d_o){
 	/* insert same str into da not tail */
 	_current_state = da_insert_without_tail(tail, s_d_o,
@@ -548,10 +555,10 @@ void da_insert(uint8 * key, void * data,
 	  = _current_state;
 	da->cells[_next_state].base
 	= dt_push_tail(tail1 + 1, da->tails);
-	da->cells[_next_state].userdata
+	da->cells[_next_state].user_data
 	  = data;
       }else{
-	da->cells[_current_state].userdata = data;
+	da->cells[_current_state].user_data = data;
       }
       
       if(*tail2 != '\0'){
@@ -560,9 +567,9 @@ void da_insert(uint8 * key, void * data,
 	  = _current_state;
 	da->cells[_next_state].base
 	= dt_push_tail(tail2 + 1, da->tails);
-	da->cells[_next_state].userdata = tail_data;
+	da->cells[_next_state].user_data = tail_data;
       }else{
-	da->cells[_current_state].userdata = data;
+	da->cells[_current_state].user_data = data;
       }
       /* after do that remove the tail from tail pool */
       dt_remove_tail(-(da->cells[_next_state].base), da->tails);
@@ -582,6 +589,7 @@ void * da_get_data(uint8 * key, double_array * da)
   state _current_state = ROOT_STATE, _next_state;
   code _next_code;
   int32 offset = 0;
+  uint8 * tail;
   while(1){
     _cell_state = 
       check_next_state(_current_state, key, offset++,
@@ -592,8 +600,8 @@ void * da_get_data(uint8 * key, double_array * da)
       break;
     case in_tail:
       /* compare the tail & the remanent. */
-      uint8 * tail = dt_get_tail(
-				 -(da->cells[_current_state].base)
+      tail = dt_get_tail(
+				 -(da->cells[_current_state].base),
 				 da->tails
 				 );
       if(0 == strcmp(tail, key + offset))
@@ -603,7 +611,7 @@ void * da_get_data(uint8 * key, double_array * da)
     case eok:
       /* state not changed 
        * return the data. */
-      return da->cells[current_state].user_data;
+      return da->cells[_current_state].user_data;
     case invalid:
     case overflow:
     case occupied_by_other:
@@ -630,7 +638,7 @@ long write_da_to_file(FILE * f, long offset, double_array * da)
    * write cell_num * state * 2,
    * base 0, check 0, base 1, check 1,...
    * Note that we don't write the tail pool, write_datp_to_file
-   * function should be called by a datrie, not double_arary.
+   * function should be called by a datrie, not double_array.
    * so when we read we don't set tails, either.
    */
   if(NULL == f)
@@ -644,19 +652,19 @@ long write_da_to_file(FILE * f, long offset, double_array * da)
     return -1;
   
   uint32 i;
-  for(i = 0; i < da->cell_num){
+  for(i = 0; i < da->cell_num; i++){
     temp = fwrite(&da->cells[i].base, sizeof(state), 1, f);
-    temp += fwrite(&da->cells[i].check, size(state), 1, f);
+    temp += fwrite(&da->cells[i].check, sizeof(state), 1, f);
     if(unlikely(temp != 2))
       return -1;
   }
-  return (1 + 2 * da->cell_num) * sizeof(uin32);
+  return (1 + 2 * da->cell_num) * sizeof(uint32);
 }
 
 double_array * read_da_from_file(FILE * f, long offset)
 {
   /* Note that when we have read we don't set tails */
-  double_arrary * to_return = dc_alloc(sizeof(double_arrary));
+  double_array * to_return = dc_alloc(sizeof(double_array));
   
   if(NULL == f)
     return NULL;
@@ -664,16 +672,16 @@ double_array * read_da_from_file(FILE * f, long offset)
   if(unlikely(temp == 0)){
     return NULL;
   }
-  temp = fread(&da->cell_num, sizeof(uint32), 1, f);
+  temp = fread(&to_return->cell_num, sizeof(uint32), 1, f);
   if(unlikely(temp != 1)){
     return NULL;
   }
   to_return->cells
     = (da_cell *)dc_alloc(sizeof(da_cell) * to_return->cell_num);
   uint32 i;
-  for(i = 0; i < to_return->cells; i++){
-    temp = fread(&da->cells[i].base, sizeof(state), 1, f);
-    temp += fwrite(&da->cells[i].check, size(state), 1, f);
+  for(i = 0; i < to_return->cell_num; i++){
+    temp = fread(&to_return->cells[i].base, sizeof(state), 1, f);
+    temp += fwrite(&to_return->cells[i].check, sizeof(state), 1, f);
     if(unlikely(temp != 2))
       return NULL;
   }

@@ -32,10 +32,11 @@
 #ifndef DOUBLE_ARRAY_H_
 #define DOUBLE_ARRAY_H_
 
+#include "typedefs.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct _double_arrary double_array;
+typedef struct _double_array double_array;
 
 /*
  * To get a pointer to new double_array
