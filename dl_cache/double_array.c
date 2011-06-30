@@ -226,7 +226,7 @@ static inline uint64 set_1_of_code(uint64 bm, code c)
   uint64 mask
     = 0x8000000080000000 >> (64 - MAX_CODE
 			     - c - 1);
-  return bm & mask;
+  return bm | mask;
 }
 
 static inline int8 num_of_1(uint64 bitmap)
