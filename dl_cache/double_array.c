@@ -115,6 +115,14 @@ static inline enum cell_state check_next_state(state current_state,
   }
 }
 
+static inline void occupy_state(state s, double_array * da)
+{
+  state _next = -da->cells[s].check;
+  state _previous = -da->cells[s].base;
+  da->cells[_previous].check = -_next;
+  da->cells[_next].base = -_previous;
+}
+
 
 double_array * new_double_array()
 {
@@ -145,6 +153,9 @@ double_array * new_double_array()
     -(to_return->cell_num - 1);
   to_return->cells[to_return->cell_num -1].check
     = 0;
+  occupy_state(ROOT_STATE, to_return);
+  to_return->cells[ROOT_STATE].base = 1;
+  to_return->cells[ROOT_STATE].check = ROOT_STATE;
   to_return->tails = new_datrie_tail_pool();
   return to_return;
 }
@@ -377,13 +388,6 @@ static inline void relocate(state to_relocate, uint64 bm,
   da->cells[to_relocate].base = b;
 }
 
-static inline void occupy_state(state s, double_array * da)
-{
-  state _next = -da->cells[s].check;
-  state _previous = -da->cells[s].base;
-  da->cells[_previous].check = -_next;
-  da->cells[_next].base = -_previous;
-}
 
 static inline state find_and_occupy(double_array * da){
   state to_return = IDLE_LIST;
@@ -547,7 +551,7 @@ void da_insert(uint8 * key, void * data,
       if(*tail2 != '\0')
 	bm3 = set_1_of_code(next_code2, bm3);
       da->cells[_current_state].base = 
-	_current_stateoccupy_next_free(bm3, da);
+	occupy_next_free(bm3, da);
       
       if(*tail1 != '\0'){
 	_next_state = da->cells[_current_state].base + next_code1;
