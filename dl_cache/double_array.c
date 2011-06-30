@@ -213,7 +213,7 @@ static inline int8 num_of_1(uint64 bitmap)
 static inline int8 first_of_1(uint64 bm)
 {
   int8 to_return;
-  bm = bm << (sizeof(uint64) - MAX_CODE);
+  bm = bm << (sizeof(uint64) - MAX_CODE - 1);
   for(to_return = 0;
       0 == (bm << to_return)&8000000000000000;
       to_return++)
@@ -221,14 +221,14 @@ static inline int8 first_of_1(uint64 bm)
       if(to_return == MAX_CODE)
 	return -1;
     }
-  return 1 + to_return;
+  return to_return;
 }
 
 /*return next 1 of bm, if touch end return -1 */
 static inline int8 next_1_of_bm(int8 curr, uint64 bm)
 {
   int8 to_return;
-  bm = bm << (sizeof(uint64) - MAX_CODE);
+  bm = bm << (sizeof(uint64) - MAX_CODE - 1);
   for(to_return = curr;to_return <MAX_CODE; to_return++){
     if(1 == ((bm << to_return)&8000000000000000))
       return 1 + to_return;
@@ -327,7 +327,7 @@ static inline void relocate(state to_relocate, uint64 bm,
     /* copy data.*/
     da->cells[b + _code].user_data
       = da->cells[da->cells[base_s_c]].user_data;
-    _code = next_1_of_bm(_code, bm);
+    
     
     /* 
      * the node base[s] + c is to be moved to b + c. Hence, for any
@@ -343,6 +343,7 @@ static inline void relocate(state to_relocate, uint64 bm,
     }
     /* free the cell */
     free_state(base_s_c, da);
+    _code = next_1_of_bm(_code, bm);
   }
   da->cells[to_relocate] = b;
 }
@@ -353,6 +354,18 @@ static inline void occupy_state(state s, double_array *)
   state _previous = -da->cells[s].base;
   da->cells[_previous].check = -_next;
   da->cells[_next].base = -_previous;
+}
+
+static inline state find_and_occupy(double_arrary * da){
+  state to_return = IDLE_LIST;
+ START_FIND_AND_OCCUPY:
+  to_return = -(da->cells[to_return].check);
+  if(to_return == IDLE_LIST){
+    expand_double_array(da);
+    goto START_FIND_AND_OCCUPY;
+  }
+  occupy_state(to_return, da);
+  return to_return;
 }
 
 /* return the offset of the first different char 
@@ -369,7 +382,28 @@ static inline uint32 str_diff_offset(uint8 * str1, uint8 * str2)
   return to_return;
 }
 
-state da_insert_temp_key()
+/*
+ * to insert some chars in to da, but will not put them in tails 
+ * pool. '\0' is not one of these chars.
+ * return the last state correspond to the last char, whose base
+ * is not set.
+ */
+static inline state da_insert_without_tail
+(uint8 * str, int32 length, state where, double_arrary da)
+{
+  uint32 offset = 0;
+  code _next_code;
+  state to_return;
+  while(offset < length){
+    /* find a idle state to occupy */
+    _next_code = get_code(*(str + offset));
+    to_return  = find_and_occupy(da);
+    da->cells[where].base = to_return - _next_code;
+    da->cells[to_return].check = where;
+    offset += 1;
+    where = to_return;
+  }
+}
 
 void da_insert(uint8 * key, void * data, 
 	       double_array * da)
@@ -454,7 +488,6 @@ void da_insert(uint8 * key, void * data,
       }
       if(0 != s_d_o){
 	/* + 1 for \0 */
-	unit8 * _temp_key = (uint8 *)dc_alloc(s_d_o + 1);
 	strncmp();
 	/* insert _temp_key into da not tail */
 	da_insert_temp_key(/*_next_state*/, _temp_key, da);
