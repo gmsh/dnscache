@@ -11,14 +11,24 @@
 
 #define  INPUTFILE "domain.list"
 #define  OUTPUTFILE "domainip.list"
+#define  IPFILE "ip.list"
 int
 main()
 {
-	FILE *fp;
+	FILE *fp, *outfp, *ipfp;
         int i =0 ;
        	if( (fp = fopen(INPUTFILE, "r")) == NULL)	
 		printf("file open error\n");
-
+ 
+ 	if( (outfp = fopen(OUTPUTFILE, "w+")) == NULL){
+		printf("file open error\n");
+		exit(0);
+	}
+ 	if( (ipfp = fopen(IPFILE, "w+")) == NULL){
+		printf("file open error\n");
+		exit(0);
+	}
+	
      //   fp = fopen(OUTPUTFILE, "rw");
 	uint32 total_length = 0;
         char readbuff[4096];
@@ -101,14 +111,19 @@ main()
                 ipstr[i] = '\0';
 	len = HEAD_LENGTH ; 
         for(i = 0; i < LINES; i++){
-		printf("%s   ", buf + len);
+		fprintf(outfp,"%s\t", buf + len);
+		printf("%s\t", buf + len);
 		len += strlen (buf + len) + 1;
  		inet_ntop(AF_INET, (in_addr_t *)((uint32 *)retbuf + i), ipstr , 16);
                 printf("%s\n", ipstr);
+                fprintf(outfp, "%s\n", ipstr);
+                fprintf(ipfp, "%s\n", ipstr);
 	}
-
+	printf("done\n");
         close(sockfd);
 	fclose(fp);
+	fclose(ipfp);
+	fclose(outfp);
 
 }
 /***************  END OF servtest.c  **************/

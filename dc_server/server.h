@@ -32,8 +32,9 @@
 #include <fcntl.h>
 
 #define MAXLINE		4096
-#define ARRAYSIZE	102400
-#define  LINES      	5
+#define ARRAYSIZE	10240000
+#define  LINES      	1843314
+
 
 #define  DNS_ERROR	"127.0.0.1"
 #define	 CACHE_MISS	"127.0.0.2"

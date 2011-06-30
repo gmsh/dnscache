@@ -38,7 +38,7 @@ thread_main_dns(void *arg)
 			Pthread_cond_wait(&dns_array_cond,
 					&dns_array_mutex);
 		
-		printf("thread %d  working \n", pthread_self());
+		printf(" dns thread %d  working \n", pthread_self());
 
 		connfd	= dns_array[iget].sockfd;
 		domain  = dns_array[iget].domain;
@@ -57,6 +57,7 @@ thread_main_dns(void *arg)
 		if(dnsrequest(domain, ipptr + count) != 0) 
 			inet_pton(AF_INET,  DNS_ERROR, ipptr+count);
 		dc_free(domain);	//dc_free the memory of domain
+		printf(" dns thread %d  finished \n", pthread_self());
 		Pthread_mutex_lock(mutex);
 		(*number)--;
 		Pthread_mutex_unlock(mutex);
