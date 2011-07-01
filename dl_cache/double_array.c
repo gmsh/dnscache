@@ -229,7 +229,7 @@ static inline _dc_bitmap _dc_bitmap_of_state(state s, double_array * da)
  */
 static inline state occupy_next_free(_dc_bitmap bm,
 				     double_array * da){
-  state next_idle, to_return, last_idle_to_occupy,
+  state next_idle, first_idle, to_return, last_idle_to_occupy,
     _previous, _next;
   int8 _next_code = first_of_1(bm);
   if(unlikely(_next_code == -1))
@@ -252,6 +252,7 @@ static inline state occupy_next_free(_dc_bitmap bm,
   
  DA_FIND_SUIT_SLOT:
   to_return = next_idle - _first_code;
+  first_idle = next_idle;
   while(-1 != (_next_code = next_of_1(_next_code, bm))){
       last_idle_to_occupy 
 	= da->cells[to_return].base + _next_code;
@@ -273,7 +274,7 @@ static inline state occupy_next_free(_dc_bitmap bm,
   }
   /*a slot is found.*/
   _next_code = _first_code;
-  _previous = -(da->cells[next_idle].base);
+  _previous = -(da->cells[first_idle].base);
   _next = -(da->cells[last_idle_to_occupy].check);
   da->cells[_previous].check = -_next;
   da->cells[_next].base = -_previous;
@@ -530,7 +531,7 @@ void da_insert(uint8 * key, void * data,
 	da->cells[_next_state].base
 	= dt_push_tail(tail2 + 1, da->tails);
 	da->cells[_next_state].user_data = tail_data;
-	da->cells[_current_state].userdata = NULL;
+	da->cells[_current_state].user_data = NULL;
       }else{
 	da->cells[_current_state].user_data = data;
       }

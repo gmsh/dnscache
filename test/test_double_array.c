@@ -19,7 +19,8 @@ int main()
   da_insert(key2, &c, da);
   int * e = da_get_data(key, da);
   int * f = da_get_data(key2, da);
-  /* the above check NULL == d
+  /* 
+   * the above check NULL == d
    * e == b
    * &c == f
    */
