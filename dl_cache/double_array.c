@@ -537,7 +537,7 @@ void da_insert(uint8 * key, void * data,
 	da->cells[_next_state].user_data = tail_data;
 	/* wipe data */
 	da->cells[_pre_state].user_data = NULL;
-	dt_remove_tail(-(da->cells[_next_state].base), da->tails);
+	dt_remove_tail(-(da->cells[_pre_state].base), da->tails);
       }else{
 	da->cells[_current_state].user_data = data;
       }
