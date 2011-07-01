@@ -33,7 +33,7 @@
 
 #define MAXLINE		4096
 #define ARRAYSIZE	2024000
-#define  LINES     	500000
+#define  LINES     	1843314
 //1843314
 
 

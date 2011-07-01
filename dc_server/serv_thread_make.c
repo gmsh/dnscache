@@ -54,7 +54,7 @@ static void serv(int connfd)
 	
 	char	*buf =(char *)dc_alloc(HEAD_LENGTH*sizeof(uint8)); /*head bufptr*/
 
-	if( read(connfd, buf, HEAD_LENGTH*sizeof(uint8)) != HEAD_LENGTH*sizeof(uint8)){
+	if( read(connfd, buf, HEAD_LENGTH*sizeof(uint8)) != HEAD_LENGTH * sizeof(uint8)){
 		close(connfd);
 		return;
 	}
@@ -109,8 +109,8 @@ static void do_search(uint8 * headptr, uint8 *requestptr, int rbuflen, int connf
 	for(;;){
 		
 		result = (fake_data_t *)get_data_and_lock(currentptr);
-		if( (NULL == result) || (result -> timestamp + 
-					TIME_OUT < time(NULL)) ){
+		if( (NULL == result)|| (result -> timestamp + TIME_OUT < time(NULL)) )
+		{
 			unlock_after_copy(currentptr);
 			misscount++;
 			curr -> domain = (uint8 *) dc_alloc((strlen(currentptr) + 1) 
@@ -141,6 +141,7 @@ static void do_search(uint8 * headptr, uint8 *requestptr, int rbuflen, int connf
 	}
 
 	if( 0 == misscount){
+		printf("no miss\n");
 		*((uint8 *)(headptr + HEAD_LENGTH - 1 )) = FIRST_WITHOUT_ERROR;
 		write(connfd, headptr, HEAD_LENGTH);
 		write(connfd, requestptr, ipcount * sizeof(uint32));
