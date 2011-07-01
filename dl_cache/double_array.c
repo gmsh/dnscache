@@ -274,7 +274,7 @@ static inline state occupy_next_free(_dc_bitmap bm,
   /* a slot is found.
    * occupy it.
    */
-    _first_code = _next_code;
+    _next_code = _first_code;
   do{
     occupy_state(to_return + _next_code, da);
   }while(-1 != (_next_code = next_of_1(_next_code, bm)));
@@ -398,7 +398,7 @@ void da_insert(uint8 * key, void * data,
 	       double_array * da)
 {
   int32 offset = 0;
-  state _current_state = ROOT_STATE, _next_state;
+  state _current_state = ROOT_STATE, _next_state, _pre_state;
   code _next_code;
   _dc_bitmap bm1, bm2, bm3;
   uint8 * tail;
@@ -480,7 +480,8 @@ void da_insert(uint8 * key, void * data,
 	return;
       }
       tail_data = da->cells[_next_state].user_data;
-      
+      /* _pre_state is used to wipe data*/
+      _pre_state = _next_state;
       if(0 != s_d_o){
 	/* insert same str into da not tail */
 	_current_state = da_insert_without_tail(tail, s_d_o,
@@ -517,7 +518,7 @@ void da_insert(uint8 * key, void * data,
 	da->cells[_next_state].check
 	  = _current_state;
 	da->cells[_next_state].base
-	= dt_push_tail(tail1 + 1, da->tails);
+	= -dt_push_tail(tail1 + 1, da->tails);
 	da->cells[_next_state].user_data
 	  = data;
       }else{
@@ -529,9 +530,10 @@ void da_insert(uint8 * key, void * data,
 	da->cells[_next_state].check
 	  = _current_state;
 	da->cells[_next_state].base
-	= dt_push_tail(tail2 + 1, da->tails);
+	= -dt_push_tail(tail2 + 1, da->tails);
 	da->cells[_next_state].user_data = tail_data;
-	da->cells[_current_state].user_data = NULL;
+	/* wipe data */
+	da->cells[_pre_state].user_data = NULL;
       }else{
 	da->cells[_current_state].user_data = data;
       }
