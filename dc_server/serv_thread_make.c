@@ -152,7 +152,7 @@ static void do_search(uint8 * headptr, uint8 *requestptr, int rbuflen, int connf
 	}else {
 		*((uint8 *)(headptr + HEAD_LENGTH - 1 )) = FIRST_WITH_ERROR;
 		write(connfd, headptr, HEAD_LENGTH);
-		write(connfd, requestptr, ipcount *sizeof(uint32));
+		write(connfd, requestptr, ipcount * sizeof(uint32));
 		dc_free(requestptr);
 		do_dns_search(headptr, misscount, firstnode, connfd);
 	}

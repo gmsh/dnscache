@@ -86,7 +86,7 @@ thread_main_dns(void *arg)
 			write(connfd, headptr, HEAD_LENGTH);
 			write(connfd, ipptr, total * 2 * sizeof(uint32));
 			printf("sended\n");
-	//		close(connfd);	//todo
+			close(connfd);	//todo
 			dc_free(ipptr);
 			dc_free(number);
 			dc_free(mutex);

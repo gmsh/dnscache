@@ -18,32 +18,6 @@
 #include "typedefs.h"
 //#include "dc_mm.h"
 #include "dl_cache_stub.h"
-#include <netdb.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <string.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <pthread.h>
-#include <errno.h>
-#include <fcntl.h>
-
-#define MAXLINE		4096
-#define ARRAYSIZE	2024000
-#define  LINES     	1843314
-//1843314
-
-
-#define  DNS_ERROR	"127.0.0.1"
-#define	 CACHE_MISS	"127.0.0.2"
-#define  FIRST_WITH_ERROR	0x3f	//0011 1111  0 with error , 
-					//	     1 without error
-#define  FIRST_WITHOUT_ERROR 	0x7f	//0111 1111
-#define	 SECOND_WITH_ERROR	0xbf	//1011 1111
-#define	 SECOND_WITHOUT_ERROR	0xff	//1111 1111
 
 #define	 HAVE_ERROR	0	
 #define	 NO_ERROR	1	

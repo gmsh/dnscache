@@ -10,6 +10,8 @@ test_slist:test_slist.c
 #	cc -g -o test_datrie_tail_pool test_datrie_tail_pool.c -I../include -L../lib -ldl_cache
 test_mm:test_mm.c
 	cc -o test_mm test_mm.c -I../include -L../lib -ldc_mm -ldc_common
+test_client:test_client.c
+	cc -o $@ $^ -I../include -L../lib  -ldc_client
 .PHONY: clean
 clean:
 	-rm test_typedefs test_dc_set test_slist test_sizeof_ptr test_datrie_tail_pool
