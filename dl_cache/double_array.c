@@ -241,7 +241,7 @@ static inline state occupy_next_free(_dc_bitmap bm,
   next_idle = IDLE_LIST;
   do{
     next_idle = -(da->cells[next_idle].check);
-  }while(next_idle < _first_code && next_idle != IDLE_LIST);
+  }while(next_idle < ROOT_STATE + _first_code && next_idle != IDLE_LIST);
   if(unlikely(next_idle == IDLE_LIST)){
     /* 
      * da needs to be expand.
@@ -479,6 +479,7 @@ void da_insert(uint8 * key, void * data,
 	return;
       }
       tail_data = da->cells[_next_state].user_data;
+      
       if(0 != s_d_o){
 	/* insert same str into da not tail */
 	_current_state = da_insert_without_tail(tail, s_d_o,
@@ -529,6 +530,7 @@ void da_insert(uint8 * key, void * data,
 	da->cells[_next_state].base
 	= dt_push_tail(tail2 + 1, da->tails);
 	da->cells[_next_state].user_data = tail_data;
+	da->cells[_current_state].userdata = NULL;
       }else{
 	da->cells[_current_state].user_data = data;
       }
