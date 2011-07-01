@@ -344,7 +344,8 @@ static inline void relocate(state to_relocate, _dc_bitmap bm,
 }
 
 /* find a idle state, occupy and return it */
-static inline state find_and_occupy(double_array * da){
+static inline state find_and_occupy(code _next_code, double_array * da){
+  /* to_return - _next_code should > 0*/
   state to_return = IDLE_LIST;
  START_FIND_AND_OCCUPY:
   to_return = -(da->cells[to_return].check);
@@ -385,7 +386,7 @@ static inline state da_insert_without_tail
   while(offset < length){
     /* find a idle state to occupy */
     _next_code = get_code(*(str + offset));
-    to_return  = find_and_occupy(da);
+    to_return  = find_and_occupy(_next_code,da);
     da->cells[where].base = to_return - _next_code;
     da->cells[to_return].check = where;
     offset += 1;

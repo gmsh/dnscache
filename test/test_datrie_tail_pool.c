@@ -7,7 +7,7 @@
 
 #include "datrie_tail_pool.h"
 char buff[80];
-void replace_n(){
+static void replace_n(){
 	int i;
 	for(i = 0; i < 80; i ++){
 		if(buff[i]=='\n'){
