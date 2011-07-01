@@ -9,7 +9,8 @@ inline _dc_bitmap bm_set(int8 i, _dc_bitmap  bm)
 
 inline int8 bm_get(int8 i, _dc_bitmap bm)
 {
-  return bm & (MASK >> (i - 1));
+  if(bm & (MASK >> (i - 1)))
+    return 1;
 }
 
 /*return first 1, if bm == 0 return -1*/

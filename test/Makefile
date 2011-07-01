@@ -1,6 +1,6 @@
 .PHONY: test default
 default:clean test_double_array
-test: test_dc_set test_datrie_tail_pool test_double_array
+test: test_dc_set test_datrie_tail_pool test_double_array test_dc_bitmap
 test_typedefs:test_typedefs.c
 
 test_dc_set:test_dc_set.c
@@ -13,6 +13,10 @@ test_double_array:test_double_array.c
 	make -C ../dl_cache clean
 	make -C ../dl_cache
 	${CC} ${CFLAGS} ${CPPFLAGS} -o test_double_array test_double_array.c -L../lib -ldl_cache
+test_dc_bitmap:test_dc_bitmap.c ../dl_cache/dc_bitmap.o
+	make -C ../dl_cache clean
+	make -C ../dl_cache dc_bitmap.o
+	${CC} ${CFLAGS} ${CPPFLAGS} -o test_dc_bitmap test_dc_bitmap.c ../dl_cache/dc_bitmap.o
 
 .PHONY: clean
 clean:
