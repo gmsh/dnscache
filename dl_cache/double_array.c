@@ -240,7 +240,7 @@ static inline state occupy_next_free(_dc_bitmap bm,
  DA_NEXT_FREE_START:
   next_idle = IDLE_LIST;
   do{
-    next_idle = -(da->cells[to_return].check);
+    next_idle = -(da->cells[next_idle].check);
   }while(next_idle < _first_code && next_idle != IDLE_LIST);
   if(unlikely(next_idle == IDLE_LIST)){
     /* 
