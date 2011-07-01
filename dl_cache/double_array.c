@@ -391,7 +391,7 @@ static inline void relocate(state to_relocate, uint64 bm,
   da->cells[to_relocate].base = b;
 }
 
-
+/* find a idle state, occupy and return it */
 static inline state find_and_occupy(double_array * da){
   state to_return = IDLE_LIST;
  START_FIND_AND_OCCUPY:
@@ -552,9 +552,9 @@ void da_insert(uint8 * key, void * data,
        * so bm3 should not by empty;
        */
       if(*tail1 != '\0')
-	bm3 = set_1_of_code(next_code1, bm3);
+	bm3 = set_1_of_code(bm3, next_code1);
       if(*tail2 != '\0')
-	bm3 = set_1_of_code(next_code2, bm3);
+	bm3 = set_1_of_code(bm3, next_code2);
       da->cells[_current_state].base = 
 	occupy_next_free(bm3, da);
       
