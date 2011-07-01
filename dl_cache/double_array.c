@@ -58,6 +58,12 @@ static enum cell_state{
   in_tail, /* the remanent is in tail pool, that is a tail*/
   in_da, /* the remanent is in double_array */
   eok, /* end of the key */
+  end_with_zero, /* 
+		  * another key end with '\0'
+		  * the key's user_data(not NULL) stores here.
+		  * check > 0, base should >= 0 in case of it
+		  * is in_tail.
+		  */
   invalid
 } _cell_state;
 
@@ -99,17 +105,24 @@ static inline enum cell_state check_next_state(state current_state,
   if(unlikely(*_next_state > da->cell_num))
     return overflow;
   if(da->cells[*_next_state].check == current_state){
+    /* check > 0*/
     if (da->cells[*_next_state].base < 0)
       return in_tail;
-    else
+    else{
+      /* commented because da_insert don't differentiate
+       *in_da & end_with_zero.
+      if(da->cells[*_next_state].user data != NULL)
+      return end_with_zero;
+      else*/
       return in_da;
+    }
   }else{
     if(da->cells[*_next_state].check < 0){
       if(unlikely(da->cells[*_next_state].base > 0))
 	return invalid;
       else
 	return idle;
-    }else{
+    }else{/* check > 0 */
       if(unlikely(da->cells[*_next_state].base < 0))
 	return occupied_by_other;
     }
@@ -147,6 +160,7 @@ double_array * new_double_array()
   for(i = 0; i < to_return->cell_num; i++){
     to_return->cells[i].base = -(i - 1);
     to_return->cells[i].check = -(i + 1); 
+    to_return->cells[i].user data = NULL;
   }
   /*base[i] is the previous free cell*/
   /*check[i] is the next free cell*/
@@ -191,6 +205,7 @@ static inline void expand_double_array(double_array * da)
   for(i = origin_cell_num; i < da->cell_num; i++){
     da->cells[i].base = -(i - 1);
     da->cells[i].check = -(i + 1);
+    da->cells[i].user_data = NULL;
   }
   /* combine the two part */ 
   da->cells[da->cell_num - 1].check = IDLE_LIST;
@@ -291,6 +306,7 @@ void free_state(state to_free, double_array * da)
       break;
     /* break if idle */
   }
+  da->cells[to_free].user_data = NULL;
   temp = -(da->cells[s].check);
   da->cells[s].check = -to_free;
   da->cells[to_free].check = -temp;
@@ -415,6 +431,7 @@ void da_insert(uint8 * key, void * data,
 		       &_next_state, da);
     switch(_cell_state){
     case in_da:
+    case end_with_zero:
       /* move ahead */
       _current_state = _next_state;
       break;
@@ -474,11 +491,13 @@ void da_insert(uint8 * key, void * data,
 	expand_double_array(da);
       }while(_next_state > da->cell_num);
       goto _IDLE;
-    case in_tail:
-      tail = dt_get_tail(-(da->cells[_next_state].base), da->tails);
+    case in_tail://TODO
+      uint32 tail_index = -(da->cells[_next_state].base);
+      tail = dt_get_tail(tail_index, da->tails);
+
       s_d_o = str_diff_offset(tail, key + offset);
       if(s_d_o == -1){
-	/* the two are same, change the userdata to data */
+	/* the two are same, change the user data to data */
 	da->cells[_next_state].user_data = data;
 	return;
       }
@@ -489,7 +508,7 @@ void da_insert(uint8 * key, void * data,
 	/* insert same str into da not tail */
 	_current_state = da_insert_without_tail(tail, s_d_o,
 						_next_state, da);
-      }else{
+      }else{/*completely different.*/
 	_current_state = _next_state;
       }
       /* 
@@ -509,40 +528,50 @@ void da_insert(uint8 * key, void * data,
       /* Note that only one of the two can be '\0' 
        * so bm3 should not by empty;
        */
-      if(*tail1 != '\0')
-	bm3 = bm_set(next_code1, bm3);
-      if(*tail2 != '\0')
-	bm3 = bm_set(next_code2, bm3);
+      if(*tail1 == '\0'){
+	da->cells[current_state].user_data = data;
+	/*tail_index stores the index, we can safely change base.*/
+	da->cells[current_state].base
+	  = find_and_occupy(next_code2, da);
+	_next_state = da->cells[current_state].base + next_code2;
+	/*move tail2 to _next_state*/
+	da->cells[_next_state].check = current_state;
+	da->cells[_next_state].base = dt_push_tail(tail2 + 1, da->tails);
+	da->cells[_next_state].user_data = tail_data;
+	dt_remove_tail(tail_index, da->tails);
+	if(_pre_state != current_state)/* wipe data */
+	  da->cells[_pre_state].user_data = data;
+	return;
+      }
+      /** tail1 != '\0' */
+      bm3 = bm_set(next_code1, bm3);
+      /*_next_state can not be end_with_zero, so *tail2 != '\0'*/
+      bm3 = bm_set(next_code2, bm3);
       da->cells[_current_state].base = 
 	occupy_next_free(bm3, da);
       
-      if(*tail1 != '\0'){
-	_next_state = da->cells[_current_state].base + next_code1;
-	da->cells[_next_state].check
-	  = _current_state;
-	da->cells[_next_state].base
+      /* tail1 */
+      _next_state = da->cells[_current_state].base + next_code1;
+      da->cells[_next_state].check
+	= _current_state;
+      da->cells[_next_state].base
 	= -dt_push_tail(tail1 + 1, da->tails);
-	da->cells[_next_state].user_data
-	  = data;
-      }else{
-	da->cells[_current_state].user_data = data;
-      }
-      
-      if(*tail2 != '\0'){
-	_next_state = da->cells[_current_state].base + next_code2;
-	da->cells[_next_state].check
-	  = _current_state;
-	da->cells[_next_state].base
+      da->cells[_next_state].user_data
+	= data;
+            
+      /*_next_state can not be end_with_zero, so *tail2 != '\0'*/
+      _next_state = da->cells[_current_state].base + next_code2;
+      da->cells[_next_state].check
+	= _current_state;
+      da->cells[_next_state].base
 	= -dt_push_tail(tail2 + 1, da->tails);
-	da->cells[_next_state].user_data = tail_data;
-	/* wipe data */
-	da->cells[_pre_state].user_data = NULL;
-	dt_remove_tail(-(da->cells[_pre_state].base), da->tails);
-      }else{
-	da->cells[_current_state].user_data = data;
-      }
-      /* after do that remove the tail from tail pool */
+      da->cells[_next_state].user_data = tail_data;
       
+      /* wipe data */
+      da->cells[_pre_state].user_data = NULL;
+      
+      /* after do that remove the tail from tail pool */
+      dt_remove_tail(-(da->cells[_pre_state].base), da->tails);
       return;
       break;
     case invalid:
