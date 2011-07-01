@@ -353,6 +353,8 @@ static inline state find_and_occupy(code _next_code, double_array * da){
     expand_double_array(da);
     goto START_FIND_AND_OCCUPY;
   }
+  if(to_return - _next_code < 0)
+    goto START_FIND_AND_OCCUPY;
   occupy_state(to_return, da);
   return to_return;
 }
@@ -535,11 +537,12 @@ void da_insert(uint8 * key, void * data,
 	da->cells[_next_state].user_data = tail_data;
 	/* wipe data */
 	da->cells[_pre_state].user_data = NULL;
+	dt_remove_tail(-(da->cells[_next_state].base), da->tails);
       }else{
 	da->cells[_current_state].user_data = data;
       }
       /* after do that remove the tail from tail pool */
-      dt_remove_tail(-(da->cells[_next_state].base), da->tails);
+      
       return;
       break;
     case invalid:
