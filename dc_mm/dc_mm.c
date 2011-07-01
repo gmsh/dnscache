@@ -209,6 +209,11 @@ void * dc_alloc(size_t size)
 	return select_pre_alloced(cap);
 }
 
+void free_extra_data(struct sl_node * sl_ptr)
+{
+	free(sl_ptr->data);	
+}
+
 void dc_free(void * ptr){
 	void * word_before_ptr = (uint64 *)ptr - 1;
 	uint64 cap = *(uint64 *)word_before_ptr;
@@ -225,6 +230,7 @@ void dc_free(void * ptr){
 		mv2head(word_before_ptr,sl_ptr);
 		printf("dc_mm : %s%8ld%s\n","free a extra chunk with specific capacity ", POW2(cap), " Bytes.");
 		if(++(elm_table[cap]->idle_num) == elm_table[cap]->total_num ){
+			traverse(free_extra_data,elm_table[cap]->chunks_list);
 			sl_free(free,elm_table[cap]->chunks_list);		
 			free(elm_table[cap]);	
 			elm_table[cap] = NULL;	
@@ -255,6 +261,7 @@ void dc_free(void * ptr){
 	printf("dc_mm : %s%8ld%s\n","free a extra chunk with specific capacity ", POW2(cap), " Bytes.");
 	(elm_table[cap]->idle_num)++;
 	if(elm_table[cap]->idle_num == elm_table[cap]->total_num ){
+		traverse(free_extra_data,elm_table[cap]->chunks_list);
 		sl_free(free,elm_table[cap]->chunks_list);		
 		free(elm_table[cap]);
 		elm_table[cap] = NULL;	
