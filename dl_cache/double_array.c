@@ -11,6 +11,7 @@
 #include "datrie_tail_pool.h"
 #include "constants.h"
 #include "typedefs.h"
+#include "dc_bitmap.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -203,79 +204,30 @@ static inline void expand_double_array(double_array * da)
 }
 
 /*
- * return a bitmap(uint64). If check[base[s] + c] = s then bitmap[s]
+ * return a _dc_bitmap(uint64). If check[base[s] + c] = s then _dc_bitmap[s]
  * is 1, otherwise 0.
  */
-static inline uint64 bitmap_of_state(state s, double_array * da)
+static inline _dc_bitmap _dc_bitmap_of_state(state s, double_array * da)
 {
-  uint64 to_return = 0;
+  _dc_bitmap to_return = 0;
   int8 i;
   /* 1 is the first code */
   for(i = 1; i <= MAX_CODE; i++){
     /*check[base[s] + c] = s*/
     if(da->cells[da->cells[s].base + i].check == s)
-      to_return = (to_return&0x1) << 1;
-    else
-      to_return = to_return << 1;
+      to_return = bm_set(i, to_return);
   }
   return to_return;
 }
 
-static inline uint64 set_1_of_code(uint64 bm, code c)
-{
-  uint64 mask
-    = 0x8000000000 >> c;
-  return bm | mask;
-}
-
-static inline int8 num_of_1(uint64 bitmap)
-{
-  int8 to_return = 0, i = 1;
-  while(to_return <= MAX_CODE){
-    if(bitmap>>i&0x1)
-      to_return++;
-  }
-  return to_return;
-}
 
 /*
- * get first code
- * return first 1 of bm, if touch end return -1 
- */
-static inline int8 first_of_1(uint64 bm)
-{
-  int8 to_return;
-  bm = bm << (64 - MAX_CODE - 1);
-  for(to_return = 0;
-      0 == (bm << to_return)&8000000000000000;
-      to_return++)
-    {
-      if(to_return == MAX_CODE)
-	return -1;
-    }
-  return to_return;
-}
-
-/*return next 1 of bm, if touch end return -1 */
-static inline int8 next_1_of_bm(int8 curr, uint64 bm)
-{
-  int8 to_return;
-  bm = bm << (64 - MAX_CODE - 1);
-  for(to_return = curr;to_return <MAX_CODE; to_return++){
-    if(1 == ((bm << to_return)&8000000000000000))
-      return 1 + to_return;
-  }
-  if(to_return = MAX_CODE)
-    return -1;
-}
-
-/*
- * according given bitmap, to find a suit slot to occupy.
+ * according given _dc_bitmap, to find a suit slot to occupy.
  * after_this > IDLE_LIST.
  * retutn a possible base value of bm.
  * return -1 if bm is empty.
  */
-static inline state occupy_next_free(uint64 bm,
+static inline state occupy_next_free(_dc_bitmap bm,
 				     double_array * da){
   state next_idle, to_return, last_idle_to_occupy,
     _previous, _next;
@@ -300,7 +252,7 @@ static inline state occupy_next_free(uint64 bm,
   
  DA_FIND_SUIT_SLOT:
   to_return = next_idle - _first_code;
-  while(-1 != (_next_code = next_1_of_bm(_next_code, bm))){
+  while(-1 != (_next_code = next_of_1(_next_code, bm))){
       last_idle_to_occupy 
 	= da->cells[to_return].base + _next_code;
       switch(check_state(last_idle_to_occupy, da)){
@@ -348,9 +300,9 @@ void free_state(state to_free, double_array * da)
 /*
  * move base for state to_relocate to a new place beginning 
  * at b.
- * bm is bitmap of to_relocate.
+ * bm is _dc_bitmap of to_relocate.
  */
-static inline void relocate(state to_relocate, uint64 bm, 
+static inline void relocate(state to_relocate, _dc_bitmap bm, 
 			    double_array * da)
 {
   /* dest base index */
@@ -358,7 +310,7 @@ static inline void relocate(state to_relocate, uint64 bm,
   /*_code is not code because -1 may return*/
   /* for each input code for state to_relocate */
   int8 _code = first_of_1(bm), _code2;
-  uint64 bm2;
+  _dc_bitmap bm2;
   while(_code != -1){
     /* mark owner */
     da->cells[b + _code].check = to_relocate;
@@ -375,7 +327,7 @@ static inline void relocate(state to_relocate, uint64 bm,
      * the node base[s] + c is to be moved to b + c. Hence, for any
      * i for which check[i] = base[s] + c, update check[i] to b + c;
      */
-    bm2 = bitmap_of_state(base_s_c, da);    
+    bm2 = _dc_bitmap_of_state(base_s_c, da);    
     /* for eache input code for state (base[to_relocate] + c) */
     _code2 = first_of_1(bm2);
     while(_code2 != -1){
@@ -385,7 +337,7 @@ static inline void relocate(state to_relocate, uint64 bm,
     }
     /* free the cell */
     free_state(base_s_c, da);
-    _code = next_1_of_bm(_code, bm);
+    _code = next_of_1(_code, bm);
   }
   da->cells[to_relocate].base = b;
 }
@@ -447,7 +399,7 @@ void da_insert(uint8 * key, void * data,
   int32 offset = 0;
   state _current_state = ROOT_STATE, _next_state;
   code _next_code;
-  uint64 bm1, bm2, bm3;
+  _dc_bitmap bm1, bm2, bm3;
   uint8 * tail;
   uint32 s_d_o;
   void * tail_data;
@@ -491,8 +443,8 @@ void da_insert(uint8 * key, void * data,
        * current state if the former plus one is less than
        * the latter.
        */
-      bm1 = bitmap_of_state(_current_state, da);
-      bm2 = bitmap_of_state(da->cells[_next_state].check, da);
+      bm1 = _dc_bitmap_of_state(_current_state, da);
+      bm2 = _dc_bitmap_of_state(da->cells[_next_state].check, da);
       num1 = num_of_1(bm1);
       num2 = num_of_1(bm2);
       if(num1 + 1 < num2){
@@ -540,10 +492,10 @@ void da_insert(uint8 * key, void * data,
        * one is key + offset + s_d_o;
        * the other is tail + s_d_o;
        * next_code1 = get_code(*(one));
-       * next_code2 = get_code(*(the other)); form a bitmap and 
+       * next_code2 = get_code(*(the other)); form a _dc_bitmap and 
        * use occupy_next_free function to get base;
        */
-      uint64 bm3 = 0;
+      _dc_bitmap bm3 = 0;
       uint8 * tail1 = key + offset + s_d_o;
       code next_code1 = get_code(*(tail1));
       uint8 * tail2 = tail + s_d_o;      
@@ -552,9 +504,9 @@ void da_insert(uint8 * key, void * data,
        * so bm3 should not by empty;
        */
       if(*tail1 != '\0')
-	bm3 = set_1_of_code(bm3, next_code1);
+	bm3 = bm_set(next_code1, bm3);
       if(*tail2 != '\0')
-	bm3 = set_1_of_code(bm3, next_code2);
+	bm3 = bm_set(next_code2, bm3);
       da->cells[_current_state].base = 
 	occupy_next_free(bm3, da);
       
