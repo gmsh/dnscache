@@ -160,7 +160,7 @@ double_array * new_double_array()
   for(i = 0; i < to_return->cell_num; i++){
     to_return->cells[i].base = -(i - 1);
     to_return->cells[i].check = -(i + 1); 
-    to_return->cells[i].user data = NULL;
+    to_return->cells[i].user_data = NULL;
   }
   /*base[i] is the previous free cell*/
   /*check[i] is the next free cell*/
@@ -421,7 +421,7 @@ void da_insert(uint8 * key, void * data,
   code _next_code;
   _dc_bitmap bm1, bm2, bm3;
   uint8 * tail;
-  uint32 s_d_o;
+  uint32 s_d_o, tail_index;
   void * tail_data;
   int8 num1, num2;    
   while(1){
@@ -492,7 +492,7 @@ void da_insert(uint8 * key, void * data,
       }while(_next_state > da->cell_num);
       goto _IDLE;
     case in_tail://TODO
-      uint32 tail_index = -(da->cells[_next_state].base);
+      tail_index = -(da->cells[_next_state].base);
       tail = dt_get_tail(tail_index, da->tails);
 
       s_d_o = str_diff_offset(tail, key + offset);
@@ -529,17 +529,17 @@ void da_insert(uint8 * key, void * data,
        * so bm3 should not by empty;
        */
       if(*tail1 == '\0'){
-	da->cells[current_state].user_data = data;
+	da->cells[_current_state].user_data = data;
 	/*tail_index stores the index, we can safely change base.*/
-	da->cells[current_state].base
+	da->cells[_current_state].base
 	  = find_and_occupy(next_code2, da);
-	_next_state = da->cells[current_state].base + next_code2;
+	_next_state = da->cells[_current_state].base + next_code2;
 	/*move tail2 to _next_state*/
-	da->cells[_next_state].check = current_state;
+	da->cells[_next_state].check = _current_state;
 	da->cells[_next_state].base = dt_push_tail(tail2 + 1, da->tails);
 	da->cells[_next_state].user_data = tail_data;
 	dt_remove_tail(tail_index, da->tails);
-	if(_pre_state != current_state)/* wipe data */
+	if(_pre_state != _current_state)/* wipe data */
 	  da->cells[_pre_state].user_data = data;
 	return;
       }
