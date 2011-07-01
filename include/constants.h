@@ -43,7 +43,7 @@
 #define TIME_OUT	86400			/* 24 hours in seconds*/
 //synckey
 
-/* used by dns cache memory management modules. */
+/* wakemecn: used by dns cache memory management modules. */
 #define SMALL 1			                /* the 2^SMALL is the smallese chunks */
 #define	BIG	20			        /* the 2^BIG is the biggest chunks */
 #define CHUNK_TYPE_NUM ( BIG - SMALL + 1 )	/* counts of  chunk's type */
@@ -55,5 +55,6 @@ uint64 num_each_chunks[]={ //1024, 1024, 1024, 1024, 1024, 512, 512, 512, 512, 5
 						//	256,  256,  256,  256,  256, 128, 128, 128, 128, 128 
 							};
 			   /* number of each type of chunks */
+/* wakemecn: end */
 
 #endif /* CONSTANTS_H_ */

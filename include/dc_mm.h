@@ -10,7 +10,12 @@
 #include <stdio.h>
 #include "typedefs.h"
 #include "slist.h"
-//#include "dc_mm_structs.h"
+
+/*
+ * the main thread calls mm_init() to initialize the momery managment 
+ * modules.
+ */
+void mm_init();
 
 /* dc_alloc() allocates size bytes and returns a pointer  to  the  allocated
  * memory.   The  memory  is  not  cleared.   If  size is 0, then dc_alloc()
@@ -18,10 +23,6 @@
  * cessfully passed to dc_free().
  */
 void * dc_alloc(size_t size);
-/* {
- * return malloc(size);
- * }
- */
 
 /*
  * dc_free()  frees  the memory space pointed to by ptr, which must have been
@@ -30,10 +31,6 @@ void * dc_alloc(size_t size);
  * occurs.  If ptr is NULL, no operation is performed.
  */
 void dc_free(void * ptr);
-/* {
- * free(ptr);
- * }
- */
 
 /*
  * The  dc_realloc() function changes the size of the memory block pointed to
@@ -47,8 +44,8 @@ void dc_free(void * ptr);
  * dc_realloc().  If the area pointed to was moved, a dc_free(ptr) is done.
  */
 void * dc_realloc(void * ptr, size_t size);
-/* {
- * return realloc(ptr, size);
- * }
- */
+
+/* print the statics about the apply and free of chunks.*/
+void print_statics();
+
 #endif

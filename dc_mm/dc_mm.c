@@ -5,7 +5,7 @@
  * decription:	dnscache's memory management
  */
 
-#define	LOG2(x) (ffs(x) - 1)
+#define	LOG2(x) (ffs(x) - 1)    /* ceil of log2(x) */
 #define POW2(x) (0x0000000000000001 << x)
 
 #include "slist.h"
@@ -13,7 +13,7 @@
 #include "dc_mm_structs.h"
 
 /*
- * return the first bit filled with 1
+ * return the first bit filled with 1 of n
  */
 uint64 ffs(uint32 n)
 {
@@ -51,23 +51,20 @@ struct slist * mm_pre_alloc(uint64 capacity, uint16 counts)
 {
 	struct slist * init_idle_list;
 	void * ptr;
-	init_idle_list = mk_slist(malloc,counts);  /* 构造链表 */
+	init_idle_list = mk_slist(malloc,counts);  /* make a blank single list. */
 	while(counts--){
-		ptr = malloc(POW2(capacity)+sizeof(uint64));
-		*(uint64 *)ptr = capacity;
-		push(ptr,init_idle_list);  /* 压入链表中*/
+		ptr = malloc(POW2(capacity)+sizeof(uint64)); /* malloc for each element of the list. */
+		*(uint64 *)ptr = capacity;				/* filled the capacity before the chunk. */
+		push(ptr,init_idle_list);  /* push the chunk into list. */
 	}
 	return init_idle_list;	
 }
 
-/*
- * the main thread calls mm_init() to initialize the momery managment 
- * modules.
- */
 void mm_init()
 {
 	int i = CHUNK_TYPE_NUM;
 	while(i--){
+		/* init all the pre-allocated chunks */
 		chunks_manager_table[i] = (struct chunks_manager *)malloc(sizeof(struct chunks_manager));
 		if(!chunks_manager_table[i]){
 			printf("dc_mm : initilization failed!!!");	
@@ -107,7 +104,8 @@ void * select_pre_alloced(uint64 cap)
 	pre_alloc_apply[pos]++;
 	pthread_mutex_unlock(pre_alloc_mutex[pos]);
 	chunk_ptr = (void *)((uint64 *)ptr + 1);
-	printf("dc_mm : %s%8ld%s\n","select a specific capacity ", POW2(cap), " Bytes form pre-allocated chunks list.");
+	printf("dc_mm : %s%8ld%s\n","select a specific capacity ", POW2(cap),
+	       " Bytes form pre-allocated chunks list.");
 	return chunk_ptr; 
 } 
 
@@ -124,13 +122,15 @@ void * select_extra(uint64 cap)
 	extra_apply[cap]++;
 	pthread_mutex_unlock(extra_mutex[cap]);
 	chunk_ptr = (void *)((uint64 *)ptr + 1);
-	printf("dc_mm : %s%8ld%s\n","select a specific capacity ", POW2(cap), " Bytes form extra chunks list.");
+	printf("dc_mm : %s%8ld%s\n","select a specific capacity ", POW2(cap), 
+	       " Bytes form extra chunks list.");
 	return chunk_ptr;
 }
 
 /* make a new extra list with specific capacity */
 void mk_el(uint64 cap){
-	printf("dc_mm : %s%8ld%s\n","start to generate extra chunks list of chunks with specific capacity ", POW2(cap), " Bytes.");
+	printf("dc_mm : %s%8ld%s\n","start to generate extra chunks list of chunks with specific capacity ", 
+	        POW2(cap), " Bytes.");
 	struct slist * list_ptr;
 	if(elm_table[cap])
 		return;
@@ -139,13 +139,15 @@ void mk_el(uint64 cap){
 	elm_table[cap]->idle_num = DEFAULT_EXTRA;
 	elm_table[cap]->total_num = DEFAULT_EXTRA;
 	elm_table[cap]->chunks_list = list_ptr;
-	printf("dc_mm : %s%8ld%s\n","finish to generate extra chunks list of chunks with specific capacity ", POW2(cap), " Bytes.");
+	printf("dc_mm : %s%8ld%s\n","finish to generate extra chunks list of chunks with specific capacity ",
+	        POW2(cap), " Bytes.");
 }
 
 /* expand a extra list with specific capacity */
 void expand_el(uint64 cap)
 {
-	printf("dc_mm : %s%8ld%s\n","start to expand extra chunks list of chunks with specific capacity ", POW2(cap), " Bytes.");
+	printf("dc_mm : %s%8ld%s\n","start to expand extra chunks list of chunks with specific capacity ", 
+	        POW2(cap), " Bytes.");
 	struct slist * list_ptr;
 	void * ptr , * chunk_ptr;
 	list_ptr = elm_table[cap]->chunks_list;
@@ -159,7 +161,8 @@ void expand_el(uint64 cap)
 	}
 	elm_table[cap]->idle_num += DEFAULT_EXTRA;
 	elm_table[cap]->total_num += DEFAULT_EXTRA;
-	printf("dc_mm : %s%8ld%s\n","finish to expand extra chunks list of chunks with specific capacity ", POW2(cap), " Bytes.");
+	printf("dc_mm : %s%8ld%s\n","finish to expand extra chunks list of chunks with specific capacity ", 
+	        POW2(cap), " Bytes.");
 }
 
 void * dc_alloc(size_t size)
@@ -215,26 +218,28 @@ void free_extra_data(struct sl_node * sl_ptr)
 }
 
 void dc_free(void * ptr){
+	/* if ptr is NULL,no operation is performed. */
+	if(!ptr)
+		return;
 	void * word_before_ptr = (uint64 *)ptr - 1;
 	uint64 cap = *(uint64 *)word_before_ptr;
 	int pos = cap - SMALL;
 	struct sl_node * sn_ptr;
 	struct slist * sl_ptr;
-	/* if ptr is NULL,no operation is performed. */
-	if(!ptr)
-		return;
 	/* if chunks wasn't pre-allocated */
 	if(cap < SMALL || cap > BIG){
 		sl_ptr = elm_table[cap]->chunks_list;
 		pthread_mutex_lock(extra_mutex[cap]);
 		mv2head(word_before_ptr,sl_ptr);
-		printf("dc_mm : %s%8ld%s\n","free a extra chunk with specific capacity ", POW2(cap), " Bytes.");
+		printf("dc_mm : %s%8ld%s\n","free a extra chunk with specific capacity ", 
+		        POW2(cap), " Bytes.");
 		if(++(elm_table[cap]->idle_num) == elm_table[cap]->total_num ){
 			traverse(free_extra_data,elm_table[cap]->chunks_list);
 			sl_free(free,elm_table[cap]->chunks_list);		
 			free(elm_table[cap]);	
 			elm_table[cap] = NULL;	
-			printf("dc_mm : %s%8ld%s\n","free a extra chunks list  with specific capacity ", POW2(cap), " Bytes.");
+			printf("dc_mm : %s%8ld%s\n","free a extra chunks list  with specific capacity ", 
+			        POW2(cap), " Bytes.");
 		}
 		extra_free[cap]++;
 		pthread_mutex_unlock(extra_mutex[cap]);
@@ -251,21 +256,24 @@ void dc_free(void * ptr){
 		++(chunks_manager_table[pos]->idle_num);
 		pre_alloc_free[pos]++;
 		pthread_mutex_unlock(pre_alloc_mutex[pos]);
-		printf("dc_mm : %s%8ld%s\n","free a chunk with specific capacity ", POW2(cap), " Bytes.");
+		printf("dc_mm : %s%8ld%s\n","free a chunk with specific capacity ", 
+		        POW2(cap), " Bytes.");
 		return; /* added by wakemecn at Jun 30th, 2011 */
 	}		
 	/* if chunk to be freed in the extra-list */
 	sl_ptr = elm_table[cap]->chunks_list;
 	pthread_mutex_lock(extra_mutex[cap]);
 	mv2head(word_before_ptr,sl_ptr);  
-	printf("dc_mm : %s%8ld%s\n","free a extra chunk with specific capacity ", POW2(cap), " Bytes.");
+	printf("dc_mm : %s%8ld%s\n","free a extra chunk with specific capacity ", 
+	        POW2(cap), " Bytes.");
 	(elm_table[cap]->idle_num)++;
 	if(elm_table[cap]->idle_num == elm_table[cap]->total_num ){
 		traverse(free_extra_data,elm_table[cap]->chunks_list);
 		sl_free(free,elm_table[cap]->chunks_list);		
 		free(elm_table[cap]);
 		elm_table[cap] = NULL;	
-		printf("dc_mm : %s%8ld%s\n","free a extra chunks list  with specific capacity ", POW2(cap), " Bytes.");
+		printf("dc_mm : %s%8ld%s\n","free a extra chunks list  with specific capacity ", 
+		        POW2(cap), " Bytes.");
 	}
 	extra_free[cap]++;
 	pthread_mutex_unlock(extra_mutex[cap]);
@@ -273,16 +281,23 @@ void dc_free(void * ptr){
 
 void * dc_realloc(void * ptr, size_t size)
 {
+	if(!ptr){
+		ptr = dc_alloc(size);
+		return ptr;
+	}
+	if(size == 0){
+		dc_free(ptr);
+		return NULL;
+	}
 	void * word_before_ptr = (void *)((uint64 *)ptr - 1);
 	void * new_ptr;
 	uint64 cap = *(uint64 *)word_before_ptr;
-	if(size == 0)
-		dc_free(ptr);
 	if(size <= POW2(cap)){
 		printf("dc_mm : %s","reallocate but return the original pointer.");
 		return ptr;
 	}
-
+	new_ptr = dc_alloc(size);
+	memcpy(new_ptr, ptr, POW2(cap));
 	dc_free(ptr);
 	printf("dc_mm : %s","reallocation finished");
 	return new_ptr;

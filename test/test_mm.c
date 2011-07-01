@@ -6,12 +6,16 @@
 main(){
 	mm_init();
 	void * ptr[2000];
-	int i, j;int count=20;
-while(1){
+	int i, j;int count=20;int step=1000;
+while(step--){
 	while(--count < 20 && count > 18){
 		for(i = 0; i < 2; i++)
 			ptr[i] = dc_alloc(POW2(count));
 		print_statics();
+		for(i=0;i<2;i++)
+			ptr[i] = dc_realloc(ptr[i],POW2(count+1));
+		print_statics();
+
 //	short x=1, y;
 //		while(x++!=0){
 //			y=x * x;
