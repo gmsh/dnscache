@@ -353,7 +353,7 @@ static inline state find_and_occupy(code _next_code, double_array * da){
     expand_double_array(da);
     goto START_FIND_AND_OCCUPY;
   }
-  if(to_return - _next_code < 0)
+  if(to_return - _next_code <= 0)
     goto START_FIND_AND_OCCUPY;
   occupy_state(to_return, da);
   return to_return;
