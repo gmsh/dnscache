@@ -224,7 +224,7 @@ static inline uint64 bitmap_of_state(state s, double_array * da)
 static inline uint64 set_1_of_code(uint64 bm, code c)
 {
   uint64 mask
-    = 0x8000000080000000 >> (64 - MAX_CODE
+    = 0x8000000000000000 >> (64 - MAX_CODE
 			     - c - 1);
   return bm | mask;
 }
