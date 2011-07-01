@@ -439,6 +439,7 @@ static inline state da_insert_without_tail
     offset += 1;
     where = to_return;
   }
+  return to_return;
 }
 
 void da_insert(uint8 * key, void * data, 
