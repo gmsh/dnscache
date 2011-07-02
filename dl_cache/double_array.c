@@ -219,8 +219,9 @@ static inline void expand_double_array(double_array * da)
 }
 
 /*
+ * base[s] > 0
  * return a _dc_bitmap(uint64). If check[base[s] + c] = s then _dc_bitmap[s]
- * is 1, otherwise 0.
+ * is 1, otherwise 0. 
  */
 static inline _dc_bitmap _dc_bitmap_of_state(state s, double_array * da)
 {
@@ -465,6 +466,11 @@ void da_insert(uint8 * key, void * data,
        * the latter.
        */
       bm1 = _dc_bitmap_of_state(_current_state, da);
+      /*state da->cells[_next_state].check is in_tail?*/
+      if(da->cells[da->cells[_next_state].check].base < 0){
+	relocate(_current_state, bm1, da);
+	offset--;
+      }
       bm2 = _dc_bitmap_of_state(da->cells[_next_state].check, da);
       num1 = num_of_1(bm1);
       num2 = num_of_1(bm2);
