@@ -12,6 +12,7 @@
 #include "constants.h"
 #include "typedefs.h"
 #include "dc_bitmap.h"
+#include "assert.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -71,7 +72,7 @@ struct _double_array{
   /*
    *	In  order to  keep a  node  number  from  exceeding the
    *  maximum index of the double-array,  we define the  size,
-   *	denoted by cell_nums.
+   *	denoted by cell_num.
    */
   int32 cell_num;
   da_cell * cells;
@@ -96,6 +97,8 @@ static inline enum cell_state check_next_state(state current_state,
 					 state * _next_state,
 					 double_array * da)
 {
+  assert(current_state > 0);
+  assert(da->cells[current_state].base > 0);
   /* TODO use mask to implement */
   uint8 input_char = *(key + offset);
   if('\0' == input_char)
@@ -136,8 +139,12 @@ static inline enum cell_state check_next_state(state current_state,
 
 static inline void occupy_state(state s, double_array * da)
 {
+  assert(s > 0);
+  assert(s < da->cell_num);
   state _next = -da->cells[s].check;
   state _previous = -da->cells[s].base;
+  assert(_previous > 0);
+  assert(_next > _previous);
   da->cells[_previous].check = -_next;
   da->cells[_next].base = -_previous;
 }
@@ -190,6 +197,7 @@ void free_da(double_array * da)
 static inline enum cell_state 
 check_state(state s, double_array * da)
 {
+  assert(s > 0);
   if(s > da->cell_num)
     return overflow;
   if(da->cells[s].check < 0)
@@ -230,6 +238,7 @@ static inline void expand_double_array(double_array * da)
  */
 static inline _dc_bitmap _dc_bitmap_of_state(state s, double_array * da)
 {
+  assert(s > 0);
   _dc_bitmap to_return = 0;
   int8 i;
   /* 1 is the first code */
@@ -247,10 +256,15 @@ static inline _dc_bitmap _dc_bitmap_of_state(state s, double_array * da)
  * after_this > IDLE_LIST.
  * retutn a possible base value of bm.
  * return -1 if bm is empty.
+ * after_this means 
+ * to_return - first_code > base[after_this]
  */
 static inline state occupy_next_free(_dc_bitmap bm, 
 				     state after_this,
 				     double_array * da){
+  assert(after_this > 0);
+  assert(da->cells[after_this].base > 0);
+  assert(bm != 0);
   state next_idle, to_return, last_idle_to_occupy,
     _previous, _next;
   int8 _next_code = first_of_1(bm);
@@ -261,40 +275,44 @@ static inline state occupy_next_free(_dc_bitmap bm,
 
   /* ensure the return base is not negative.
    * ensure the return base is after after_this.
+   * find an idle state
    */
- DA_NEXT_FREE_START:
-  next_idle = after_this;
+  next_idle = da->cells[after_this].base + _first_code + 1;
   while(da->cells[next_idle].check > 0){
-    if(++next_idle >= da->cell_num -1){
+    next_idle += 1;
+    while(next_idle >= da->cell_num -1){
       expand_double_array(da);
-      goto DA_NEXT_FREE_START;
     }
   }
-  while(next_idle - _first_code <= after_this){
+  while(next_idle - _first_code <= 
+	da->cells[after_this].base){
     if(da->cells[next_idle].check == IDLE_LIST)
       expand_double_array(da);
     next_idle = -(da->cells[next_idle].check);
   }
-    
+  assert(next_idle < da->cell_num);
  DA_FIND_SUIT_SLOT:
   to_return = next_idle - _first_code;
+  assert(to_return > 0);
   while(-1 != (_next_code = next_of_1(_next_code, bm))){
       last_idle_to_occupy 
-	= da->cells[to_return].base + _next_code;
+	= to_return + _next_code;
       switch(check_state(last_idle_to_occupy, da)){
       case occupied_by_other:
 	/*not idle, move ahead*/
 	next_idle = -(da->cells[next_idle].check);
+	if(da->cells[next_idle].check == IDLE_LIST)
+	  expand_double_array(da);
 	_next_code = _first_code;
 	goto DA_FIND_SUIT_SLOT;
-	break;/*useless*/
       case idle:
 	/* check next code*/
 	break;
       case overflow:
-	expand_double_array(da);
-	goto DA_FIND_SUIT_SLOT;
-	break; /* useless */
+	while(overflow ==
+	      check_state(last_idle_to_occupy, da))
+	  expand_double_array(da);
+	break;
       }
   }
   /* a slot is found.
@@ -304,12 +322,16 @@ static inline state occupy_next_free(_dc_bitmap bm,
   do{
     occupy_state(to_return + _next_code, da);
   }while(-1 != (_next_code = next_of_1(_next_code, bm)));
+  assert(to_return - _first_code > da->cells[after_this].base);
   return to_return;
 }
 
 /* free the state */
 static inline void free_state(state to_free, double_array * da)
 {
+  assert(to_free > 0);
+  assert(to_free < da->cell_num);
+  assert(da->cells[to_free].check > 0);
   state s = to_free, temp;
   while(s != IDLE_LIST){
     s--;
@@ -369,11 +391,13 @@ static inline void relocate(state to_relocate, state b,
   da->cells[to_relocate].base = b;
 }
 
-/* find a idle state, occupy and return it */
+/* find a idle state, occupy and return it.
+ * after_this means to_return - _next_code > after_this
+ */
 static inline state find_and_occupy(code _next_code,
 				    state after_this,
 				    double_array * da){
-  /* to_return - _next_code should > 0*/
+  /* to_return - _next_code should > after_this */
   state to_return = after_this;
   while(da->cells[to_return].check > 0){
     if(++to_return >= da->cell_num -1){
@@ -565,7 +589,8 @@ void da_insert(uint8 * key, void * data,
 	da->cells[_current_state].user_data = data;
 	/*tail_index stores the index, we can safely change base.*/
 	da->cells[_current_state].base
-	  = find_and_occupy(next_code2, _current_state, da);
+	  = find_and_occupy(next_code2, _current_state, da)
+	  - next_code2;
 	_next_state = da->cells[_current_state].base + next_code2;
 	/*move tail2 to _next_state*/
 	da->cells[_next_state].check = _current_state;
@@ -580,6 +605,10 @@ void da_insert(uint8 * key, void * data,
       bm3 = bm_set(next_code1, bm3);
       /*_next_state can not be end_with_zero, so *tail2 != '\0'*/
       bm3 = bm_set(next_code2, bm3);
+      /* because base[_current_state] is negative before call 
+       * occupy_next_free. we set the base = _current_state.
+       */
+      da->cells[_current_state].base = _current_state;
       da->cells[_current_state].base = 
 	occupy_next_free(bm3, _current_state, da);
       
