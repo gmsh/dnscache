@@ -143,7 +143,7 @@ static inline void occupy_state(state s, double_array * da)
   assert(s < da->cell_num);
   state _next = -da->cells[s].check;
   state _previous = -da->cells[s].base;
-  assert(_previous > 0);
+  assert(_previous >= 0);
   assert(_next > _previous);
   da->cells[_previous].check = -_next;
   da->cells[_next].base = -_previous;
