@@ -109,6 +109,11 @@ static inline enum cell_state check_next_state(state current_state,
     if (da->cells[*_next_state].base < 0)
       return in_tail;
     else{
+      /*in case of base[s] + c = s*/
+      return occupied_by_other;/* occupied_by_"other"
+				* means you should
+				* relocate it.
+				*/
       /* commented because da_insert don't differentiate
        *in_da & end_with_zero.
       if(da->cells[*_next_state].user data != NULL)
@@ -481,7 +486,7 @@ void da_insert(uint8 * key, void * data,
       if(num1 < num2){
 	/* occupy bm3 */
 	dest_base = occupy_next_free(bm3, da);
-	/* only relocate bm2 */
+	/* only relocate bm1 */
 	relocate(_current_state, dest_base, bm1, da);
       }else{
 	dest_base = occupy_next_free(bm2, da);
