@@ -350,6 +350,7 @@ static inline void relocate(state to_relocate, state b,
       /* check[base[base[s] + c] + d] = b + c */
       /* check[base[base_s_c] + _code2] = b + code */
       da->cells[da->cells[base_s_c].base + _code2].check = b + _code;
+      _code2 = next_of_1(_code2, bm2);
     }
     /* free the cell */
     free_state(base_s_c, da);
