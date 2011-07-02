@@ -19,8 +19,8 @@
  */
 
 typedef struct {
-	uint32 ip ;
-	time_t timestamp ; /* time stamp*/
+	uint32	ip;
+	time_t	timestamp ; /* time stamp*/
 } fake_data_t;
 
 /*
