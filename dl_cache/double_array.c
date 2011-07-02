@@ -147,6 +147,7 @@ static inline void occupy_state(state s, double_array * da)
   assert(_next > _previous);
   da->cells[_previous].check = -_next;
   da->cells[_next].base = -_previous;
+  printf("occupy_state: %d\n", s);
 }
 
 
@@ -257,7 +258,7 @@ static inline _dc_bitmap _dc_bitmap_of_state(state s, double_array * da)
  * retutn a possible base value of bm.
  * return -1 if bm is empty.
  * after_this means 
- * to_return - first_code > base[after_this]
+ * to_return  > base[after_this]
  */
 static inline state occupy_next_free(_dc_bitmap bm, 
 				     state after_this,
@@ -285,7 +286,6 @@ static inline state occupy_next_free(_dc_bitmap bm,
   assert(next_idle < da->cell_num);
   int found = 0;
   while(!found){
-    next_idle = -(da->cells[next_idle].check);
     while(unlikely(
 		   da->cells[next_idle].check == IDLE_LIST 
 		   )){
@@ -299,6 +299,7 @@ static inline state occupy_next_free(_dc_bitmap bm,
 			 to_return + _next_code, da
 			 )){
       case occupied_by_other:
+	next_idle = -(da->cells[next_idle].check);
 	continue;/*continue while*/
       case idle:
 	break;/*break switch*/
@@ -320,7 +321,7 @@ static inline state occupy_next_free(_dc_bitmap bm,
   do{
     occupy_state(to_return + _next_code, da);
   }while(-1 != (_next_code = next_of_1(_next_code, bm)));
-  assert(to_return - first_code > da->cells[after_this].base);
+  assert(to_return > (da->cells[after_this].base));
   return to_return;
 }
 
@@ -343,6 +344,7 @@ static inline void free_state(state to_free, double_array * da)
   da->cells[to_free].check = -temp;
   da->cells[to_free].base = -s;
   da->cells[temp].base = -to_free;
+  printf("free state: %d\n", to_free);
 }
 
 /*
@@ -460,7 +462,7 @@ void da_insert(uint8 * key, void * data,
   state _current_state = ROOT_STATE, _next_state, _pre_state,
     dest_base;
   code _next_code;
-  _dc_bitmap bm1, bm2, bm3;
+  _dc_bitmap bm1, bm2, bm3, bm4;
   uint8 * tail;
   uint32 s_d_o, tail_index;
   void * tail_data;
@@ -613,9 +615,9 @@ void da_insert(uint8 * key, void * data,
 	return;
       }
       /* *tail1 != '\0' */
-      bm3 = bm_set(next_code1, bm3);
+      bm4 = bm_set(next_code1, bm4);
       /* *tail2 != '\0'*/
-      bm3 = bm_set(next_code2, bm3);
+      bm4 = bm_set(next_code2, bm4);
       /* because base[_current_state] is negative before call 
        * occupy_next_free. we set the base = _current_state.
        */
