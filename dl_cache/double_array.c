@@ -110,7 +110,8 @@ static inline enum cell_state check_next_state(state current_state,
       return in_tail;
     else{
       /*in case of base[s] + c = s*/
-      return occupied_by_other;/* occupied_by_"other"
+      if(*_next_state == current_state)
+	return occupied_by_other;/* occupied_by_"other"
 				* means you should
 				* relocate it.
 				*/
@@ -427,7 +428,7 @@ static inline state da_insert_without_tail
   while(offset < length){
     /* find a idle state to occupy */
     _next_code = get_code(*(str + offset));
-    to_return  = find_and_occupy(_next_code,da);
+    to_return  = find_and_occupy(_next_code, where, da);
     da->cells[where].base = to_return - _next_code;
     da->cells[to_return].check = where;
     offset += 1;
@@ -494,7 +495,7 @@ void da_insert(uint8 * key, void * data,
       bm3 = bm_set(_next_code, bm1);
       /*state da->cells[_next_state].check is in_tail?*/
       if(da->cells[da->cells[_next_state].check].base < 0){
-	dest_base = occupy_next_free(bm1, da);
+	dest_base = occupy_next_free(bm1, _current_state, da);
 	relocate(_current_state, dest_base, bm1, da);
 	offset--;
       }
@@ -503,11 +504,11 @@ void da_insert(uint8 * key, void * data,
       num2 = num_of_1(bm2);
       if(num1 < num2){
 	/* occupy bm3 */
-	dest_base = occupy_next_free(bm3, da);
+	dest_base = occupy_next_free(bm3, _current_state, da);
 	/* only relocate bm1 */
 	relocate(_current_state, dest_base, bm1, da);
       }else{
-	dest_base = occupy_next_free(bm2, da);
+	dest_base = occupy_next_free(bm2, da->cells[_next_state].check, da);
 	relocate(da->cells[_next_state].check, dest_base, bm2, da);
       }
       /* after do relocate the state should be idle*/
@@ -570,7 +571,7 @@ void da_insert(uint8 * key, void * data,
 	da->cells[_current_state].user_data = data;
 	/*tail_index stores the index, we can safely change base.*/
 	da->cells[_current_state].base
-	  = find_and_occupy(next_code2, da);
+	  = find_and_occupy(next_code2, _current_state, da);
 	_next_state = da->cells[_current_state].base + next_code2;
 	/*move tail2 to _next_state*/
 	da->cells[_next_state].check = _current_state;
@@ -586,7 +587,7 @@ void da_insert(uint8 * key, void * data,
       /*_next_state can not be end_with_zero, so *tail2 != '\0'*/
       bm3 = bm_set(next_code2, bm3);
       da->cells[_current_state].base = 
-	occupy_next_free(bm3, da);
+	occupy_next_free(bm3, _current_state, da);
       
       /* tail1 */
       _next_state = da->cells[_current_state].base + next_code1;
