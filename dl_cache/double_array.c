@@ -117,7 +117,7 @@ static inline enum cell_state check_next_state(state current_state,
       return in_da;
     }
   }else{
-    if(da->cells[*_next_state].check < 0){
+    if(da->cells[*_next_state].check <= 0){
       if(unlikely(da->cells[*_next_state].base > 0))
 	return invalid;
       else
@@ -298,12 +298,12 @@ static inline state occupy_next_free(_dc_bitmap bm,
 }
 
 /* free the state */
-void free_state(state to_free, double_array * da)
+static inline void free_state(state to_free, double_array * da)
 {
   state s = to_free, temp;
   while(s != IDLE_LIST){
     s--;
-    if(da->cells[s].check < 0)
+    if(da->cells[s].check <= 0)
       break;
     /* break if idle */
   }
@@ -483,7 +483,7 @@ void da_insert(uint8 * key, void * data,
       }else{
 	relocate(da->cells[_next_state].check, bm2, da);
       }
-      /* after do relocate the state should be idle */
+      /* after do relocate the state should be idle*/
       /* move back the input char & rechek */
       offset--;
       break;
