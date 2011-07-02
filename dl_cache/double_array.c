@@ -416,7 +416,8 @@ void da_insert(uint8 * key, void * data,
 	       double_array * da)
 {
   int32 offset = 0;
-  state _current_state = ROOT_STATE, _next_state, _pre_state;
+  state _current_state = ROOT_STATE, _next_state, _pre_state,
+    dest_base;
   code _next_code;
   _dc_bitmap bm1, bm2, bm3;
   uint8 * tail;
@@ -469,7 +470,8 @@ void da_insert(uint8 * key, void * data,
       bm3 = bm_set(_next_code, bm1);
       /*state da->cells[_next_state].check is in_tail?*/
       if(da->cells[da->cells[_next_state].check].base < 0){
-	relocate(_current_state, bm1, da);
+	dest_base = occupy_next_free(bm1, da);
+	relocate(_current_state, dest_base, bm1, da);
 	offset--;
       }
       bm2 = _dc_bitmap_of_state(da->cells[_next_state].check, da);
@@ -477,11 +479,12 @@ void da_insert(uint8 * key, void * data,
       num2 = num_of_1(bm2);
       if(num1 < num2){
 	/* occupy bm3 */
-	state dest_base = occupy_next_free(bm3, da);
+	dest_base = occupy_next_free(bm3, da);
 	/* only relocate bm2 */
 	relocate(_current_state, dest_base, bm1, da);
       }else{
-	relocate(da->cells[_next_state].check, bm2, da);
+	dest_base = occupy_next_free(bm2, da);
+	relocate(da->cells[_next_state].check, dest_base, bm2, da);
       }
       /* after do relocate the state should be idle*/
       /* move back the input char & rechek */
