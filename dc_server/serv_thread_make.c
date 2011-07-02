@@ -8,8 +8,6 @@
  * description:		create accept threads and some methods
  ********************************************************************/
 #include "server.h"
-//#include "dc_mm.h"
-#include "dl_cache_stub.h"
 
 uint32 dns_error , cache_miss;
 
@@ -52,7 +50,7 @@ void  * thread_main_serv(void * arg)
 
 static void serv(int connfd)
 {	
-	printf("%d is serving\n", pthread_self());
+	//printf("%d is serving\n", pthread_self());
 	int readcount;
 	int n;
 	uint32 total_length, magic_number, request_number;
@@ -112,6 +110,7 @@ static void do_search(uint8 * headptr, uint8 *requestptr, int rbuflen, int connf
 	uint32 *ipptr = (uint32 *)requestptr;
 	fake_data_t *result;
 	uint32 ipcount = 0;
+	uint32 *tempptr;
 
 	for(;;){
 		
@@ -142,10 +141,11 @@ static void do_search(uint8 * headptr, uint8 *requestptr, int rbuflen, int connf
 			/*CACHE_MISS 127.0.0.2*/
 
 		} else {
-			*( ipptr + ipcount ) = result -> ip;
-			unlock_after_copy(currentptr);
+			tempptr = currentptr; 
 			readcount += strlen(currentptr) + 1;
 			currentptr  += strlen(currentptr) + 1;	
+			*( ipptr + ipcount ) = result -> ip;
+			unlock_after_copy(tempptr);
 		}
 		
 		ipcount++;
@@ -219,7 +219,6 @@ static void do_dns_search(uint8* headptr, int total, dm_node * firstnode, int co
                 if( iget == iput ){
                  	printf("iget == iput\n");
 		 	exit(0);
-		
 		}
                 Pthread_cond_signal(&dns_array_cond);
                	Pthread_mutex_unlock(&dns_array_mutex);

@@ -9,10 +9,11 @@
  ********************************************************************/
 
 #include "server.h"
-//#include "dc_mm.h"
 
-pthread_mutex_t dns_array_mutex= PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t  dns_array_cond= PTHREAD_COND_INITIALIZER;
+pthread_mutex_t dns_array_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t  dns_array_cond = PTHREAD_COND_INITIALIZER;
+
+pthread_mutex_t serv_thread_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 
 int
@@ -35,7 +36,11 @@ main(int argc, char **argv)
 		printf("bind error\n");
 		exit(0);
 	}
-	 dns_thread_tptr = calloc(MAXDNSTHREADS, sizeof(dns_thread_t));
+
+
+
+	
+	dns_thread_tptr = calloc(MAXDNSTHREADS, sizeof(thread_t));
 	serv_thread_tptr = calloc(MAXSERVTHREADS, sizeof(thread_t));
 	
 	int backlog;
@@ -54,7 +59,8 @@ main(int argc, char **argv)
 	for(i = 0; i < MAXSERVTHREADS; i++ ){
 		thread_make_serv(i);
 	}
-	
+
+	start_udp_server();	/* start the udp server */
 
 	for(;;)
 		pause();

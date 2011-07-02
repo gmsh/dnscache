@@ -16,12 +16,14 @@
 
 #include "constants.h"
 #include "typedefs.h"
-//#include "dc_mm.h"
+#include "dc_mm.h"
 #include "dl_cache_stub.h"
 
 #define	 HAVE_ERROR	0	
 #define	 NO_ERROR	1	
 
+#define	 MAX_UDP_LENGTH (64 * 64)
+#define	 UDP_BUF_LENGTH	(1024 * 1024 * 1024) //UDP buffer length 1G
 typedef struct dmnode{
 	char	*domain;	/* point to the domain */
 	uint32  index;		/* the index in the first message */
@@ -62,6 +64,7 @@ thread_t *dns_thread_tptr;	/* point to the memory alloc for
 thread_t *serv_thread_tptr;	/* point to the memory alloc for 
 				   connect threads	
 				 */
+
 dns_thread_t dns_array[ARRAYSIZE];		
 				/*
 				 *  dns threads read it and know
@@ -94,6 +97,10 @@ void *thread_main_dns(void *arg);
 void thread_make_serv(int i);
 void *thread_main_serv(void * arg);
 void init(void);
+void  start_udp_server(void);
+int dnsrequest(const char *name ,uint32 *ipaddr);
+
+
 
 /* wraped functions */
 void	Pthread_create(pthread_t *, const pthread_attr_t *,

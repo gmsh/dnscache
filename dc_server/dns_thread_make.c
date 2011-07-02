@@ -9,8 +9,7 @@
  ********************************************************************/
 
 #include "server.h"
-#include "dc_mm.h"
-//#include "dc_mm_structs.h"
+//#include "dc_mm.h"
 void thread_make_dns(int i)
 {
 	void*	thread_main_dns(void *);
@@ -19,11 +18,9 @@ void thread_make_dns(int i)
 	return;
 }
 
-
-void *
+ void *
 thread_main_dns(void *arg)
 {	
-	int dnsrequest(const char *name, uint32 *ipaddr);
 	struct iovec iovec[2]; //for writev
 	int connfd, *number, count, total;
 	char  *domain ;
@@ -60,7 +57,6 @@ thread_main_dns(void *arg)
 
 		//do our job 
 		*(uint32 *)(ipptr + count * 2) = index;
-		printf("index %d", *(ipptr + count * 2  ));
 		if(dnsrequest(domain, ipptr + count * 2 + 1  ) != 0){
 			inet_pton(AF_INET,  DNS_ERROR, ipptr + count * 2 + 1);
 			missindex = HAVE_ERROR;

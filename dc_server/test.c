@@ -11,7 +11,6 @@
 #include "server.h"
 //#include "dc_mm.h"
 
-int dnsrequest(char *, uint32 *);
 pthread_mutex_t	dns_array_mutex= PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t	dns_array_cond= PTHREAD_COND_INITIALIZER;
 

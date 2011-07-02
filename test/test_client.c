@@ -17,9 +17,10 @@ int main(int argc, char **argv)
 {
 	char *a;
 	a=malloc(1024*sizeof(char));
-	strcpy(a, "baidu.com");
-	strcpy(a+strlen(a) + 1, "google.com");
+	strcpy(a, "www.baidu.com");
+	strcpy(a+strlen(a) + 1, "www.google.com");
 	dns_search(a, 2, f);
+
 }
 
 void f(char *domain , uint32 *ip)
