@@ -8,7 +8,9 @@
  * description:		change it
  ********************************************************************/
 #include "dl_cache_stub.h"
+#include <arpa/inet.h>
 fake_data_t fake_data ;
+
 /*
  * To initialize the dl_cache.
  * size_per_data is the size of data.
@@ -29,9 +31,11 @@ void dl_cache_init(size_t size_per_data){
 void * get_data_and_lock(uint8 * key)
 
 {
-	if ('w' == *key)
-		return &fake_data; /* stub for miss */
-	return NULL; /* hit */
+	inet_pton(AF_INET, "192.168.1.1",  &fake_data.ip ) ; 
+	fake_data.timestamp = time(NULL);; 
+//	if ('w' == *key)
+		return &fake_data; 
+//	return NULL; 
 }
 
 /*
