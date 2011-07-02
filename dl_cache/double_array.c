@@ -317,14 +317,12 @@ void free_state(state to_free, double_array * da)
 
 /*
  * move base for state to_relocate to a new place beginning 
- * at b.
+ * at b(dest base index).
  * bm is _dc_bitmap of to_relocate.
  */
-static inline void relocate(state to_relocate, _dc_bitmap bm, 
-			    double_array * da)
+static inline void relocate(state to_relocate, state b,
+			    _dc_bitmap bm, double_array * da)
 {
-  /* dest base index */
-  state b = occupy_next_free(bm, da);
   /*_code is not code because -1 may return*/
   /* for each input code for state to_relocate */
   int8 _code = first_of_1(bm), _code2;
@@ -465,20 +463,27 @@ void da_insert(uint8 * key, void * data,
        * current state if the former plus one is less than
        * the latter.
        */
+      /* origin bm of _current_state */
       bm1 = _dc_bitmap_of_state(_current_state, da);
+      /* if add _next_code, form bm3*/
+      bm3 = bm_set(_next_code, bm1);
       /*state da->cells[_next_state].check is in_tail?*/
       if(da->cells[da->cells[_next_state].check].base < 0){
 	relocate(_current_state, bm1, da);
 	offset--;
       }
       bm2 = _dc_bitmap_of_state(da->cells[_next_state].check, da);
-      num1 = num_of_1(bm1);
+      num1 = num_of_1(bm3);
       num2 = num_of_1(bm2);
-      if(num1 + 1 < num2){
-	relocate(_current_state, bm1, da);
+      if(num1 < num2){
+	/* occupy bm3 */
+	state dest_base = occupy_next_free(bm3, da);
+	/* only relocate bm2 */
+	relocate(_current_state, dest_base, bm1, da);
       }else{
 	relocate(da->cells[_next_state].check, bm2, da);
       }
+      /* after do relocate the state should be idle */
       /* move back the input char & rechek */
       offset--;
       break;
