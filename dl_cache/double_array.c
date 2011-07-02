@@ -129,7 +129,6 @@ static inline enum cell_state check_next_state(state current_state,
       else
 	return idle;
     }else{/* check > 0 */
-      if(unlikely(da->cells[*_next_state].base < 0))
 	return occupied_by_other;
     }
   }
