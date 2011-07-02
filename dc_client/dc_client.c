@@ -28,7 +28,7 @@ int  	dns_search(char *buf, int nbuf, void (*f)(char *,uint32 *))
 	int i, misscount=0;
 	uint32 total_length = 0, tempip;
 	index[0] = 0;
-	for(i = 1; i <=nbuf ; i++){
+	for(i = 1; i <= nbuf ; i++){
 		while(buf[total_length] != '\0'){
 			if(!is_in_set(buf + total_length))
 				return NOT_IN_SET;
@@ -66,10 +66,10 @@ int  	dns_search(char *buf, int nbuf, void (*f)(char *,uint32 *))
 	iovec[0].iov_base = headbuf;
 	iovec[1].iov_base = buf;
 	iovec[0].iov_len  = HEAD_LENGTH;
-	iovec[1].iov_len  = total_length - HEAD_LENGTH;
+	iovec[1].iov_len  = total_length - HEAD_LENGTH ;
 
 
-	if(writev(sockfd, iovec, 2) != total_length){
+	if(writev(sockfd, iovec, 2) != total_length ){
 		printf("writev wrong \n");
 		return OTHER_WRONG;
 	}
@@ -99,9 +99,9 @@ int  	dns_search(char *buf, int nbuf, void (*f)(char *,uint32 *))
 	for(i = 0; i < nbuf ; i++){
 		tempip = *(uint32 *)((uint32 *)(retbuf + HEAD_LENGTH )+ i);
 	//	inet_pton(AF_INET,(uint32 *) ((uint32 *)(retbuf + HEAD_LENGTH )+ i), &tempip);
-		if(tempip == dns_error ||tempip ==  cache_miss)
+		if(tempip == dns_error || tempip ==  cache_miss)
 			misscount++;
-		f(buf + count , (uint32 *)(retbuf + HEAD_LENGTH) + i);
+		f(buf + index[i] , (uint32 *)(retbuf + HEAD_LENGTH) + i);
 			//call the f to do with <domain, ip>
 	}		
 
