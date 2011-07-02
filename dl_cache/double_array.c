@@ -248,7 +248,8 @@ static inline _dc_bitmap _dc_bitmap_of_state(state s, double_array * da)
  * retutn a possible base value of bm.
  * return -1 if bm is empty.
  */
-static inline state occupy_next_free(_dc_bitmap bm,
+static inline state occupy_next_free(_dc_bitmap bm, 
+				     state after_this,
 				     double_array * da){
   state next_idle, to_return, last_idle_to_occupy,
     _previous, _next;
@@ -257,9 +258,18 @@ static inline state occupy_next_free(_dc_bitmap bm,
     return -1;
   int8 _first_code = _next_code;
 
-  /* ensure the return base is not negative. */
+
+  /* ensure the return base is not negative.
+   * ensure the return base is after after_this.
+   */
  DA_NEXT_FREE_START:
-  next_idle = IDLE_LIST;
+  next_idle = after_this;
+  while(da->cells[next_idle].check > 0){
+    if(++next_idle >= da->cell_num -1){
+      expand_double_array(da);
+      goto DA_NEXT_FREE_START;
+    }
+  }
   do{
     next_idle = -(da->cells[next_idle].check);
   }while(next_idle < ROOT_STATE + _first_code && next_idle != IDLE_LIST);
@@ -365,9 +375,17 @@ static inline void relocate(state to_relocate, state b,
 }
 
 /* find a idle state, occupy and return it */
-static inline state find_and_occupy(code _next_code, double_array * da){
+static inline state find_and_occupy(code _next_code,
+				    state after_this,
+				    double_array * da){
   /* to_return - _next_code should > 0*/
-  state to_return = IDLE_LIST;
+  state to_return = after_this;
+  while(da->cells[to_return].check > 0){
+    if(++to_return >= da->cell_num -1){
+      expand_double_array(da);
+      to_return = after_this;
+    }
+  }
  START_FIND_AND_OCCUPY:
   to_return = -(da->cells[to_return].check);
   if(to_return == IDLE_LIST){
