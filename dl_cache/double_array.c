@@ -274,7 +274,7 @@ static inline state occupy_next_free(_dc_bitmap bm,
    * ensure the return base is after after_this.
    * find an idle state first.
    */
-  next_idle = da->cells[after_this].base + _first_code + 1;
+  next_idle = da->cells[after_this].base + first_code + 1;
   while(da->cells[next_idle].check > 0){
     next_idle += 1;
     while(next_idle >= da->cell_num -1){
@@ -296,16 +296,17 @@ static inline state occupy_next_free(_dc_bitmap bm,
     /* check if other codes are satisfied.*/
     while(-1!=(_next_code = next_of_1(_next_code, bm))){
       switch(check_state(
-			 to_return + _next_code
+			 to_return + _next_code, da
 			 )){
       case occupied_by_other:
 	continue;/*continue while*/
       case idle:
 	break;/*break switch*/
       case overflow:
-	while(overflow == check_state(
-				      to_return + _next_code
-				      ))
+	while(overflow 
+	      == check_state(
+			     to_return + _next_code, da
+			     ))
 	  expand_double_array(da);
       }
     }
@@ -315,11 +316,11 @@ static inline state occupy_next_free(_dc_bitmap bm,
   /* a slot is found.
    * occupy it.
    */
-  _next_code = _first_code;
+  _next_code = first_code;
   do{
     occupy_state(to_return + _next_code, da);
   }while(-1 != (_next_code = next_of_1(_next_code, bm)));
-  assert(to_return - _first_code > da->cells[after_this].base);
+  assert(to_return - first_code > da->cells[after_this].base);
   return to_return;
 }
 
