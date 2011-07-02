@@ -21,19 +21,23 @@ static int is_in_set(char * c);
  */
 int  	dns_search(char *buf, int nbuf, void (*f)(char *,uint32 *))
 {
-	uint32 dns_error , cache_miss;
+	uint32 dns_error , cache_miss , index[nbuf];
 	inet_pton(AF_INET, DNS_ERROR, &dns_error);
 	inet_pton(AF_INET, CACHE_MISS, &cache_miss);
 	struct iovec iovec[2];
 	int i, misscount=0;
 	uint32 total_length = 0, tempip;
-	for(i = nbuf ; i >= 0 ; i--){
+	index[0] = 0;
+	for(i = 1; i <=nbuf ; i++){
 		while(buf[total_length] != '\0'){
 			if(!is_in_set(buf + total_length))
 				return NOT_IN_SET;
 			total_length++;
 		}
 		total_length++;
+		if(i != nbuf)
+			index[i] =  total_length ;
+
 	}
 		
 	total_length += HEAD_LENGTH;
@@ -93,12 +97,12 @@ int  	dns_search(char *buf, int nbuf, void (*f)(char *,uint32 *))
 	}
 	misscount = 0;
 	for(i = 0; i < nbuf ; i++){
-		inet_pton(AF_INET,  CACHE_MISS, &tempip);
+		tempip = *(uint32 *)((uint32 *)(retbuf + HEAD_LENGTH )+ i);
+	//	inet_pton(AF_INET,(uint32 *) ((uint32 *)(retbuf + HEAD_LENGTH )+ i), &tempip);
 		if(tempip == dns_error ||tempip ==  cache_miss)
 			misscount++;
 		f(buf + count , (uint32 *)(retbuf + HEAD_LENGTH) + i);
 			//call the f to do with <domain, ip>
-		count += strlen(buf + count ) + 1;
 	}		
 
 	//second return;
@@ -110,21 +114,11 @@ int  	dns_search(char *buf, int nbuf, void (*f)(char *,uint32 *))
 		if((misscount * 2 * sizeof(uint32) +  HEAD_LENGTH) <= count)
 			break;
 	}
-	int missed_array[misscount];
-	missed_array[0] = -1;
-	count = 1;
-	for(i = 0; i < total_length - HEAD_LENGTH -1; i++){
-       		if(0 == buf[i]){
-			missed_array[count++] = i;
-		}
-       }
-       i =0;
-       for(i = 0; i < misscount ; i++){
-				
-	//	if( missed_array[misscount]  == *(uint32 *)((uint32 *)(retbuf + HEAD_LENGTH ) + 2 * i) )
-			
-			
-		f(buf + missed_array[i] + 1, (uint32 *) ((uint32 *)(retbuf + HEAD_LENGTH) + 2 * i + 1));
+	
+	i = 0;
+	for(i = 0; i < misscount ; i++){
+		f(buf + index[*((uint32 *)(retbuf + HEAD_LENGTH) + 2 * i)], 
+		  (uint32 *) ((uint32 *)(retbuf + HEAD_LENGTH) + 2 * i + 1));
 			//call the f to do with <domain, ip>
 	}
 
@@ -135,6 +129,8 @@ int  	dns_search(char *buf, int nbuf, void (*f)(char *,uint32 *))
 	return   SUCCESS;
 
 }
+
+
 /*
  * by wakemecn
  * determine a character is in the dc_set;
