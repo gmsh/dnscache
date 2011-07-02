@@ -267,15 +267,12 @@ static inline state occupy_next_free(_dc_bitmap bm,
   assert(bm != 0);
   state next_idle, to_return, last_idle_to_occupy,
     _previous, _next;
-  int8 _next_code = first_of_1(bm);
-  if(unlikely(_next_code == -1))
-    return -1;
-  int8 _first_code = _next_code;
-
-
-  /* ensure the return base is not negative.
+  int8 _next_code, first_code = first_of_1(bm);
+  assert(first_code != -1);
+  
+  /* 
    * ensure the return base is after after_this.
-   * find an idle state
+   * find an idle state first.
    */
   next_idle = da->cells[after_this].base + _first_code + 1;
   while(da->cells[next_idle].check > 0){
@@ -284,41 +281,41 @@ static inline state occupy_next_free(_dc_bitmap bm,
       expand_double_array(da);
     }
   }
-  while(next_idle - _first_code <= 
-	da->cells[after_this].base){
-    if(da->cells[next_idle].check == IDLE_LIST)
-      expand_double_array(da);
-    next_idle = -(da->cells[next_idle].check);
-  }
+
   assert(next_idle < da->cell_num);
- DA_FIND_SUIT_SLOT:
-  to_return = next_idle - _first_code;
-  assert(to_return > 0);
-  while(-1 != (_next_code = next_of_1(_next_code, bm))){
-      last_idle_to_occupy 
-	= to_return + _next_code;
-      switch(check_state(last_idle_to_occupy, da)){
+  int found = 0;
+  while(!found){
+    next_idle = -(da->cells[next_idle].check);
+    while(unlikely(
+		   da->cells[next_idle].check == IDLE_LIST 
+		   )){
+      expand_double_array(da);
+    }
+    to_return = next_idle - first_code;
+    _next_code = first_code;
+    /* check if other codes are satisfied.*/
+    while(-1!=(_next_code = next_of_1(_next_code, bm))){
+      switch(check_state(
+			 to_return + _next_code
+			 )){
       case occupied_by_other:
-	/*not idle, move ahead*/
-	next_idle = -(da->cells[next_idle].check);
-	if(da->cells[next_idle].check == IDLE_LIST)
-	  expand_double_array(da);
-	_next_code = _first_code;
-	goto DA_FIND_SUIT_SLOT;
+	continue;/*continue while*/
       case idle:
-	/* check next code*/
-	break;
+	break;/*break switch*/
       case overflow:
-	while(overflow ==
-	      check_state(last_idle_to_occupy, da))
+	while(overflow == check_state(
+				      to_return + _next_code
+				      ))
 	  expand_double_array(da);
-	break;
       }
+    }
+    found = 1;
   }
+  assert(found);
   /* a slot is found.
    * occupy it.
    */
-    _next_code = _first_code;
+  _next_code = _first_code;
   do{
     occupy_state(to_return + _next_code, da);
   }while(-1 != (_next_code = next_of_1(_next_code, bm)));
