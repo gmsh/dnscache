@@ -10,12 +10,19 @@
 #include "server.h"
 //#include "dc_mm.h"
 #include "dl_cache_stub.h"
+
+uint32 dns_error , cache_miss;
+
+
+
 static void serv(int connfd);
 static void do_search(uint8* headptr, uint8 *requestptr, int rbuflen ,int conndfd);
 static void do_dns_search(uint8 * headptr,int total, dm_node * firstnode, int connfd);
 
 void thread_make_serv(int i)
 {
+	inet_pton(AF_INET, DNS_ERROR, &dns_error);
+	inet_pton(AF_INET, CACHE_MISS, &cache_miss);
         void*   thread_main_serv(void *); 
 	Pthread_create(&serv_thread_tptr[i].thread_tid,
 		                NULL, &thread_main_serv, (void *)i);
@@ -39,7 +46,6 @@ void  * thread_main_serv(void * arg)
 		connfd = accept(serv_listenfd, cliaddr, &clilen);
 		Pthread_mutex_unlock(&serv_thread_mutex);
 		serv(connfd);
-	//	close(connfd);
 	}
 
 }
@@ -98,10 +104,11 @@ static void serv(int connfd)
 
 static void do_search(uint8 * headptr, uint8 *requestptr, int rbuflen, int connfd)
 {	
+	struct iovec iovec[2];	//for writev
 	uint8 *currentptr = requestptr;
 	int readcount = 0, misscount = 0;
-	dm_node *curr = dc_alloc(sizeof(dm_node));
-	dm_node *firstnode = curr;
+	dm_node *curr;
+	dm_node *firstnode ;
 	uint32 *ipptr = (uint32 *)requestptr;
 	fake_data_t *result;
 	uint32 ipcount = 0;
@@ -109,10 +116,22 @@ static void do_search(uint8 * headptr, uint8 *requestptr, int rbuflen, int connf
 	for(;;){
 		
 		result = (fake_data_t *)get_data_and_lock(currentptr);
-		if( (NULL == result)|| (result -> timestamp + TIME_OUT < time(NULL)) )
+		if( (NULL == result)|| (result -> timestamp + TIME_OUT < time(NULL)) ||
+		result -> ip == cache_miss || result -> ip == dns_error)
 		{
+			
+			if(0 == misscount){
+				curr = (dm_node *)dc_alloc(sizeof(dm_node));
+				firstnode = curr;
+			} else{
+				curr -> next = (dm_node *)dc_alloc(sizeof(dm_node));
+				curr = curr -> next;
+			}
+			curr -> next = NULL;
+
 			unlock_after_copy(currentptr);
 			misscount++;
+			printf("misscount %d\n", misscount);
 			curr -> domain = (uint8 *) dc_alloc((strlen(currentptr) + 1) 
 						* sizeof(uint8));
 			curr -> index = ipcount;
@@ -123,7 +142,7 @@ static void do_search(uint8 * headptr, uint8 *requestptr, int rbuflen, int connf
 			/*CACHE_MISS 127.0.0.2*/
 
 		} else {
-			*(ipptr + ipcount) = result -> ip;
+			*( ipptr + ipcount ) = result -> ip;
 			unlock_after_copy(currentptr);
 			readcount += strlen(currentptr) + 1;
 			currentptr  += strlen(currentptr) + 1;	
@@ -132,30 +151,33 @@ static void do_search(uint8 * headptr, uint8 *requestptr, int rbuflen, int connf
 		ipcount++;
 		if(readcount >= rbuflen)
 			break;
-		if( NULL == result ){
-			curr -> next = (dm_node *)dc_alloc(sizeof(dm_node));
-			curr = curr -> next;
-			curr -> next =NULL;
-		}
 
 	}
-
-	if( 0 == misscount){
-		printf("no miss\n");
-		*((uint8 *)(headptr + HEAD_LENGTH - 1 )) = FIRST_WITHOUT_ERROR;
-		write(connfd, headptr, HEAD_LENGTH);
-		write(connfd, requestptr, ipcount * sizeof(uint32));
-		dc_free(headptr);
-		dc_free(requestptr);
-		close( connfd );
 	
-	}else {
+	iovec[0].iov_base = headptr ;
+	iovec[0].iov_len  = HEAD_LENGTH;
+	iovec[1].iov_base = requestptr ;
+	iovec[1].iov_len  = ipcount * sizeof(uint32);
+
+	if( 0 == misscount)
+		*((uint8 *)(headptr + HEAD_LENGTH - 1 )) = FIRST_WITHOUT_ERROR;
+	else
 		*((uint8 *)(headptr + HEAD_LENGTH - 1 )) = FIRST_WITH_ERROR;
-		write(connfd, headptr, HEAD_LENGTH);
-		write(connfd, requestptr, ipcount * sizeof(uint32));
-		dc_free(requestptr);
-		do_dns_search(headptr, misscount, firstnode, connfd);
+		
+	if(writev(connfd, iovec, 2) != HEAD_LENGTH + ipcount*sizeof(uint32)){
+		printf("writev wrong \n");
+		exit(0);
 	}
+	
+	dc_free(requestptr);
+	
+	if(0 == misscount){
+		dc_free(headptr);
+		printf("no miss\n");
+		close( connfd );
+	} else 
+		do_dns_search(headptr, misscount, firstnode, connfd);
+	
 
 	return;
 }
@@ -168,7 +190,6 @@ static void do_dns_search(uint8* headptr, int total, dm_node * firstnode, int co
 {
 	dm_node *currnode = firstnode, *tempnode ;
 	int i;
-	
 	int  *number, count;
 	uint32 *ipptr, index;
 	uint8	*miss = dc_alloc(sizeof(uint8));
@@ -198,18 +219,18 @@ static void do_dns_search(uint8* headptr, int total, dm_node * firstnode, int co
                 if( iget == iput ){
                  	printf("iget == iput\n");
 		 	exit(0);
+		
 		}
-
                 Pthread_cond_signal(&dns_array_cond);
-                Pthread_mutex_unlock(&dns_array_mutex);
+               	Pthread_mutex_unlock(&dns_array_mutex);
 		i++;
 		tempnode = currnode;
 		currnode = currnode -> next;
 		dc_free(tempnode);
-		
-	
 	}
+	return;
 }
+
 
  
 /***************  END OF serv_thread_make.c  **************/

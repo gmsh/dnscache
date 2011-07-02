@@ -22,8 +22,9 @@ void thread_make_dns(int i)
 
 void *
 thread_main_dns(void *arg)
-{
+{	
 	int dnsrequest(const char *name, uint32 *ipaddr);
+	struct iovec iovec[2]; //for writev
 	int connfd, *number, count, total;
 	char  *domain ;
 	uint32 *ipptr, index;
@@ -39,7 +40,7 @@ thread_main_dns(void *arg)
 			Pthread_cond_wait(&dns_array_cond,
 					&dns_array_mutex);
 		
-		printf(" dns thread %d  working \n", pthread_self());
+	//	printf(" dns thread %d  working \n", pthread_self());
 
 		connfd	= dns_array[iget].sockfd;
 		domain  = dns_array[iget].domain;
@@ -82,9 +83,18 @@ thread_main_dns(void *arg)
 			else 
 				*((uint8 *)(headptr + HEAD_LENGTH - 1 )) =
 					SECOND_WITHOUT_ERROR;
+			
+			iovec[0].iov_base = headptr ;
+			iovec[0].iov_len  = HEAD_LENGTH;
+			iovec[1].iov_base = ipptr ;
+			iovec[1].iov_len  = total * 2 * sizeof(uint32);
+			if(writev(connfd, iovec, 2) != 
+				HEAD_LENGTH + total * 2 * sizeof(uint32)){
+				printf("writev wrong \n");
+				exit(0);
+			}
 
-			write(connfd, headptr, HEAD_LENGTH);
-			write(connfd, ipptr, total * 2 * sizeof(uint32));
+			
 			printf("sended\n");
 			close(connfd);	//todo
 			dc_free(ipptr);

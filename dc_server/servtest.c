@@ -49,7 +49,7 @@ main()
         bzero(&servaddr, sizeof(servaddr));
         servaddr.sin_family = AF_INET;
         servaddr.sin_port  = htons(PORT);
-        inet_pton(AF_INET, "121.250.222.112", &servaddr.sin_addr);
+        inet_pton(AF_INET, SERVIP, &servaddr.sin_addr);
         if( connect(sockfd, (struct sockaddr *)&servaddr, 
                 sizeof(servaddr)) != 0)
                 printf("connect failed\n");
@@ -99,7 +99,7 @@ main()
                 printf("%s\n", ipstr);
         } 
 
-    	/*//second return
+    	//second return
 	retcount = 0;
 	while( (i = read(sockfd, retbuf + retcount,HEAD_LENGTH * sizeof(uint8)
 					+ LINES * 2 * sizeof(uint32))) > 0){
@@ -121,7 +121,7 @@ main()
                 fprintf(outfp, "%s\n", ipstr);
               fprintf(ipfp, "%s\n", ipstr);
 	}
-*/
+
 	printf("done\n");
         close(sockfd);
 	fclose(fp);
