@@ -270,17 +270,12 @@ static inline state occupy_next_free(_dc_bitmap bm,
       goto DA_NEXT_FREE_START;
     }
   }
-  do{
+  while(next_idle - _first_code <= after_this){
+    if(da->cells[next_idle].check == IDLE_LIST)
+      expand_double_array(da);
     next_idle = -(da->cells[next_idle].check);
-  }while(next_idle < ROOT_STATE + _first_code && next_idle != IDLE_LIST);
-  if(unlikely(next_idle == IDLE_LIST)){
-    /* 
-     * da needs to be expand.
-     */
-    expand_double_array(da);
-    goto DA_NEXT_FREE_START;
   }
-  
+    
  DA_FIND_SUIT_SLOT:
   to_return = next_idle - _first_code;
   while(-1 != (_next_code = next_of_1(_next_code, bm))){
