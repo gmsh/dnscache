@@ -582,9 +582,7 @@ void da_insert(uint8 * key, void * data,
       code next_code1 = get_code(*(tail1));
       uint8 * tail2 = tail + s_d_o;      
       code next_code2 = get_code(*(tail2));
-      /* Note that only one of the two can be '\0' 
-       * so bm3 should not by empty;
-       */
+      /* Note that only one of the two can be '\0' */
       if(*tail1 == '\0'){
 	da->cells[_current_state].user_data = data;
 	/*tail_index stores the index, we can safely change base.*/
@@ -601,9 +599,24 @@ void da_insert(uint8 * key, void * data,
 	  da->cells[_pre_state].user_data = data;
 	return;
       }
-      /** tail1 != '\0' */
+      if(*tail2 == '\0'){
+	da->cells[_current_state].user_data = tail_data;
+	da->cells[_current_state].base =
+	  find_and_occupy(next_code1, _current_state, da)
+	  - next_code1;
+	_next_state = da->cells[_current_state].base + next_code1;
+	/* move tail1 to _next_state */
+	da->cells[_next_state].check = _current_state;
+	da->cells[_next_state].base = dt_push_tail(tail1 + 1, da->tails);
+	da->cells[_next_state].user_data = data;
+	dt_remove_tail(tail_index, da->tails);
+	if(_pre_state != _current_state)/* wipe data */
+	  da->cells[_pre_state].user_data = data;
+	return;
+      }
+      /* *tail1 != '\0' */
       bm3 = bm_set(next_code1, bm3);
-      /*_next_state can not be end_with_zero, so *tail2 != '\0'*/
+      /* *tail2 != '\0'*/
       bm3 = bm_set(next_code2, bm3);
       /* because base[_current_state] is negative before call 
        * occupy_next_free. we set the base = _current_state.
@@ -621,7 +634,7 @@ void da_insert(uint8 * key, void * data,
       da->cells[_next_state].user_data
 	= data;
             
-      /*_next_state can not be end_with_zero, so *tail2 != '\0'*/
+      /* tail2 */
       _next_state = da->cells[_current_state].base + next_code2;
       da->cells[_next_state].check
 	= _current_state;
@@ -633,7 +646,8 @@ void da_insert(uint8 * key, void * data,
       da->cells[_pre_state].user_data = NULL;
       
       /* after do that remove the tail from tail pool */
-      dt_remove_tail(-(da->cells[_pre_state].base), da->tails);
+      if(_pre_state != _next_state)
+	dt_remove_tail(-(da->cells[_pre_state].base), da->tails);
       return;
       break;
     case invalid:
