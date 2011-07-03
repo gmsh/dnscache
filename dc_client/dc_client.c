@@ -13,7 +13,7 @@ uint32 dns_error , cache_miss;
 
 static int	is_in_set(char * c);
 static void	build_head(uint8* headbuf, uint32 total_length );
-static void	pre_do(uint8* buf, uint32* total_length, uint32* index, int nbuf);
+static int	pre_do(uint8* buf, uint32* total_length, uint32* index, int nbuf);
 static int	tcp_dns_search(char *buf, int nbuf, void (*f)(char*, uint32 *));
 static int	udp_dns_search(char *buf, int nbuf, void (*f)(char*, uint32 *));
 
@@ -26,14 +26,22 @@ static int	udp_dns_search(char *buf, int nbuf, void (*f)(char*, uint32 *));
  *	   nbuf number of domains
  */
 
-
 int  	dns_search(char *buf, int nbuf, void (*f)(char *,uint32 *))
 {
-	if(nbuf > TCP_OR_UDP )
-		tcp_dns_search(buf, nbuf, f);
-	else 
-		udp_dns_search(buf, nbuf, f);
+	if(nbuf < TCP_OR_UDP )	// chose tcp 
+		return tcp_dns_search(buf, nbuf, f);
+	else 			// udp
+		return udp_dns_search(buf, nbuf, f);
 }
+
+/*  do dns search with tcp connection.
+ *  return SUCCESS  success,
+ *	   NOT_IN_SET there is character in buf not in the code set
+ *	   CONNECT_WRONG if connect wrong
+ *	   OTHER_WRONG other wrong
+ *	   f is the fuction you want do with each pair of <domain ,ip>
+ *	   nbuf number of domains
+ */
 
 static int tcp_dns_search(char *buf, int nbuf, void(*f)(char*, uint32 *))
 {
@@ -41,7 +49,9 @@ static int tcp_dns_search(char *buf, int nbuf, void(*f)(char*, uint32 *))
 	uint32 tempip, total_length, index[nbuf];
 	struct iovec iovec[2];
 	
-	pre_do(buf, &total_length, index, nbuf);
+	i = pre_do(buf, &total_length, index, nbuf);
+	if(SUCCESS != i )
+		return i;
 
         int sockfd;
         struct sockaddr_in servaddr;
@@ -101,7 +111,6 @@ static int tcp_dns_search(char *buf, int nbuf, void(*f)(char*, uint32 *))
 	}		
 
 	//second return;
-	
 	count = 0;
 	while( (i = read(sockfd, retbuf + count, HEAD_LENGTH * sizeof(uint8)
 					+ misscount * 2 * sizeof(uint32))) > 0){
@@ -119,7 +128,6 @@ static int tcp_dns_search(char *buf, int nbuf, void(*f)(char*, uint32 *))
 
 	free(headbuf);
 	free(retbuf);
-	
         close(sockfd);
 	return   SUCCESS;
 
@@ -127,10 +135,10 @@ static int tcp_dns_search(char *buf, int nbuf, void(*f)(char*, uint32 *))
 
 
 /*  do dns search with udp connection.
- *  return 0 success,
- *	   1 there is character in buf not in the code set
- *	   2 if connect wrong
- *	   3 other wrong
+ *  return SUCCESS  success,
+ *	   NOT_IN_SET there is character in buf not in the code set
+ *	   CONNECT_WRONG if connect wrong
+ *	   OTHER_WRONG other wrong
  *	   f is the fuction you want do with each pair of <domain ,ip>
  *	   nbuf number of domains
  */
@@ -149,14 +157,13 @@ static int  udp_dns_search(char *buf, int nbuf, void (*f)(char *,uint32 *))
         servaddr.sin_port  = htons(PORT);
         inet_pton(AF_INET, SERVIP, &servaddr.sin_addr);
 	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-	printf("sockfd %d\n", sockfd);
-	
 
-	pre_do(buf, &total_length, index, nbuf);
+	i = pre_do(buf, &total_length, index, nbuf);
+	if(SUCCESS != i)
+		return i;
 
         uint8 *headbuf = (uint8 *)malloc(HEAD_LENGTH*sizeof(uint8));
 	build_head(headbuf, total_length);
-	
 
 	msgsend.msg_name = &servaddr;
 	msgsend.msg_namelen = sizeof(servaddr);
@@ -169,7 +176,7 @@ static int  udp_dns_search(char *buf, int nbuf, void (*f)(char *,uint32 *))
 	
 	if(sendmsg(sockfd, &msgsend, 0) != total_length){
 		perror("sendmsg");
-		exit(0);
+		return OTHER_WRONG;
 	}
 	
 	uint8 *retbuf = (uint8 *)malloc(nbuf * 2 * sizeof(uint32) +
@@ -212,9 +219,12 @@ static void	build_head(uint8* headbuf, uint32 total_length )
 /*
  * by synckey
  * gather the total_length and index  info of the buf
+ * return  NOT_IN_SET   if there is character not in the
+ * 			code set.
+ *	   SUCCESS      if it works well
  *
  */
-static void pre_do(uint8* buf, uint32* total_length, uint32* index, int nbuf)
+static int pre_do(uint8* buf, uint32* total_length, uint32* index, int nbuf)
 {
 	
 	inet_pton(AF_INET, DNS_ERROR, &dns_error);
@@ -225,8 +235,7 @@ static void pre_do(uint8* buf, uint32* total_length, uint32* index, int nbuf)
 	for(i = 1; i <= nbuf ; i++){
 		while('\0' != buf[*total_length]){
 			if(!is_in_set(buf + *total_length))
-				//return NOT_IN_SET;
-				return;
+				return NOT_IN_SET;
 			(*total_length)++;
 		}
 		(*total_length)++;
@@ -235,7 +244,7 @@ static void pre_do(uint8* buf, uint32* total_length, uint32* index, int nbuf)
 	}
 
 	*total_length += HEAD_LENGTH;
-	return;
+	return SUCCESS ;
 	
 }
 
@@ -248,6 +257,7 @@ static void pre_do(uint8* buf, uint32* total_length, uint32* index, int nbuf)
  */
 static int is_in_set(char * c)
 {	
+	
 	/* if c pointer to 'a'-'z' or '.' */
 	if((*c >= 97 && *c <= 122) || (*c == 46))
 		return 1;
@@ -262,6 +272,9 @@ static int is_in_set(char * c)
 		*c = *c + 32;  /* 'a' - 'A' = 32 */
 		return 1;
 	}
+	if(*c == '_')
+		return 1;
+	printf("%c", *c);
 	return 0;
 }
 
