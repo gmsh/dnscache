@@ -35,7 +35,7 @@
 
 #define MAXLINE		4096
 #define ARRAYSIZE	2048000
-#define  LINES      	1000
+#define  LINES      	1843314
 //1843314
 
 
@@ -67,11 +67,11 @@
 						// requests, results will be in
 						// the second message.
 #define	RESERVED_BYTE 	'F'
-#define	PORT	8888				//server port
+#define	PORT	9999				//server port
 #define SERVIP	"121.250.222.111"
 
 //modify 
-#define MAXDNSTHREADS   220			/* the number of DNS threads  */
+#define MAXDNSTHREADS   240			/* the number of DNS threads  */
 #define MAXSERVTHREADS  100   			/* the number of work threads */
 #define MAXUDPTHREADS	20    			/* the number of UDP threads */
 
