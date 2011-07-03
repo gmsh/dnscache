@@ -62,7 +62,7 @@
 						// requests, results will be in
 						// the second message.
 #define	RESERVED_BYTE 	'F'
-#define	PORT	8888				//server port
+#define	PORT	9999				//server port
 #define SERVIP	"121.250.222.111"
 
 //modify 
@@ -73,6 +73,7 @@
 
 #define TIME_OUT	86400			/* 24 hours in seconds*/
 
+#define TCP_OR_UDP 1000
 //synckey
 
 /* wakemecn: used by dns cache memory management modules. */
@@ -81,11 +82,11 @@
 #define CHUNK_TYPE_NUM ( BIG - SMALL + 1 )	/* counts of  chunk's type */
 #define DEFAULT_EXTRA 2	/* default number of each type of extra chunks  */
 #define BIGGEST_CAP 30
-uint64 chunks_num[]={ //1024, 1024, 1024, 1024, 1024, 512, 512, 512, 512, 512,
-							1,1,1,1,1 ,1,1,1,1,50,
-							1,1,1,1,1 ,1,1,1,1,1
+//uint64 chunks_num[]={ //1024, 1024, 1024, 1024, 1024, 512, 512, 512, 512, 512,
+//							1,1,1,1,1 ,1,1,1,1,50,
+//							1,1,1,1,1 ,1,1,1,1,1
 						//	256,  256,  256,  256,  256, 128, 128, 128, 128, 128 
-							};
+//							};
 			   /* number of each type of chunks */
 /* wakemecn: end */
 

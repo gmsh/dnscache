@@ -11,7 +11,7 @@
 test_mm:test_mm.c
 	cc -g -o test_mm test_mm.c -I../include -L../lib -ldc_mm -ldc_common
 test_client:test_client.c
-	cc -g -o test_client test_client.c -I../include -L../lib -ldc_common -ldc_client -lpthread
+	cc -g -o test_client test_client.c -I../include -L../lib -ldc_client -lpthread
 .PHONY: clean
 clean:
 	-rm test_client

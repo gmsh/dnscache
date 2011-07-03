@@ -14,7 +14,7 @@
 
 #define INPUT_FILE "input.list"
 #define OUTPUT_FILE "output.list"
-#define DN_NUM_LIMIT 50
+#define DN_NUM_LIMIT 100
 #define uint32	int
 #define DN_LENGTH 63
 #define DN_BUF_LENGTH (DN_NUM_LIMIT * (DN_LENGTH + 1))
@@ -61,6 +61,7 @@ int main()
 		pthread_create(&pt[num], NULL, ecp_dns_search, arg[num]);
 		pthread_join(pt[num], NULL);
 	}
+
 	/* single thred */
 /*	
 	char * dn_buf;
@@ -70,7 +71,6 @@ int main()
 //		dns_search(dn_buf, dn_num, write_into_file);
 		dns_search(dn_buf, dn_num, print);
 */
-//	sleep(20);
 	return 0;	
 }
 

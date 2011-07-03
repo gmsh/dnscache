@@ -151,22 +151,49 @@ sl\_node*),\\[-30pt]
 缓存的数据结构为：
 \begin{quote}
 \begin{lstlisting}[language={C}]
-struct {
-	uint32 a;
-	uint16 b;
-} fake_data;
+typedef struct {
+	uint32 ip ;
+	time_t timestamp ; /* time stamp*/
+} fake_data_t;
 \end{lstlisting}
+\end{quote}
+
 \paragraph{初始化缓存}
-\codebox{\#include <stdlib.h>}
-{void dl\_cache\_init(size\_t size, per\_data)}{无返回值}
+\codebox{\#include "dl\_cache\_stub.h" }
+{void dl\_cache\_init(size\_t size\_per\_data)}{无返回值}
 	\begin{compactdesc}
-	\item[参数:]无
+	\item[参数:]size\_per\_data指数据的大小。
 	\item[返回:]无
-	\item[说明:]打印各种chunk的申请、释放情况
+	\item[说明:]初始化缓存管理模块
 	\end{compactdesc}
 
-
-\end{quote}
+\paragraph{访问缓存数据并加锁}
+\codebox{\#include "dl\_cache\_stub.h"}
+{void * get\_data\_and\_lock(uint8 * key)}{key对应的缓存数据域}
+	\begin{compactdesc}
+	\item[参数:]key是关键字。
+	\item[返回:]如果命中缓存，返回key对应的缓存数据域，如果
+	没有命中缓存返回NULL。
+	\item[说明:]调用该函数接口之后必须调用unlock\_after\_copy();
+	\end{compactdesc}
+	
+\paragraph{释放缓存数据锁}
+\codebox{\#include "dl\_cache\_stub.h"}
+{void unlock\_after\_copy(uint8 * key)}{无返回值}
+	\begin{compactdesc}
+	\item[参数:]key是关键字。
+	\item[返回:]无
+	\item[说明:]从缓存中拷贝完数据后需要释放锁。
+	\end{compactdesc}
+	
+\paragraph{向缓中写入数据}
+\codebox{\#include "dl\_cache\_stub.h"}
+{void push\_dc(uint8 * key, void * data}{无返回值}
+	\begin{compactdesc}
+	\item[参数:]key是关键字，data是关键字对应的数据。
+	\item[返回:]无
+	\item[说明:]更新缓存内容时调用。
+	\end{compactdesc}
 
 %
 %/*********************************  END OF jiekousheji.tex  *********************************/
