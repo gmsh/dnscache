@@ -42,6 +42,13 @@ uint64 ffs(uint32 n)
   	return (uint64)c;
 }
 
+uint64 chunks_num[]={ //1024, 1024, 1024, 1024, 1024, 512, 512, 512, 512, 512,
+							1,1,1,1,1 ,1,1,1,1,50,
+							1,1,1,1,1 ,1,1,1,1,1
+						//	256,  256,  256,  256,  256, 128, 128, 128, 128, 128 
+							};
+			   /* number of each type of chunks */
+
 /*
  * call mm_pre_alloc() to pre-allocate number of counts' chunks with 
  * 2^capacity KB memory.
