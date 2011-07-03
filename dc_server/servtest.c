@@ -119,7 +119,8 @@ main()
  		inet_ntop(AF_INET, (in_addr_t *)((uint32 *)(retbuf + HEAD_LENGTH) + i * 2 + 1), ipstr , 16);
                 printf("%s\n", ipstr);
                 fprintf(outfp, "%s\n", ipstr);
-             	fprintf(ipfp, "%u\n",  (in_addr_t *)((uint32 *)(retbuf + HEAD_LENGTH) + i * 2 + 1));
+             	fprintf(ipfp, "%u\n",  *((in_addr_t *)((uint32 *)(retbuf +
+		HEAD_LENGTH) + i * 2 + 1)));
 	}
 
 	printf("done\n");
