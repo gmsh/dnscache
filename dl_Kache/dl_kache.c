@@ -76,6 +76,6 @@ void kache_store(uint8 * key, data_t * data)
 
 void kache_exit()
 {
-  dc_free(main_tr);
+  free(main_tr);
   dc_free(main_tr_data);
 }
