@@ -15,9 +15,9 @@
 /*
  * return the first bit filled with 1 of n
  */
-static uint64 ffs(uint32 n)
+uint64 ffs(uint32 n)
 {
-	if(n==0)
+	if(n == 0)
 		return 0;
 	uint8 c = 32;
 	if (!(n & 0xffff0000)){
@@ -47,7 +47,7 @@ static uint64 ffs(uint32 n)
  * 2^capacity KB memory.
  * RETURN the pointer to a chunks list.
  */
-static struct slist * mm_pre_alloc(uint64 capacity, uint16 counts)
+struct slist * mm_pre_alloc(uint64 capacity, uint16 counts)
 {
 	struct slist * init_idle_list;
 	void * ptr;
@@ -71,9 +71,9 @@ void mm_init()
 			exit(1);
 		}
 		chunks_manager_table[i]->chunks_cap = SMALL+i;
-		chunks_manager_table[i]->idle_num = num_each_chunks[i];
-		chunks_manager_table[i]->idle_chunks = mm_pre_alloc((SMALL+i), num_each_chunks[i]);	
-		chunks_manager_table[i]->alloced_chunks = mk_slist(malloc, num_each_chunks[i]);	
+		chunks_manager_table[i]->idle_num = chunks_num[i];
+		chunks_manager_table[i]->idle_chunks = mm_pre_alloc((SMALL+i), chunks_num[i]);	
+		chunks_manager_table[i]->alloced_chunks = mk_slist(malloc, chunks_num[i]);	
 		printf("dc_mm : %s%8ld%s\n","chunks list and extra chunks list with specific capacity ",
 		        POW2(SMALL + i), " Bytes has been initilized.");
 		pre_alloc_mutex[i] = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
@@ -91,7 +91,7 @@ void mm_init()
 }
 
 /* select a node from the pre-allocated idle list */
-static void * select_pre_alloced(uint64 cap)
+void * select_pre_alloced(uint64 cap)
 {
 	int pos = cap - SMALL;  /* position of the pointer in the array. */
 	void * ptr , * chunk_ptr;
@@ -110,7 +110,7 @@ static void * select_pre_alloced(uint64 cap)
 } 
 
 /* select a node frome the extra idle list */
-static void * select_extra(uint64 cap)
+void * select_extra(uint64 cap)
 {
 	void * ptr , * chunk_ptr;
 	if(0 == elm_table[cap]->idle_num)
@@ -128,7 +128,7 @@ static void * select_extra(uint64 cap)
 }
 
 /* make a new extra list with specific capacity */
-static void mk_el(uint64 cap){
+void mk_el(uint64 cap){
 	printf("dc_mm : %s%8ld%s\n","start to generate extra chunks list of chunks with specific capacity ", 
 	        POW2(cap), " Bytes.");
 	struct slist * list_ptr;
@@ -144,7 +144,7 @@ static void mk_el(uint64 cap){
 }
 
 /* expand a extra list with specific capacity */
-static void expand_el(uint64 cap)
+void expand_el(uint64 cap)
 {
 	printf("dc_mm : %s%8ld%s\n","start to expand extra chunks list of chunks with specific capacity ", 
 	        POW2(cap), " Bytes.");
@@ -167,6 +167,8 @@ static void expand_el(uint64 cap)
 
 void * dc_alloc(size_t size)
 {
+	if(size == 0)
+		return NULL;
 	uint64 cap = (uint64)LOG2((uint64)size); /* */
 	if((uint64)size > (POW2(cap)))
 		cap++;
@@ -212,7 +214,7 @@ void * dc_alloc(size_t size)
 	return select_pre_alloced(cap);
 }
 
-static void free_extra_data(struct sl_node * sl_ptr)
+void free_extra_data(struct sl_node * sl_ptr)
 {
 	free(sl_ptr->data);	
 }

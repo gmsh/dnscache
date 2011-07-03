@@ -10,9 +10,11 @@
 #	cc -g -o test_datrie_tail_pool test_datrie_tail_pool.c -I../include -L../lib -ldl_cache
 test_mm:test_mm.c
 	cc -g -o test_mm test_mm.c -I../include -L../lib -ldc_mm -ldc_common
+test_client:test_client.c
+	cc -g -o test_client test_client.c -I../include -L../lib -ldc_common -ldc_client -lpthread
 .PHONY: clean
 clean:
-	-rm test_mm
+	-rm test_client
 # test_typedefs test_slist test_mm 
 	# test_sizeof_ptr test_datrie_tail_pool test_dc_set
 CPPFLAGS = -I../include
