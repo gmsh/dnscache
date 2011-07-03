@@ -8,14 +8,13 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "typedefs.h"
 #include "slist.h"
 
 /*
  * the main thread calls mm_init() to initialize the momery managment 
  * modules.
  */
-void mm_init();
+void mm_init(void);
 
 /* dc_alloc() allocates size bytes and returns a pointer  to  the  allocated
  * memory.   The  memory  is  not  cleared.   If  size is 0, then dc_alloc()

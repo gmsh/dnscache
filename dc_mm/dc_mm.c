@@ -5,49 +5,20 @@
  * decription:	dnscache's memory management
  */
 
-#define	LOG2(x) (ffs(x) - 1)    /* ceil of log2(x) */
+#include "dc_mm_structs.h"
+#include "dc_mm.h"
+
+#define LOG2(x) (ffs(x) - 1)  /* ceil of log2(x) */
 #define POW2(x) (0x0000000000000001 << x)
 
-#include "slist.h"
-#include "dc_mm.h"
-#include "dc_mm_structs.h"
 
-/*
- * return the first bit filled with 1 of n
- */
-uint64 ffs(uint32 n)
-{
-	if(n == 0)
-		return 0;
-	uint8 c = 32;
-	if (!(n & 0xffff0000)){
-   		c -= 16;
-  		n <<= 16;
-  	}
-  	if (!(n & 0xff000000)){
-  		c -= 8;
-  		n <<= 8;
-  	}
-  	if (!(n & 0xf0000000)){
-  		c -= 4;
-  		n <<= 4;
-  	}
- 	 if (!(n & 0xc0000000)){
-  		c -= 2;
-  		n <<= 2;
-  	}
-  	if (!(n & 0x80000000)){
-  		c -= 1;
-  	}
-  	return (uint64)c;
-}
-
-uint64 chunks_num[]={ //1024, 1024, 1024, 1024, 1024, 512, 512, 512, 512, 512,
+static uint64 chunks_num[]={ //1024, 1024, 1024, 1024, 1024, 512, 512, 512, 512, 512,
 							1,1,1,1,1 ,1,1,1,1,50,
 							1,1,1,1,1 ,1,1,1,1,1
 						//	256,  256,  256,  256,  256, 128, 128, 128, 128, 128 
 							};
 			   /* number of each type of chunks */
+
 
 /*
  * call mm_pre_alloc() to pre-allocate number of counts' chunks with 
@@ -326,4 +297,34 @@ void print_statics(){
 		printf("dc_mm : statics, %s%10d%s%10ld%s%10ld%s\n","chunks with specific capacity ",
 			   POW2(i)," were applied ", apply_count ," times and freed ",free_count," times.");	
 	}
+}
+
+/*
+ * return the first bit filled with 1 of n
+ */
+int ffs(int n)
+{
+	if(n == 0)
+		return 0;
+	int c = 32;
+	if (!(n & 0xffff0000)){
+   		c -= 16;
+  		n <<= 16;
+  	}
+  	if (!(n & 0xff000000)){
+  		c -= 8;
+  		n <<= 8;
+  	}
+  	if (!(n & 0xf0000000)){
+  		c -= 4;
+  		n <<= 4;
+  	}
+ 	 if (!(n & 0xc0000000)){
+  		c -= 2;
+  		n <<= 2;
+  	}
+  	if (!(n & 0x80000000)){
+  		c -= 1;
+  	}
+  	return c;
 }

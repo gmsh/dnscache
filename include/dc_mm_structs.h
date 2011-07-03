@@ -14,7 +14,6 @@
 #include <pthread.h>
 #include "typedefs.h"
 #include "constants.h"
-#include "slist.h"
 
 struct chunks_manager {	/* manage the chunks with small capacity. */
 	uint64	chunks_cap;	/* the defined n for the capacity of  2^n-bytes chunks */
@@ -34,5 +33,7 @@ uint64 extra_apply[BIGGEST_CAP + 1], extra_free[BIGGEST_CAP + 1];
 
 pthread_mutex_t * pre_alloc_mutex[CHUNK_TYPE_NUM];
 pthread_mutex_t * extra_mutex[BIGGEST_CAP + 1];
+
+int  ffs(int n);
 
 #endif
