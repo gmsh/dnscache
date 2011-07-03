@@ -1,7 +1,6 @@
-all:libdl_kache.a list2tri test_tri
-libdl_kache.a:dl_kache.o alpha-map.o darray.o fileutils.o tail.o trie.o dc_mm.o
-	ar rs dl_kache.o alpha-map.o darray.o fileutils.o tail.o trie.o dc_mm.o
-	ranlib -t libdl_kache.a
+all:test_dl_kache list2tri test_tri
+test_dl_kache: test_dl_kache.c dl_kache.o alpha-map.o darray.o fileutils.o tail.o trie.o dc_mm.o
+	${CC} -o test_dl_kache test_dl_kache.c dl_kache.o alpha-map.o darray.o fileutils.o tail.o trie.o dc_mm.o
 test_tri: test_tri.c alpha-map.o darray.o fileutils.o tail.o trie.o
 	${CC} -o test_tri test_tri.c alpha-map.o darray.o fileutils.o tail.o trie.o
 list2tri: list2tri.c alpha-map.o darray.o fileutils.o tail.o trie.o
@@ -10,5 +9,5 @@ list2tri: list2tri.c alpha-map.o darray.o fileutils.o tail.o trie.o
 	${CC} -c %<
 .PHONY:clean
 clean:
-	-rm *.o list2tri test_tri
-CC=cc -g
+	-rm *.o test_dl_kache list2tri test_tri
+CC=cc -O3

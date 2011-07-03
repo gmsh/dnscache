@@ -14,7 +14,7 @@ typedef struct{
 
 void kache_init();
 
-void * kache_retrieve_lock(uint8 * key);
+data_t * kache_retrieve_lock(uint8 * key);
 
 void kache_unlock(uint8 *key);
 

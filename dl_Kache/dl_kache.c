@@ -27,7 +27,7 @@ void kache_init()
   FILE * iplist = fopen(IPLISTPATH, "r");
   uint8 * buff = (uint8 *)dc_alloc(80);
   assert(iplist != NULL);
-  for(i = 1; i <= TRIESIZE; i++){
+  for(i = 1; i <= TRIESIZE - 1; i++){
     char *s = fgets(buff, 80, iplist);
     assert(s != NULL);
     temp = atol(buff);
@@ -39,7 +39,7 @@ void kache_init()
   printf("dl_Kache init OK");
 }
 
-void * kache_retrieve_lock(uint8 * key)
+data_t * kache_retrieve_lock(uint8 * key)
 {
   if(NULL == key)
     return NULL;

@@ -28,7 +28,7 @@ int main(){
   alpha_map_add_range(am_, 0x002d, 0x002e);
   alpha_map_add_range(am_, 0x0030, 0x0039);
   alpha_map_add_range(am_, 0x0061, 0x007a);
-  
+  alpha_map_add_range(am_, 0x005f, 0x005f);
   Trie * tr_ =  trie_new(am_);
   alpha_map_free(am_);
   
