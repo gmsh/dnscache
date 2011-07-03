@@ -2,7 +2,7 @@
 
 /********************************************************************
  * filename:		wraps.c
- * author: 		synckey
+ * author: 		unpv3 by stevens
  * version:		v1.0
  * datetime:		2011-06-26 10:23:38
  * description:		wraped functions

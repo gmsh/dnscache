@@ -28,7 +28,7 @@ static int	udp_dns_search(char *buf, int nbuf, void (*f)(char*, uint32 *));
 
 int  	dns_search(char *buf, int nbuf, void (*f)(char *,uint32 *))
 {
-	if(nbuf < TCP_OR_UDP )	// chose tcp 
+	if(nbuf > TCP_OR_UDP )	// chose tcp 
 		return tcp_dns_search(buf, nbuf, f);
 	else 			// udp
 		return udp_dns_search(buf, nbuf, f);
@@ -155,7 +155,7 @@ static int  udp_dns_search(char *buf, int nbuf, void (*f)(char *,uint32 *))
  
  	servaddr.sin_family = AF_INET;
         servaddr.sin_port  = htons(PORT);
-        inet_pton(AF_INET, SERVIP, &servaddr.sin_addr);
+        inet_pton(AF_INET, "121.250.222.111", &servaddr.sin_addr);
 	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 
 	i = pre_do(buf, &total_length, index, nbuf);
@@ -280,4 +280,4 @@ static int is_in_set(char * c)
 
 
 
-/***************  END OF servtest.c  **************/
+/***************  END OF dc_client.c  **************/

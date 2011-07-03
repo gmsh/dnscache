@@ -82,6 +82,6 @@ $(TESTD): $(TESTD).o
 	
 .PHONY:clean
 clean:
-	rm *.o   *.gch
+	rm *.o   *.gch *.a
 
 #all:dc_server

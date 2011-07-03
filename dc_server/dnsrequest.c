@@ -27,11 +27,11 @@ int dnsrequest(const char *name ,uint32 *ipaddr)
 	
 	retval = getaddrinfo(name, "domain", &hints, &res);
 
-	if(retval != 0){
+	if(0 != retval ){
 		return retval;
 	}
 	
-	if(res != NULL){
+	if(NULL != res){
 		*ipaddr =(in_addr_t) (((struct sockaddr_in *)(res->ai_addr))
 				->sin_addr).s_addr;
 	}

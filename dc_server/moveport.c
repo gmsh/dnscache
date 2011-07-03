@@ -27,7 +27,6 @@ int main(int argc, char **argv)
 			printf("move out a ipaddr\n");
 			continue;
 		}
-
 		fwrite(buff, sizeof(char), i+1, fpout);
 		
 	}

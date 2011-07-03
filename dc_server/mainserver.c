@@ -12,7 +12,6 @@
 
 pthread_mutex_t dns_array_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t  dns_array_cond = PTHREAD_COND_INITIALIZER;
-
 pthread_mutex_t serv_thread_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 
@@ -53,6 +52,7 @@ main(int argc, char **argv)
 	listen(serv_listenfd, backlog);
 	
 	iget = iput = 0;
+
 	for(i = 0; i < MAXDNSTHREADS; i ++ )
 	           thread_make_dns(i);
 
@@ -62,8 +62,8 @@ main(int argc, char **argv)
 
 	start_udp_server();	/* start the udp server */
 
-	for(;;)
-		pause();
+//	for(;;)
+//		pause();
 
 }
 

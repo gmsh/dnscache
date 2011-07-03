@@ -22,8 +22,8 @@
 #define	 HAVE_ERROR	0	
 #define	 NO_ERROR	1	
 
-#define	 MAX_UDP_LENGTH (64 * 64)
-#define	 UDP_BUF_LENGTH	(1024 * 1024 * 1024) //UDP buffer length 1G
+#define	 MAX_UDP_LENGTH (1024 * 128)
+#define	 UDP_BUF_LENGTH	(1024 * 1024 ) //UDP buffer length 1G
 typedef struct dmnode{
 	char	*domain;	/* point to the domain */
 	uint32  index;		/* the index in the first message */
@@ -90,14 +90,22 @@ int iget, iput;			/*
 
 
 
-
+/* tcp server listen fd */
 int serv_listenfd;
+
+/* create dns threads */
 void thread_make_dns(int i);
-void *thread_main_dns(void *arg);
+
+/* create worker threads */
 void thread_make_serv(int i);
-void *thread_main_serv(void * arg);
+
+/* init the memory manage module and cache module */
 void init(void);
+
+/* create udp server thread */
 void  start_udp_server(void);
+
+/* do dns requests */
 int dnsrequest(const char *name ,uint32 *ipaddr);
 
 

@@ -16,19 +16,19 @@ uint32 dns_error , cache_miss;
 static void serv(int connfd);
 static void do_search(uint8* headptr, uint8 *requestptr, int rbuflen ,int conndfd);
 static void do_dns_search(uint8 * headptr,int total, dm_node * firstnode, int connfd);
+static void*   thread_main_serv(void *); 
 
 void thread_make_serv(int i)
 {
 	inet_pton(AF_INET, DNS_ERROR, &dns_error);
 	inet_pton(AF_INET, CACHE_MISS, &cache_miss);
-        void*   thread_main_serv(void *); 
 	Pthread_create(&serv_thread_tptr[i].thread_tid,
 		                NULL, &thread_main_serv, (void *)i);
 	       return;
 }
 
 
-void  * thread_main_serv(void * arg)
+static void  * thread_main_serv(void * arg)
 {
 	int connfd;
 	socklen_t clilen;

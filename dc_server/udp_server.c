@@ -15,7 +15,7 @@ uint32 dns_error , cache_miss;
 
 static void udp_recv(int sockfd, struct sockaddr *cliaddr, socklen_t clilen);
 static void do_search(int sockfd, uint8 *buf, struct sockaddr * cliaddr,
-			socklen_t  len);
+			socklen_t  *len);
 
 void  start_udp_server(void )
 {
@@ -45,7 +45,7 @@ void  start_udp_server(void )
 	n = UDP_BUF_LENGTH;
 	setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &n, sizeof(n));
 	printf("udp server started\n");
-	udp_recv(sockfd, (struct sockaddr *)&cliaddr, sizeof(clilen));
+	udp_recv(sockfd, (struct sockaddr *)&cliaddr, sizeof(cliaddr));
 
 }
 
@@ -53,13 +53,15 @@ static void udp_recv(int sockfd, struct sockaddr *cliaddr, socklen_t clilen)
 {		
 	int8  *readbuf =(int8 *)dc_alloc((HEAD_LENGTH + MAX_UDP_LENGTH) * sizeof(uint8)); 
 	int n;
-	socklen_t len;
+	socklen_t *len;
+	len =(socklen_t *) dc_alloc(sizeof(socklen_t));
 	for( ; ; ){
-		len = clilen;
+		*len = clilen;
 		n = recvfrom(sockfd, readbuf, HEAD_LENGTH + MAX_UDP_LENGTH,
-				0, cliaddr, &len);
+				0, cliaddr, len);
+
 		if(-1 == n){
-			printf("recv error\n");
+			perror("recvfrom");
 			exit(0);
 		}
 		printf("udp rec\n");
@@ -70,7 +72,7 @@ static void udp_recv(int sockfd, struct sockaddr *cliaddr, socklen_t clilen)
 }
 
 static void do_search(int sockfd, uint8 *buf,
-		struct sockaddr * cliaddr, socklen_t  len)
+		struct sockaddr * cliaddr, socklen_t  *len)
 {	
 	int n;
 	uint32 total_length;
@@ -95,6 +97,7 @@ static void do_search(int sockfd, uint8 *buf,
 
 			unlock_after_copy(currentptr);
 			misscount++;
+			
 			printf("misscount %d\n", misscount);
 			
 			readcount += strlen(currentptr) + 1;
@@ -123,10 +126,11 @@ static void do_search(int sockfd, uint8 *buf,
 	
 	ssize_t send_len;
 	send_len = HEAD_LENGTH + ipcount * sizeof(uint32); 
-	if(send_len != (sendto(sockfd, buf, send_len, 0, cliaddr, len))){
-		printf("send error\n");
+	if(send_len != (sendto(sockfd, buf, send_len, 0, cliaddr, *len))){
+		perror("sendto");
 		return;
 	}
+	printf("sended\n");
 
 	return;
 }

@@ -9,16 +9,18 @@
  ********************************************************************/
 
 #include "server.h"
-//#include "dc_mm.h"
+	
+	
+static  void*	thread_main_dns(void *);
+
 void thread_make_dns(int i)
 {
-	void*	thread_main_dns(void *);
 	Pthread_create(&dns_thread_tptr[i].thread_tid,
 		NULL, &thread_main_dns, (void *)i);
 	return;
 }
 
- void *
+static void *
 thread_main_dns(void *arg)
 {	
 	struct iovec iovec[2]; //for writev
@@ -38,7 +40,6 @@ thread_main_dns(void *arg)
 					&dns_array_mutex);
 		
 	//	printf(" dns thread %d  working \n", pthread_self());
-
 		connfd	= dns_array[iget].sockfd;
 		domain  = dns_array[iget].domain;
 		number	= dns_array[iget].number;
@@ -89,10 +90,9 @@ thread_main_dns(void *arg)
 				printf("writev wrong \n");
 				exit(0);
 			}
-
 			
-			printf("sended\n");
-			close(connfd);	//todo
+		//	printf("sended\n");
+			close(connfd);
 			dc_free(ipptr);
 			dc_free(number);
 			dc_free(mutex);
