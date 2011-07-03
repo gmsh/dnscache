@@ -102,7 +102,7 @@ sl\_node*),\\[-30pt]
 统计数据函数。
 \paragraph{初始化内存模块}
 \codebox{\#include "dc\_mm.h"}
-{void mm\_init()}{无返回值}
+{void mm\_init(void)}{无返回值}
 	\begin{compactdesc}
 	\item[参数:]无
 	\item[返回:]无
@@ -146,7 +146,7 @@ sl\_node*),\\[-30pt]
 	\item[说明:]打印各种chunk的申请、释放情况
 	\end{compactdesc}
 
-\subsection{缓存接口对外接口}
+\subsection{缓存模块对外接口}
 缓存接口提供一组初始化缓存、从缓存中获取数据并加锁、从缓存中复制数据后解锁、向缓存中写入数据的接口。
 缓存的数据结构为：
 \begin{quote}
