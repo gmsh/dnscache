@@ -17,6 +17,7 @@
 
 
 //sycnkey
+#include <sys/uio.h>
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,10 +30,12 @@
 #include <pthread.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <unistd.h> 
+
 
 #define MAXLINE		4096
-#define ARRAYSIZE	2024000
-#define  LINES     	1843314
+#define ARRAYSIZE	2048000
+#define  LINES      	1000
 //1843314
 
 
@@ -68,10 +71,12 @@
 #define SERVIP	"121.250.222.111"
 
 //modify 
-#define MAXDNSTHREADS   300			/* the number of DNS threads  */
-#define MAXSERVTHREADS  20    			/* the number of work threads */
+#define MAXDNSTHREADS   220			/* the number of DNS threads  */
+#define MAXSERVTHREADS  100   			/* the number of work threads */
+#define MAXUDPTHREADS	20    			/* the number of UDP threads */
 
 #define MAXLISTENQ	4096
+#define TCP_OR_UDP	64
 
 #define TIME_OUT	86400			/* 24 hours in seconds*/
 
