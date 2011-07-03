@@ -7,6 +7,8 @@
  * datetime:		2011-06-26 20:33:20
  * description:		test the server
  ********************************************************************/
+
+
 #include "server.h"
 int main()
 {
