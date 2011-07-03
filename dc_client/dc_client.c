@@ -184,7 +184,7 @@ static int  udp_dns_search(char *buf, int nbuf, void (*f)(char *,uint32 *))
 
 	int count = 0;
 	count = recvfrom(sockfd, retbuf + count, HEAD_LENGTH * sizeof(uint8) +
-		nbuf*sizeof(uint32), 0, NULL, NULL);
+		nbuf * sizeof(uint32), 0, NULL, NULL);
 	
 	for(i = 0; i < nbuf ; i++){
 		f(buf + index[i] , (uint32 *)(retbuf + HEAD_LENGTH) + i);
