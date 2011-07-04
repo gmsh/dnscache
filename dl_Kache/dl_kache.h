@@ -16,7 +16,7 @@ void kache_init();
 
 data_t * kache_retrieve_lock(uint8 * key);
 
-void kache_unlock(uint8 *key);
+inline void kache_unlock(uint8 *key);
 
 void kache_store(uint8 * key, data_t * data);
 
