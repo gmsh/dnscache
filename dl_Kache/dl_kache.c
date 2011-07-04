@@ -97,4 +97,5 @@ void kache_exit()
 {
   free(main_tr);
   dc_free(main_tr_data);
+  dc_free(hash_data);
 }
