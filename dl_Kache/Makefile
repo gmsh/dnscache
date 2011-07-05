@@ -1,5 +1,5 @@
 all:test_dl_kache list2tri test_tri
-test_dl_kache: test_dl_kache.c dl_kache.o alpha-map.o darray.o fileutils.o tail.o trie.o dc_mm.o hash.o
+test_dl_kache: test_dl_kache.o dl_kache.o alpha-map.o darray.o fileutils.o tail.o trie.o dc_mm.o hash.o
 	${CC} -o test_dl_kache test_dl_kache.c dl_kache.o alpha-map.o darray.o fileutils.o tail.o trie.o dc_mm.o hash.o
 test_tri: test_tri.c alpha-map.o darray.o fileutils.o tail.o trie.o
 	${CC} -o test_tri test_tri.c alpha-map.o darray.o fileutils.o tail.o trie.o
