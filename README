@@ -1,4 +1,50 @@
-dnsKache
-The dl_cache module in dnscache's master branch will never be maintained before dnsKache is complete.
-But the dnsKache will be finally merged into dnscache project as libdnsKache.
-The initial version only works under x86_64.
+
+This is dnscache project for Baidu.
+
+===============================================================
+
+Baidu's large-scale cluster environments has a module, it needs
+to specify the user's machine name list, and connect these mac-
+hines to complete certain tasks. In this process, a large number
+ of the domain name will be resolved, not only cause greater pr-
+essure on the DNS server, but also prone to parsing fails.We 
+design such a project called dnscache to slove this problem.
+
+This project includes server and client.
+
+===============================================================
+Server Usage:
+
+$cd server
+$vi constant.h		% you can choose you favourite editor
+			% modify the SERVIP and PORT and other
+			% arguments.
+$make 
+$./mainserver
+
+when you see such things below printed on the screen, it means
+         ****************************************
+         * dc_mm : dns cache memory management  *  
+         *         modules has been initilized. *
+         * dl_Kache init OK                     *
+         * tcp server started                   *
+         * udp server started                   *
+         ****************************************
+the server is started! Have fun in our project.
+
+===============================================================
+Client Usage:
+
+$cd client
+$vi constant.h		% you can choose your favourite editor
+			% modify the SERVIP and PORT the same
+			% with configure with server
+$vi test_client.h	% you also can choose your favourite 
+			% editor.modify THREAD_NUM(one imitat-
+			% ion per thread ), DN_NUM_LIMIT(we 
+			% generate random number between 0 and
+			% DN_NUM_LIMIT)
+$make 
+$./test_client
+
+waring: you must conneted to server after the server started.

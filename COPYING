@@ -1,0 +1,41 @@
+dnscache - a program for Baidu
+
+=========================================================================
+
+Copyright (C) 2011 gmsh     <gmshcn@gmail.com> 
+                   wakemecn <wakemecn@gmail.com>
+                   synckey  <synckey@gmail.com> 
+                   vivivan  <vivililin@gmail.com>
+
+This program is free software; you can redistribute it and/or modify it 
+under the terms of the GNU GENERAL PUBLIC LICENSE as published by 
+the Free Software Foundation; either version 3 of the License, or (at 
+your option) any later version.This library is distributed in the hope t-
+hat it will be useful,but WITHOUT ANY WARRANTY; without even the implied 
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See th-
+e GNU Lesser General Public License for more details.You should have rec-
+eived a copy of the GNU Lesser General Public License along with this li-
+brary; if not, write to the Free Software Foundation, Inc., 51 Franklin 
+St, Fifth Floor, Boston, MA  02110-1301  USA
+
+For more information on this, and how to apply and follow the GNU GPL, 
+see <http://www.gnu.org/licenses/>.
+
+=========================================================================
+
+Part of our code is based on libdatrie.
+The below is Legeal Information of libdatrie.
+**************************************************************************
+libdatrie - Double-Array Trie Library
+Copyright (C) 2006  Theppitak Karoonboonyanan <thep@linux.thai.net>
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
