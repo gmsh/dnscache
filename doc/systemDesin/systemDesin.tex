@@ -1,0 +1,229 @@
+
+
+%******************************************************************************
+% *filename:		systemDesign.tex
+% *author:  		synckey
+% *version: 		v1.0
+% *datetime:		2011-06-23 13:18
+% *description:
+% *****************************************************************************/
+\documentclass[12pt, a4paper, titlepage]{article}
+\usepackage{titletoc}
+\usepackage{fontspec}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{paralist}
+\usepackage{float,longtable}
+\usepackage{enumerate}
+\usepackage{xcolor,listings}
+\usepackage{booktabs, multirow}
+\usepackage[pagestyles]{titlesec}
+\usepackage{xeCJK}
+\lstset{
+	numbers=left,%行号
+	framexleftmargin = 2em,%背景框
+	frame = none,
+	backgroundcolor = \color[RGB]{245, 245,244},
+	keywordstyle = \bf\color{blue},
+	identifierstyle = \bf,
+	numberstyle=\color[RGB]{0,192,192},
+	commentstyle=\it\color[RGB]{0,96,96},
+	stringstyle=\rmfamily\slshape\color[RGB]{128,0,0},
+	showstringspaces=false
+}
+
+
+\newcommand{\codebox}[3]
+{
+\begin{center}
+\fbox{
+	\begin{minipage}[b]{130mm}
+		#1\\
+		#2
+		\begin{flushright}
+		返回值：#3
+		\end{flushright}
+	\end{minipage}
+}
+\end{center}
+}
+
+
+\titlecontents{section}[4em]{\small}{\contentslabel{3.3em}}{}
+	{\titlerule*[0.5pc]{$\cdot$}\contentspage}
+\titlecontents{subsection}[7em]{\small}{\contentslabel{3.3em}}{}
+	{\titlerule*[0.5pc]{$\cdot$}\contentspage}
+\titlecontents{subsubsection}[7em]{\small}{\contentslabel{3.3em}}{}
+	{\titlerule*[0.5pc]{$\cdot$}\contentspage}
+\renewcommand{\today}{\number\year-\number\month-\number\day}
+\setmainfont[BoldFont=SimHei]{SimSun}
+\setmonofont{SimSun}
+\XeTeXlinebreaklocale"zh"
+\title{DNS缓存系统系统设计说明书}
+\author{v2.0}
+\newpagestyle{mypagestyle}{
+	\sethead{\sectiontitle}{}{$\cdot$~\thepage~$\cdot$
+	}
+	\setheadrule{1pt}
+	\setfoot{}{}{\headrule}
+}
+\newpagestyle{myempty}{
+	\sethead{\sectiontitle}{}{}
+	\setheadrule{1pt}
+	\setfoot{}{}{\headrule}
+}
+\renewcommand{\contentsname}{目\quad 录}
+\renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
+\renewcommand{\refname}{参考文献}
+\pagestyle{mypagestyle}
+\makeatletter
+\let\@afterindentfalse\@afterindenttrue
+\@afterindenttrue
+\makeatother
+\setlength{\parindent}{2em}%中文缩进两个汉字位
+\linespread{1.25}
+\usepackage[pagebackref,colorlinks, linkcolor = blue , urlcolor = blue]{hyperref}
+\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
+
+\begin{document}
+\maketitle
+\begin{table}[H]
+\centering
+\centering\Large\textbf{修改记录}\\[15pt]
+\begin{tabular}{|p{2em}|c|p{9em}|c|}
+\hline
+\centering\textbf{No} &  \tabincell{c}{ \textbf{修改后} \\ \textbf{版本号}} 
+& \centering \textbf{修改内容简介}&\textbf{修改日期 } \\
+\hline
+\centering 1 & v1.0 & 第一版 &2011.06.25\\
+\hline
+\centering 2&v1.1&修改发送报文格式&2011.06.27\\
+\hline
+\centering 3&v1.2&UDP服务器说明&2011.07.01\\
+\hline 
+\centering 4& v2.0& 修改部分细节错误& 2011.07.06\\
+\hline&&&\\\hline&&&\\\hline
+\end{tabular}
+\end{table}
+\thispagestyle{myempty}
+\newpage
+\pagenumbering{Roman}
+\tableofcontents
+\newpage
+\pagenumbering{arabic}
+
+\section{引言}
+
+\subsection{编写目的}
+	\indent
+	本文档详细介绍了DNS缓存系统的系统设计，描述出一个具体的产品
+	设计模型，为开发及测试人员提供下步工作的依据。
+
+\subsection{背景}
+	\indent
+	本系统的开发满足需求设计中对本系统的要求。它提供DNS缓存服务，网络中的主
+	机可以一次向本系统提出多个DNS请求，系统以尽快的速度予以响应。这样就避免
+	了客户端频繁的DNS请求，加快了客户端的速度。另外，客户可以一次请求多个域
+	名。本系统可以同时为多个客户端服务，采用多线程加快处理速度，初步设计为
+	可以承受5000reqs/s的工作负担。采用比LRU效率更高的LIRS\cite{LIRS}算法来
+	管理本地的缓存，可以提高系统的缓存命中率，减小了响应时间。
+
+\section{总体设计}
+\subsection{软件体系结构}
+
+\begin{figure}[H]
+\centering
+\includegraphics[keepaspectratio, scale=0.7]{pitures/zixitongcengcitu.png}
+\caption{DNS缓存系统子系统层次图}
+\end{figure}
+\indent DNS缓存系统是一个DNS的一个高速缓存服务器，提供DNS缓存服务。传统的DNS服务
+	器一次只能查询一个域名，而且响应速度慢。本系统将为客户端代理DNS请求
+	，把DNS查询结果返回给客户端，并且把结果缓存在本地。当客户下一次请求同样
+	的域名时，就可以在本地的缓存中查找，如果缓存中存在未被替换的结果，则返回
+	该结果；否则，系统重新请求DNS服务器，并将DNS服务器返回结果存入缓存
+	中。客户可以在一次请求中查询多个域名的IP地址，本系统予以响应。我们把整
+	个系统分为三个大的模块:
+	\begin{compactitem}
+	\item{\textbf{缓存管理模块：} 把从DNS处获得的IP地址在本地缓存。域名使用
+	字典树\cite{IDAT}在本地组织，从而加快对域名的检索速度。在缓存区满了以后，采用比传统
+	LRU算法效率更高的LIRS\cite{LIRS}算法，进行缓冲区的更新。}
+	\item{\textbf{内存管理模块：}为了加快系统的响应速度，减少动态申请内存带
+	来的时间损耗，系统开初始时申请大块内存空间，程序中所有其它模块在需要使用
+	内存时，都从内存管理模块申请。释放内存的操作也由本模块提供。}
+	\item{\textbf{线程池管理模块：}为了减少创建和销毁线程所带来的系统开销，
+	在系统中采用线程池技术。在系统启动时，创建一定数目的线程。主线程负责接受
+	用户的请求，然后调用线程池中的线程为客户服务。线程池管理模块负责线程的创
+	建，申请和回收。}
+	\item{\textbf{测试客户端：}用于测试本DNS缓存系统是否正确工作，同时也测试它
+	的并发性能。}
+	\end{compactitem}
+\subsection{运行系统}
+\subsubsection{运行体系图}
+\begin{figure}[H]
+\centering
+\includegraphics[keepaspectratio, scale=0.5]{pitures/xitongyunxing.png}
+\caption{DNS缓存系统子系统层次图}
+\end{figure}
+\subsubsection{程序/模块对应表}
+\begin{figure}[H]
+\centering
+\includegraphics[keepaspectratio, scale=0.7]{pitures/struct.png}
+\caption{程序/模块对应表}
+\end{figure}
+\subsubsection{运行时序图}
+\begin{figure}[H]
+\centering
+\includegraphics[keepaspectratio, scale=0.7]{pitures/shixutu.png}
+\caption{运行时序图}
+\end{figure}
+
+
+\subsection{系统物理结构}
+\begin{figure}[H]
+\centering
+\includegraphics[keepaspectratio, scale=0.7]{pitures/xitongwulijiegou.png}
+\caption{系统物理结构图}
+\end{figure}
+
+\section{系统环境}
+\subsection{开发环境}
+\begin{longtable}{%
+@{\extracolsep{\fill}}>{\tt}ll@{}}
+\toprule[1pt]
+\multicolumn{1}{c}{环境}&
+\multicolumn{1}{c}{工具}\\\midrule
+操作系统	&	ubuntu11.04 x86\_64 \\
+内核版本	&	2.6.38-8\\
+编译器		&	gcc 4.5.2 \\
+
+\bottomrule[1pt]\\[2pt]
+\caption{开发环境}
+\end{longtable}
+
+\input{shejisilu.tex}
+
+\input{fengxiankongzhi.tex}
+
+\input{mokuaisheji.tex}
+
+
+\input{tongxinxieyi.tex}
+\input{jiekousheji.tex}
+\newpage
+\begin{thebibliography}{9}
+\bibitem{LIRS}Song Jiang, Xiaodong Zhang , LIRS: An Efficient Low Inter-reference 
+	Recency Set Replacement Policy to Improve Buffer Cache Performance.ACM 
+	SIGMETRICS Performance Evaluation , 2002 -portal.acm.org.\par
+\bibitem{IDAT}Theppitak Karoonboonyanan,
+\href{http://linux.thai.net/~thep/datrie/datrie.html}{An Implementation of 
+	Double-ArrayTrie.}\par
+\bibitem{unpv1}W.Richard Stevens,Bill Fenner, Andrew M.Rudoff.《UNIX网络编程(卷1):
+	套接字联网API(第3版)》.人民邮电出版社.\par
+\bibitem{unpv2}W.Richard Stevens.《UNIX网络编程(卷2):进程间通信(第2版)》.人民邮电出版社.\par
+\bibitem{DATA}王思力,张华平,王斌.双数组Trie树算法优化及其应用研究 \par
+
+\end{thebibliography}
+\end{document}
+%*********************************  END OF report.tex  *********************************/
