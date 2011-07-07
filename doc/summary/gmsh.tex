@@ -1,0 +1,120 @@
+%
+%
+%/********************************************************************
+% * filename:           gmsh.tex
+% * author:             wakemecn
+% * version:            v1.0
+% * datetime:           Jun 7th, 2011 
+% ********************************************************************/
+
+\documentclass[12pt, a4paper, titlepage]{article}
+\usepackage{titletoc}
+\usepackage{fontspec}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{paralist}
+\usepackage{float,longtable}
+\usepackage{enumerate}
+\usepackage{xcolor,listings}
+\usepackage{booktabs, multirow}
+\usepackage[pagestyles]{titlesec}
+\usepackage{xeCJK}
+
+
+\titlecontents{section}[4em]{\small}{\contentslabel{3.3em}}{}
+	{\titlerule*[0.5pc]{$\cdot$}\contentspage}
+\titlecontents{subsection}[7em]{\small}{\contentslabel{3.3em}}{}
+	{\titlerule*[0.5pc]{$\cdot$}\contentspage}
+\titlecontents{subsubsection}[7em]{\small}{\contentslabel{3.3em}}{}
+	{\titlerule*[0.5pc]{$\cdot$}\contentspage}
+\renewcommand{\today}{\number\year-\number\month-\number\day}
+\setmainfont[BoldFont=SimHei]{SimSun}
+\setmonofont{SimSun}
+\XeTeXlinebreaklocale"zh"
+
+\newpagestyle{mypagestyle}{
+	\sethead{\sectiontitle}{}{$\cdot$~\thepage~$\cdot$
+	}
+	\setheadrule{1pt}
+	\setfoot{}{}{\headrule}
+}
+\newpagestyle{myempty}{
+	\sethead{\sectiontitle}{}{}
+	\setheadrule{1pt}
+	\setfoot{}{}{\headrule}
+}
+\renewcommand{\contentsname}{目\quad 录}
+\renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
+\renewcommand{\refname}{参考文献}
+\pagestyle{mypagestyle}
+\makeatletter
+\let\@afterindentfalse\@afterindenttrue
+\@afterindenttrue
+\makeatother%
+
+\usepackage{ulem}
+\setlength{\parindent}{2em}%中文缩进两个汉字位
+\linespread{1.25}
+\usepackage[pagebackref,colorlinks, linkcolor = blue , urlcolor = blue]{hyperref}
+\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
+
+
+
+%\vspace{26mm}
+\begin{document}
+%\maketitle
+\begin{titlepage}
+\centering
+\Huge\textbf{软件工程实训总结报告}\\[7pt]
+\large{通用DNS缓存设计——百度}\\[50mm]
+
+%\begin{flushcenter}
+\textbf{作 \qquad 者} {  郭茂盛}
+%\end{flushcenter}
+
+\end{titlepage}
+
+\newpage
+\pagenumbering{arabic}
+\par{
+	时间过的真快转眼间我期望已久的实训周已经结束。经过两周的实训练习让我学到了许多
+	知识回头想想实训这几天我确实是有很大收获的。在老师的耐心指导和鼓励下，圆满完成
+	了实习任务，从总体上达到了实习 预期的目标和要求。这次总实习 给了我一次全面的、
+	系统的实践锻炼的机会，巩固了所学的理论知识，增强了我的实际操作能力，我进一步从
+	实践中认识到编写代码对于我们软件工程专业的重要性。	
+}
+
+\par{
+	我以后在工作中光有理论知识是不够的，还要能把理论运用到实践中去才行。理论知识
+	固然重要，可是无实践的理论就是空谈。真正做到理论与实践的相结合，将理论真正用
+	到实践中去，才能更好的将自己的才华展现出来。我以前总以为看书看的明白，也理解
+	就得了，经过这次的实训，我现在终于明白，没有实践所学的东西就不属于你的。俗话
+	说：“尽信书则不如无书”我们要读好书，而不是读死书。实训期间，让我学到了很多东
+	西，不仅使我在理论上对网络管理有了全新的认识，在实践能力上也得到了提高，真正
+	地做到了学以致用，更学到了很多做人的道理，对我来说受益非浅。除此以外，我还学
+	会了如何更好地与别人沟通，如何更好地去陈述自己的观点，如何说服别人认同自己的
+	观点。第一次亲身感受到理论与实际的相结合，让我大开眼界。也是对以前所学知识的
+	一个初审吧！这次实训对于我以后学习、找工作也真是受益菲浅，在短短的两周中相信
+	这些宝贵的经验会成为我今后成功的重要的基石。	
+}
+
+\par{
+	我感受最深的，还有以下几点：
+}
+\begin{description}
+	\item[其一]实训是对每个人综合能力的检验。要想做好任何事，除了自己平时要有一定
+	的功底外，我们还需要一定的实践动手能力，操作能力。
+	\item[其二]此次实训，我深深体会到了积累知识的重要性。俗话说：“要想为事业多添
+	一把火，自己就得多添一捆材”。我对此话深有感触。
+	\item[再次]“纸上得来终觉浅，绝知此事要躬行！”在短暂的实习过程中，让我深深的感
+	觉到自己在实际运用中的专业知识的匮乏，刚开始的一段时间里，对一些工作感到无从
+	下手，茫然不知所措，这让我感到非常的难过。在学校总以为自己学的不错，一旦接触
+	到实际，才发现自己知道的是多么少，这时才真正领悟到“学无止境”的含义。这也许是
+	我一个人的感觉。
+\end{description}
+
+\end{document}
+%
+%/***************  END OF testdesin.tex  **************/

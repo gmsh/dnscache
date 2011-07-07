@@ -1,0 +1,289 @@
+%
+%
+%/********************************************************************
+% * filename:           groupsummary.tex
+% * author:             synckey
+% * version:            v1.0
+% * datetime:           2011-07-05 08:33:29
+% * description:        group summary
+% ********************************************************************/
+
+\documentclass[12pt, a4paper, titlepage]{article}
+\usepackage{titletoc}
+\usepackage{fontspec}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{paralist}
+\usepackage{float,longtable}
+\usepackage{enumerate}
+\usepackage{xcolor,listings}
+\usepackage{booktabs, multirow}
+\usepackage[pagestyles]{titlesec}
+\usepackage{xeCJK}
+
+
+\titlecontents{section}[4em]{\small}{\contentslabel{3.3em}}{}
+	{\titlerule*[0.5pc]{$\cdot$}\contentspage}
+\titlecontents{subsection}[7em]{\small}{\contentslabel{3.3em}}{}
+	{\titlerule*[0.5pc]{$\cdot$}\contentspage}
+\titlecontents{subsubsection}[7em]{\small}{\contentslabel{3.3em}}{}
+	{\titlerule*[0.5pc]{$\cdot$}\contentspage}
+\renewcommand{\today}{\number\year-\number\month-\number\day}
+\setmainfont[BoldFont=SimHei]{SimSun}
+\setmonofont{SimSun}
+\XeTeXlinebreaklocale"zh"
+
+\newpagestyle{mypagestyle}{
+	\sethead{\sectiontitle}{}{$\cdot$~\thepage~$\cdot$
+	}
+	\setheadrule{1pt}
+	\setfoot{}{}{\headrule}
+}
+\newpagestyle{myempty}{
+	\sethead{\sectiontitle}{}{}
+	\setheadrule{1pt}
+	\setfoot{}{}{\headrule}
+}
+\renewcommand{\contentsname}{目\quad 录}
+\renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
+\renewcommand{\refname}{参考文献}
+\pagestyle{mypagestyle}
+\makeatletter
+\let\@afterindentfalse\@afterindenttrue
+\@afterindenttrue
+\makeatother%
+
+\usepackage{ulem}
+\setlength{\parindent}{2em}%中文缩进两个汉字位
+\linespread{1.25}
+\usepackage[pagebackref,colorlinks, linkcolor = blue , urlcolor = blue]{hyperref}
+\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
+
+
+
+%\vspace{26mm}
+\begin{document}
+%\maketitle
+\begin{titlepage}
+\centering
+\Huge\textbf{软件工程实训总结报告}\\[20pt]
+\Large{通用DNS缓存设计——百度}  \\[130mm]
+
+\begin{large}
+\rule{40mm}{0pt}
+\textbf{成\qquad 员} {\hfill 李 琳\quad 王 健\quad 王军委
+\quad 郭茂盛 } \\ 
+\rule{40mm}{0pt}
+\textbf{专\qquad 业} {\hfill 软\quad 件\quad 工\quad 程\quad\quad\quad\quad } \\
+\rule{40mm}{0pt}
+\textbf{指导老师} {\hfill 臧 志 \quad 余 沛 \quad 龚 城\quad\quad\quad} \\
+\rule{40mm}{0pt}
+\textbf{日\qquad 期}{ \hfill2011年7月9日\quad\quad\quad } \\
+\end{large}
+\end{titlepage}
+
+\newpage
+\pagenumbering{Roman}%
+
+\tableofcontents
+\newpage
+\pagenumbering{arabic}
+\section{软件工程实训}
+\subsection{软件工程实训目标}
+\begin{asparaenum}
+\item{了解企业的文化和制度，熟悉企业的工作流程和工作方式。}
+\item{熟悉实际项目分析、设计、开发、测试、提交等完整流程，熟悉企业各类文档模板，
+并按照这些模板撰写项目文档。}
+\item{悉使用各种开发工具、系统设计工具、项目管理工具和缺陷管理工具；熟练使用常用
+服务器软件安装、配置、开发。}
+\item{掌握开发架构，能独立设计完成企业中小型解决方案。}
+\item{形成良好的编码习惯，熟练掌握如何使代码更加易于理解和可读。}
+\item{养成良好的表达、沟通和团队协作能力，掌握快速学习方法，培养良好的分析问题
+和解决问题能力。}
+\end{asparaenum}
+
+\section{软件项目概述}
+\subsection{软件项目名称}
+通用DNS缓存系统设计。
+
+\subsection{软件项目要求}
+\paragraph{场景描述：\\[7pt]}  
+
+在百度的大规模集群环境中，有这样一个模块，在它工作时，需要根据用户指定的机器名列
+表，与这些机器建立连接完成一定任务。在这个过程中，会大量进行域名的解析，不仅对
+DNS服务器造成较大压力，还容易发生解析失败的情况，请设计一个系统，来解决这个问题
+。(该系统还可以应用于短连接大并发的系统模型中)。
+
+\paragraph{功能需求:}
+\begin{asparaenum}
+\item{可配置的缓存更新策略，如缓存的老化周期，缓存的大小。根据LRU来实现缓存更新
+算法，并可扩展。}
+\item{处理网络请求，请求内容为一个或者n个主机名，返回对应的ip地址。包格式请考虑
+以后的扩展性。}
+\item{利用多核CPU，采用多线程实现。}
+\end{asparaenum}
+\paragraph{实现要求：}
+\begin{asparaenum}
+\item{文档齐全：设计文档、单元测试文档、自动测试文档。文档的撰写思路明晰，
+内容完善。}
+\item{设计方面考虑完整，模块划分清晰。}
+\item{使用C/C++实现。实现功能完整，代码符合代码规范，好的代码的可读性和可维护性
+，必要的注释。}
+\item{使用GTest或CPPUnit进行单元测试。}
+\item{完善的自动化测试用例。撰写程序对整体功能进行测试。}
+\end{asparaenum}
+
+\subsection{软件特点}
+本系统为其它系统服务，根据客户提出的域名，返回域名对应的IP 地址。用户可以一次提
+出一个请求，也可以在一个请求中请求若干域名的IP地址。系统根据用户的请求，从DNS 服
+务器获得域名和IP 地址的对应关系，并进行缓存，从而在用户下次请求时，可以快速响应
+。当服务器的缓放满之后，就使用LIRS 算法，对缓冲区进行更新。
+
+\section{技术技能}
+本次实训项目使用C语言以及网络编程的技术，技术简介如下：
+\subsection{C语言}
+\par{
+	C语言是一种计算机程序设计语言。它既具有高级语言的特点，又具有汇编语言的特点。
+	它由美国贝尔研究所的D.M.Ritchie于1972年推出。1978后，C语言已先后被移植到大、
+	中、小及微型机上。它可以作为工作系统设计语言，编写系统应用程序，也可以作为应
+	用程序设计语言，编写不依赖计算机硬件的应用程序。它的应用范围广泛，具备很强的
+	数据处理能力，不仅仅是在软件开发上，而且各类科研都需要用到C语言，适于编写系
+	统软件，三维，二维图形和动画。具体应用比如单片机以及嵌入式系统开发。
+}
+\par{
+	C语言对编写需要硬件进行操作的场合，明显优于其它解释型高级语言，有一些大型应
+	用软件也是用C语言编写的。C语言具有以下特点：	
+}
+
+\begin{itemize}
+	\item C是中级语言。它把高级语言的基本结构和语句与低级语言的实用性结合起来。
+	C 语言可以像汇编语言一样对位、字节和地址进行操作， 而这三者是计算机最基本的
+	工作单元。
+	\item C是结构式语言。结构式语言的显著特点是代码及数据的分隔化，即程序的各个
+	部分除了必要的信息交流外彼此独立。这种结构化方式可使程序层次清晰，便于使用、
+	维护以及调试。C 语言是以函数形式提供给用户的，这些函数可方便的调用，并具有多
+	种循环、条件语句控制程序流向，从而使程序完全结构化。
+	\item C语言功能齐全。具有各种各样的数据类型，并引入了指针概念，可使程序效率
+	更高。而且计算功能、逻辑判断功能也比较强大，可以实现决策目的的游戏。
+	\item  C语言适用范围大。适合于多种操作系统，如Windows、DOS、UNIX等等；也适用
+	于多种机型。
+\end{itemize}
+
+\par{ 指针是C语言的一大特色，可以说是C语言优于其它高级语言的一个重要原因。就是因
+	为它有指针，可以直接进行靠近硬件的操作，但是C的指针操作也给它带来了很多不安
+	全的因素。
+	}
+
+\subsection{网络编程}
+\par{通过使用套接字来达到进程间通信目的编程就是网络编程。}
+\par{网络编程从大的方面说就是对信息的发送到接收，中间传输为物理线路的作用，编程
+	人员可以不用考虑。网络编程最主要的工作就是在发送端把信息通过规定好的协议进行
+	组装包，在接收端按照规定好的协议把包进行解析，从而提取出对应的信息，达到通信
+	的目的！中间最主要的就是数据包的组装，数据包的过滤，数据包的捕获，数据包的分
+	析，当然最后再做一些处理！
+}
+\par{数据包是网络通信编程的一个重要概念,也称为组装包,指在应用层数据或报文按照一
+	定事先规定好的规则整合的数据集合，实际操作包括组包(打包)，数据包传送，解包。
+	组包(打包)，指按照协议把零散的数据或报文按照组合起来，实际应用中,比如在C++编
+	程中,往往定义一种新的数据类型用来存储数据包的结构。数据包传送，指数据包的电
+	气物理传输。解包，指接收端对接收的数据进行解析，获得有用信息和数据。
+}
+
+\section{系统设计}
+\subsection{整体框架}
+\par{DNS缓存系统是一个DNS的一个高速缓存服务器，提供DNS缓存服务。传统的DNS服务器
+	一次只能查询一个域名，而且响应速度慢。本系统将为客户端代理DNS请求，把DNS查
+	询结果返回给客户端，并且把结果缓存在本地。当客户下一次请求同样的域名时，就
+	可以在本地的缓存中查找，如果缓存中存在未被替换的结果，则返回该结果；否则，系
+	统重新请求DNS服务器，并将DNS服务器返回结果存入缓存中。客户可以在一次请求中
+	查询多个域名的IP地址，本系统予以响应。我们把整个系统分为四个大的模块:	
+}
+\begin{compactitem}
+     \item{\textbf{缓存管理模块：} 把从DNS处获得的IP地址在本地缓存。域名使用
+     字典树\cite{IDAT}在本地组织，从而加快对域名的检索速度。在缓存区满了以后，采用比传统
+     LRU算法效率更高的LIRS\cite{LIRS}算法，进行缓冲区的更新。}
+    \item{\textbf{内存管理模块：}为了加快系统的响应速度，减少动态申请内存带
+     来的时间损耗，系统开初始时申请大块内存空间，程序中所有其它模块在需要使用
+     内存时，都从内存管理模块申请。释放内存的操作也由本模块提供。}
+     \item{\textbf{线程池管理模块：}为了减少创建和销毁线程所带来的系统开销，
+     在系统中采用线程池技术。在系统启动时，创建一定数目的线程。主线程负责接受
+     用户的请求，然后调用线程池中的线程为客户服务。线程池管理模块负责线程的创
+     建，申请和回收。}
+     \item{\textbf{测试客户端：}用于测试本DNS缓存系统是否正确工作，同时也测试它
+     的并发性能。}
+\end{compactitem}
+
+
+
+\section{实训感想}经过近一月的实训，我们的小组每个人都收获颇多。不仅个人素质、专
+业能力得到锻炼和提升，同时对如何更有效的进行团队合作方式有了更深刻的理解。
+\subsection{软件工程开发方法}
+\par{在实训期间，我们小组将软件工程开发理论方法用于实际，切实体会到软件工程开发方
+	法在项目开发中起到的重要作用，从需求分析到系统设计，从代码开发到系统测试，每
+	一步都是在小组成员的讨论商议中完成。	
+}
+\par{在需求分析阶段，我们通过题目要求，着重分析系统的性能要求，实现在 8*2.33G CPU，
+	16G 内存，64 位主机上处理速度需要达到 5000req/s。此数值将根据具体主机的不同而
+	调整，基本评判标准是在相同缓存策略下，处理速度越快越好。
+}
+\par{为了实现需求中的各种功能、性能要求，我们团队在系统设计阶段对各种算法、数据结构
+	等方面做了折中，选取代价最小而性能最高的方法设计系统。在UDP和TCP协议的选择中，
+	我们做出这样初步设计为系统提供两个服务器，一个 UDP 服务器，和一个 TCP 服务器。
+	客户端根据它的报文大小来选择使用 UDP 还是 TCP。在替换算法方面，LIRS 的效率比 
+	LRU 高，但是实现的代价比 LRU高不了多少，我们选择使用 LIRS。在数据结构方面，我
+	们选择了冲突更小的字典树替代了冲突较高的HASH函数。为了进一步提高系统性能，我们
+	采用一次请求两次返回机制。详见系统设计说明书。
+}
+\par{在代码开发阶段。小组采用迭代式开发方法，每完成一个子模块就进行测试，保证了后续
+	开发的正确性及稳定性。	
+}
+\par{在最后的测试阶段，我们应用代码走差、单元测试、集成测试、功能测试等测试方法，
+	设计测试用例对系统的功能、性能、安全性进行测试，并形成测试报告。	
+}
+\par{总之，通过本次实训平台，给我们提高了一个良好的实践机会，将所学理论知识进一
+	步用于实践中，在实践中巩固和检验理论。	
+}
+
+
+
+
+\subsection{小组内团队合作}
+小组内成员在项目开发过程中通过不断调整工作分配方式和问题解决办法，循序渐进中做到
+充分发挥每个人的优势，将每个人的知识、能力和经验用于团队开发中。小组里的每个角色
+都代表了对项目的一种独一无二的观点，但是没有哪个个人能够完全代表所有的不同质量目
+标。
+\subsubsection{组成员资源共享}
+\par{为了方便共享资源和代码，了解他人进度。小组集各个成员的智慧于一体，通过多种
+方式实现资源管理与共享，建立ftp、快盘账户、git（Linux 内核开发的版本控制工具）。}
+\subsubsection{小组讨论}
+\par{在本次开发过程中，小组内逐渐形成了相互学习和讨论的氛围。发现问题时尽早解决
+，个人解决不了时召开小组讨论会，共同针对问题进行讨论。在讨论过程中出现分歧时，对
+分歧进行分析折中，选择最为适合的解决方案。}
+
+\subsection{企业软件开发方法和规范}
+\subsubsection{学会写个人日报和小组周报}
+\par{软件工程师日常的工作是设计、编程和测试，但是每日或每段时间进行的工作只是整
+个软件产品的一个小的部分。百度规定每个人每天下班前五分钟完成个人日报和每个小组每
+周完成小组周报 "帮助 "我们计划当前要作的工作，估算时间，记录项目完成进度，以及计
+划下一步的工作和在当天工作中遇到的问题，方便记录和解决问题。}
+\subsubsection{学会进行小组计划跟踪}
+\par{制定小组计划并对计划进行跟踪，召集小组成员对工作进展情况进行讨论，了解小组
+成员间的工作进度，同时对遇到的问题及时解决。}
+\subsubsection{学会团队合作}
+\par{通过百度“荒岛物品选择”小游戏，充分的体现了团队合作意识以及每个人在团队中的
+角色和位置。同时让小组每个成员反思自身在团队中的价值，认识到协作的重要性。也对下
+一步的团队合作提出了一定的指导和更高的要求。根据每个人的特长、兴趣爱好调整工作分
+配方式，更好的加强团队协作能力、提高团队工作效率。}
+\subsubsection{学习软件开发规范}
+\par{ 团队在软件开发过程中，根据指导教师的任务安排开展工作，同时学习百度的软件开
+发规范和最新的工具、技术，如测试阶段使用GTest等测试工具进行单元测试。}
+\subsubsection{获得企业对大学生需求信息}
+\par{在实训过程中，指导老师除了对我们进行培训和疑问解答，也向我们介绍IT行业的新
+技术、新趋势，同时对我们提出的职业规划和未来的求职问题进行一一解答。让我们了解公
+司对大学生的要求和工作后的状况。}
+
+\end{document}
+%
+%/***************  END OF testdesin.tex  **************/
