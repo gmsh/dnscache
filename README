@@ -48,4 +48,4 @@ $vi test_client.h	% you also can choose your favourite
 $make 
 $./test_client
 
-waring: you must conneted to server after the server started.
+warning: you must conneted to server after the server started.
