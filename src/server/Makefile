@@ -3,9 +3,9 @@ all:mainserver test_dl_kache list2tri test_tri
 	-cp $^ ../../bin
 	-cp domains.tri ip.list ../../bin
 test_dl_kache: test_dl_kache.c dl_kache.o alpha-map.o darray.o fileutils.o tail.o trie.o dc_mm.o slist.o hash.o
-	${CC} -o test_dl_kache test_dl_kache.c dl_kache.o alpha-map.o darray.o fileutils.o tail.o trie.o dc_mm.o slist.o hash.o
+	${CC} -o $@ $^
 test_tri: test_tri.c alpha-map.o darray.o fileutils.o tail.o trie.o slist.o
-	${CC} -o test_tri test_tri.c alpha-map.o darray.o fileutils.o tail.o trie.o
+	${CC} -o $@ test_tri.c alpha-map.o darray.o fileutils.o tail.o trie.o
 list2tri: list2tri.c alpha-map.o darray.o fileutils.o tail.o trie.o slist.o
 	${CC} -o list2tri list2tri.c alpha-map.o darray.o fileutils.o tail.o trie.o slist.o
 
