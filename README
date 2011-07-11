@@ -61,7 +61,7 @@ $cd bin
 $./mainserver
 
 for Client:
-$cd src/client
+$cd bin
 $./test_client
 
 ===============================================================
