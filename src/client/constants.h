@@ -65,7 +65,7 @@
 						// the second message.
 #define	RESERVED_BYTE 	'F'
 #define	PORT	8888		//server port
-#define SERVIP	"211.87.232.231"
+#define SERVIP	"211.87.232.119"
 
 //modify 
 #define MAXDNSTHREADS   50	/* the number of DNS threads  */

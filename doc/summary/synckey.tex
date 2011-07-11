@@ -1,0 +1,93 @@
+%
+%
+%/********************************************************************
+% * filename:           synckeysummary.tex
+% * author:             synckey
+% * version:            v1.0
+% * datetime:           2011-07-05 21:54:29
+% * description:        synckey summary
+% ********************************************************************/
+
+\documentclass[12pt, a4paper, titlepage]{article}
+\usepackage{titletoc}
+\usepackage{fontspec}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{paralist}
+\usepackage{float,longtable}
+\usepackage{enumerate}
+\usepackage{xcolor,listings}
+\usepackage{booktabs, multirow}
+\usepackage[pagestyles]{titlesec}
+\usepackage{xeCJK}
+
+
+\titlecontents{section}[4em]{\small}{\contentslabel{3.3em}}{}
+	{\titlerule*[0.5pc]{$\cdot$}\contentspage}
+\titlecontents{subsection}[7em]{\small}{\contentslabel{3.3em}}{}
+	{\titlerule*[0.5pc]{$\cdot$}\contentspage}
+\titlecontents{subsubsection}[7em]{\small}{\contentslabel{3.3em}}{}
+	{\titlerule*[0.5pc]{$\cdot$}\contentspage}
+\renewcommand{\today}{\number\year-\number\month-\number\day}
+\setmainfont[BoldFont=SimHei]{SimSun}
+\setmonofont{SimSun}
+\XeTeXlinebreaklocale"zh"
+
+\newpagestyle{mypagestyle}{
+	\sethead{\sectiontitle}{}{$\cdot$~\thepage~$\cdot$
+	}
+	\setheadrule{1pt}
+	\setfoot{}{}{\headrule}
+}
+\newpagestyle{myempty}{
+	\sethead{\sectiontitle}{}{}
+	\setheadrule{1pt}
+	\setfoot{}{}{\headrule}
+}
+\renewcommand{\contentsname}{目\quad 录}
+\renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
+\renewcommand{\refname}{参考文献}
+\pagestyle{mypagestyle}
+\makeatletter
+\let\@afterindentfalse\@afterindenttrue
+\@afterindenttrue
+\makeatother%
+
+\usepackage{ulem}
+\setlength{\parindent}{2em}%中文缩进两个汉字位
+\linespread{1.25}
+\usepackage[pagebackref,colorlinks, linkcolor = blue , urlcolor = blue]{hyperref}
+\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
+
+\title{软件工程实训个人总结}
+\author{王健 \quad 200800300234}
+\date{2011-07-10}
+\begin{document}
+\maketitle
+\par{Time flies!!!转眼之间项目实训就要结束了，在老师的指导和鼓励下，我们出色完成
+了任务。这一个月过得飞快而又漫长，说它漫长，不是因为很累，而是因为我敢觉我成长了很多。}
+\par{首先，我学会了团队合作。我们这是一个团队分工的项目，一个人是很难完成的。从
+系统的整体设计到项目中的遇到的每一个问题，我们组都经过充分的讨论和交流，最终确定解决方案。
+在交流中能感受到每个人对同一个问题的不同观点和看法，学习他人的思想和反思自己的不足。
+同时在一个团队中工作也是很快乐的，我们每个人为一个共同的目标而努力，每个人既要专
+注自己的领域，又要考虑与其他组员的合作，当把每个人写的模块组装到一起又能成功运行
+时，每个组员都很有成就感。}
+\par{从这次项目实训中我也锻炼了自己的能力。以前的基本上都是在看书，学习理论知识
+，有些知识，以为自己懂了，就真的懂了。但是在实践中遇到了许多意想不到的问题，这些
+都是很具体很细节的问题，通过解决这些问题，我更加深刻理解了C语言的指针和内存操作
+。通过写socket程序，我熟悉了TCP和UDP的工作原理，为以后写出更好的C/S程序打下基础
+。我们这个程序是用多线程写的，在代码实现的过程中，遇到了很多同步的问题，解决这些
+问题的过程也是一个学习的过程。总之，这次实训使我认识到，虽然理论知识很重要，但是
+动手的实践也能学到很多书上学不到的知识。理论和实践这两者缺一不可。}
+\par{在这一次实训中，我也感受到了百度公司良好的企业文化。百度来的几位老师都非常好。他们不仅
+仅教我们技术方面的问题，也教会我们一些团队合作和职业生涯规划的问题。他们每天都会
+给我们安排吃水果的时间，虽然是一个很小的举动，但是从一个侧面反映了百度公司的文化
+和对人才的态度。与其他IT公司不同，百度非常重视人才的生活和工作的平衡，员工既要有
+生活，又要有工作，这是很难得的。}
+\par{}
+
+\end{document}
+%
+%/***************  END OF testdesin.tex  **************/
