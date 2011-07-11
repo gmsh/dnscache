@@ -63,3 +63,6 @@ $./mainserver
 for Client:
 $cd src/client
 $./test_client
+
+===============================================================
+Have fun in our project.
