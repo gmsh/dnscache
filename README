@@ -16,7 +16,7 @@ This project includes server and client.
 ===============================================================
 Server Usage:
 
-$cd server
+$cd src/server
 $vi constant.h		% you can choose you favourite editor
 			% modify the SERVIP and PORT and other
 			% arguments.
@@ -31,12 +31,12 @@ when you see such things below printed on the screen, it means
          * tcp server started                   *
          * udp server started                   *
          ****************************************
-the server is started! Have fun in our project.
+the server is started! 
 
 ===============================================================
 Client Usage:
 
-$cd client
+$cd src/client
 $vi constant.h		% you can choose your favourite editor
 			% modify the SERVIP and PORT the same
 			% with configure with server
@@ -49,3 +49,17 @@ $make
 $./test_client
 
 warning: you must conneted to server after the server started.
+
+================================================================
+Well,here come a shortcut method to deploy our project.
+
+$make
+
+
+for Server:
+$cd bin 
+$./mainserver
+
+for Client:
+$cd src/client
+$./test_client
