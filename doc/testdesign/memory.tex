@@ -1,0 +1,187 @@
+%
+%
+%/********************************************************************
+% * filename:		cache.tex
+% * author: 		synckey
+% * version:		v1.0
+% * datetime:		2011-07-05 13:32:37
+% * description:	cache module
+% ********************************************************************/
+\section{内存管理模块测试用例设计}
+\subsection{内存管理初始化功能测试用例}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{8em}|p{22em}|}
+\hline
+\textbf{测试项目编号:}&dc\_mm/CASE1\\
+\hline
+\textbf{测试项目描述:}&测试内存管理模块初始化\\
+\hline
+\textbf{测试说明:}& 测试dc\_mm初始化功能，预分配特定大小的chunk各若干\\
+\hline
+\textbf{测试步骤及输入:}&配置随机的chunks大小以及数目，调用mm\_init()，无输入\\
+\hline
+\textbf{期待结果及输出:}&通过GDB查看内存，相关chunk已经正确初始化\\
+\hline
+\textbf{测试结果:}& 初始化正常\\
+\hline
+\textbf{测试所花时间（单位：分钟）}& 约160分钟\\
+\hline
+\textbf{备注:}& \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection {内存分配功能测试用例}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{8em}|p{22em}|}
+\hline
+\textbf{测试项目编号:}&dc\_mm/CASE2\\
+\hline
+\textbf{测试项目描述:}&测试内存分配\\
+\hline
+\textbf{测试说明:}&随机产生产生块大小，不断申请\\
+\hline
+\textbf{测试步骤及输入:}& 随机申请大小及数目，包括不合法数据\\
+\hline
+\textbf{期待结果及输出:}&通过GDB查看内存，查看到指针已正确存储相应的chunk地址，不合法输入返回NULL\\
+\hline
+\textbf{测试结果:}&无它异常\\
+\hline
+\textbf{测试所花时间（单位：分钟）}& 约240分钟\\
+\hline
+\textbf{备注:}&修复计算最佳适应chunk大小中的bug \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection {内存释放功能测试用例}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{8em}|p{22em}|}
+\hline
+\textbf{测试项目编号:}&dc\_mm/CASE3\\
+\hline
+\textbf{测试项目描述:}&测试内存释放功能\\
+\hline
+\textbf{测试说明:}&在随机申请的内存里，随机乱序释放相关内存\\
+\hline
+\textbf{测试步骤及输入:}&随机申请的chunk，调用dc\_free()随机乱序释放\\
+\hline
+\textbf{期待结果及输出:}&成功释放相关内存，对于不合法的内存释放不予处理\\
+\hline
+\textbf{测试结果:}&无异常\\
+\hline
+\textbf{测试所花时间（单位：分钟）}& 约180分钟\\
+\hline
+\textbf{备注:}& \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\subsection {内存重分配功能测试用例}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{8em}|p{22em}|}
+\hline
+\textbf{测试项目编号:}&dc\_mm/CASE4\\
+\hline
+\textbf{测试项目描述:}&测试内存重分配功能\\
+\hline
+\textbf{测试说明:}&在可控范围内，随机申请的内存，释放内存，重新分配内存\\
+\hline
+\textbf{测试步骤及输入:}&随机申请的chunk，调用dc\_free()随机乱序释放，重新分配内存\\
+\hline
+\textbf{期待结果及输出:}&通过GDB查看，成功重新分配内存\\
+\hline
+\textbf{测试结果:}&无异常\\
+\hline
+\textbf{测试所花时间（单位：分钟）}& 约180分钟\\
+\hline
+\textbf{备注:}& \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\subsection {打印统计功能测试用例}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{8em}|p{22em}|}
+\hline
+\textbf{测试项目编号:}&dc\_mm/CASE5\\
+\hline
+\textbf{测试项目描述:}&测试打印统计数据功能\\
+\hline
+\textbf{测试说明:}&在可控范围内，随机申请的内存，释放内存，打印统计数据\\
+\hline
+\textbf{测试步骤及输入:}&随机申请的chunk，调用dc\_free()随机乱序释放，并统计相关数据\\
+\hline
+\textbf{期待结果及输出:}&成功打印统计结果\\
+\hline
+\textbf{测试结果:}&无异常\\
+\hline
+\textbf{测试所花时间（单位：分钟）}& 约80分钟\\
+\hline
+\textbf{备注:}& \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\subsection{性能及压力测试用例}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{8em}|p{22em}|}
+\hline
+\textbf{测试项目编号:}&dc\_mm/CASE6\\
+\hline
+\textbf{测试项目描述:}&性能压力测试\\
+\hline
+\textbf{测试说明:}&在内存极限下申请、释放内存\\
+\hline
+\textbf{测试步骤及输入:}&随机申请大小、数目，随机释放\\
+\hline
+\textbf{期待结果及输出:}&正确执行\\
+\hline
+\textbf{测试结果:}& 无异常\\
+\hline
+\textbf{测试所花时间（单位：分钟）}& 约150分钟\\
+\hline
+\textbf{备注:}& \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\subsection{稳定性测试用例}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{8em}|p{22em}|}
+\hline
+\textbf{测试项目编号:}&dc\_mm/CASE7\\
+\hline
+\textbf{测试项目描述:}&稳定性测试\\
+\hline
+\textbf{测试说明:}&不断申请、释放、重分配内存，以及一些极限条件\\
+\hline
+\textbf{测试步骤及输入:}&随机数据\\
+\hline
+\textbf{期待结果及输出:}&内存稳定，无泄漏\\
+\hline
+\textbf{测试结果:}&连续运行24小时，内存不断变化但一段时间内总是稳定在某一水平\\
+\hline
+\textbf{测试所花时间（单位：分钟）}& 约60*24分钟\\
+\hline
+\textbf{备注:}& \\
+\hline
+\end{tabular}
+\end{table}
+
+
+
+%
+%/***************  END OF cache.tex  **************/

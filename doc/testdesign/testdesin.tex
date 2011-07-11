@@ -1,0 +1,150 @@
+%
+%
+%/********************************************************************
+% * filename:           testdesin.tex
+% * author:             synckey
+% * version:            v1.0
+% * datetime:           2011-07-05 08:33:29
+% * description:        testdesing
+% ********************************************************************/
+
+\documentclass[12pt, a4paper, titlepage]{article}
+\usepackage{titletoc}
+\usepackage{fontspec}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{paralist}
+\usepackage{float,longtable}
+\usepackage{enumerate}
+\usepackage{xcolor,listings}
+\usepackage{booktabs, multirow}
+\usepackage[pagestyles]{titlesec}
+\usepackage{xeCJK}
+\lstset{
+	numbers=left,%行号
+	framexleftmargin = 2em,%背景框
+	frame = none,
+	backgroundcolor = \color[RGB]{245, 245,244},
+	keywordstyle = \bf\color{blue},
+	identifierstyle = \bf,
+	numberstyle=\color[RGB]{0,192,192},
+	commentstyle=\it\color[RGB]{0,96,96},
+	stringstyle=\rmfamily\slshape\color[RGB]{128,0,0},
+	showstringspaces=false
+}
+
+
+\newcommand{\codebox}[3]
+{
+\begin{center}
+\fbox{
+	\begin{minipage}[b]{130mm}
+		#1\\
+		#2
+		\begin{flushright}
+		返回值：#3
+		\end{flushright}
+	\end{minipage}
+}
+\end{center}
+}
+
+
+\titlecontents{section}[4em]{\small}{\contentslabel{3.3em}}{}
+	{\titlerule*[0.5pc]{$\cdot$}\contentspage}
+\titlecontents{subsection}[7em]{\small}{\contentslabel{3.3em}}{}
+	{\titlerule*[0.5pc]{$\cdot$}\contentspage}
+\titlecontents{subsubsection}[7em]{\small}{\contentslabel{3.3em}}{}
+	{\titlerule*[0.5pc]{$\cdot$}\contentspage}
+\renewcommand{\today}{\number\year-\number\month-\number\day}
+\setmainfont[BoldFont=SimHei]{SimSun}
+\setmonofont{SimSun}
+\XeTeXlinebreaklocale"zh"
+\title{DNS缓存系统测试设计}
+\author{v1.0}
+\date{2011-07-05}
+\newpagestyle{mypagestyle}{
+	\sethead{\sectiontitle}{}{$\cdot$~\thepage~$\cdot$
+	}
+	\setheadrule{1pt}
+	\setfoot{}{}{\headrule}
+}
+\newpagestyle{myempty}{
+	\sethead{\sectiontitle}{}{}
+	\setheadrule{1pt}
+	\setfoot{}{}{\headrule}
+}
+\renewcommand{\contentsname}{目\quad 录}
+\renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
+\renewcommand{\refname}{参考文献}
+\pagestyle{mypagestyle}
+\makeatletter
+\let\@afterindentfalse\@afterindenttrue
+\@afterindenttrue
+\makeatother%
+
+\setlength{\parindent}{2em}%中文缩进两个汉字位
+\linespread{1.25}
+\usepackage[pagebackref,colorlinks, linkcolor = blue , urlcolor = blue]{hyperref}
+\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
+
+\begin{document}
+\maketitle
+
+
+\newpage
+\pagenumbering{Roman}%
+
+
+\tableofcontents
+\newpage
+\pagenumbering{arabic}
+
+\section{项目描述}
+\subsection{项目总述}
+\begin{table}[H]
+\centering
+%\centering\Large\textbf{项目描述部分}\\[15pt]
+\begin{tabular}{|p{5em}|p{25em}|}
+\hline
+\textbf{项目名称:}&DNS缓存系统\\
+\hline
+\textbf{项目提交人:}&李琳，郭茂盛，王健，王军委\\
+\hline
+\textbf{提交时间:}& 2011-07-12 17时\\
+\hline
+\textbf{研发建议完成时间:}&2011-07-10 17时\\
+\hline
+\textbf{项目背景描述:}&{在百度的大规模集群环境中，有这样一个模块，在它工作时，需
+要根据用户指定的机器名列表，与这些机器建立连接完成一定任务。
+在这个过程中，会大量进行域名的解析，不仅对DNS 服务器造成较大压力，还容易发生解析
+失败的情况，设计一个系统，来应对突发性的、海量的DNS 请求并在超出能力极限的情况下
+自我保护。该系统同时可以应用于短连接大并发的DNS 请求并在超出能力极限的情况下自我
+保护。
+本项目设计的系统为其它系统服务，根据客户提出的域名，返回域名对应的IP 地址。用户
+可以一次提出一个请求，也可以在一个请求中请求若干域名的IP地址。系统根据用户的请求
+，从DNS 服务器获得域名和IP 地址的对应关系，并进行缓存，从而在用户下次请求时，可
+以快速响应。当服务器的缓放满之后，就使用LＲＵ算法，对缓冲区进行更新。}\\
+\hline
+\textbf{测试要求:}& １.对系统设计测试用例，包括：新功能测试用例、基本功能回归测
+试用例、性能及压力测试用例、稳定性测试用例。
+２.根据测试用例对系统进行单元测试、集成测试。对系统的功能、性能、压力、稳定性进
+行测试。
+３.发现缺陷并及时修复\\
+\hline
+\textbf{其他:}& 记录测试中出现的缺陷的原因、位置、修复状况。\\
+\hline
+\end{tabular}
+\end{table}
+
+
+\input{cache.tex}
+\input{thread.tex}
+\input{memory.tex}
+
+
+\end{document}
+%
+%/***************  END OF testdesin.tex  **************/

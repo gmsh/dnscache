@@ -1,0 +1,141 @@
+%
+%
+%/********************************************************************
+% * filename:		cache.tex
+% * author: 		synckey
+% * version:		v1.0
+% * datetime:		2011-07-05 13:32:37
+% * description:	thread module
+% ********************************************************************/
+\section{线程模块测试用例设计}
+\subsection{DNS查询线程测试用例}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{8em}|p{22em}|}
+\hline
+\textbf{测试项目编号:}&thread/CASE1\\
+\hline
+\textbf{测试项目描述:}&DNS查询线程功能测试\\
+\hline
+\textbf{测试说明:}& DNS查询线程从工作队列中取出请求，进行DNS查询，将查询结果写入缓存并发给客户端\\
+\hline
+\textbf{测试步骤及输入:}&工作队列，里面有域名和客户端地址\\
+\hline
+\textbf{期待结果及输出:}&DNS查询结果正确，成功写入缓存，并发送给客户端，线程之间同步正确\\
+\hline
+\textbf{测试结果:}& 客户端收到DNS查询结果，本地缓存被更新，线程间同步正确\\
+\hline
+\textbf{测试所花时间（单位：分钟）}& 约130分钟\\
+\hline
+\textbf{备注:}& \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection {TCP工作线程测试用例}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{8em}|p{22em}|}
+\hline
+\textbf{测试项目编号:}&thread/CASE2\\
+\hline
+\textbf{测试项目描述:}&TCP工作线程功能测试\\
+\hline
+\textbf{测试说明:}&主线程在创建TCP监听套接字后，各个工作线程单独accept客户端请求，
+	与客户端交互，查询本地缓存，并把结果返回给客户端\\
+\hline
+\textbf{测试步骤及输入:}&服务器开启，客户端连接到服务器，请求域名\\
+\hline
+\textbf{期待结果及输出:}&客户端能够连接到服务器，并收到服务器的正确结果，工作线
+程间同步正确\\
+\hline
+\textbf{测试结果:}&客户端收到服务器发来的响应，多客户端并发访问正常\\
+\hline
+\textbf{测试所花时间（单位：分钟）}& 约130分钟\\
+\hline
+\textbf{备注:}& \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection {UDP服务器线程测试用例}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{8em}|p{22em}|}
+\hline
+\textbf{测试项目编号:}&thread/CASE3\\
+\hline
+\textbf{测试项目描述:}&UDP服务器功能测试\\
+\hline
+\textbf{测试说明:}&接收客户端的UDP请求，查询本地缓存，返回结果\\
+\hline
+\textbf{测试步骤及输入:}&开启UDP服务器，客户端用UDP连接到服务器，请求域名\\
+\hline
+\textbf{期待结果及输出:}&服务器能接收到客户端的请求，并把结果返回给客户端\\
+\hline
+\textbf{测试结果:}&服务器迭代处理客户端的请求，客户端收到正确结果\\
+\hline
+\textbf{测试所花时间（单位：分钟）}& 约130分钟\\
+\hline
+\textbf{备注:}& \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\subsection{性能及压力测试用例}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{8em}|p{22em}|}
+\hline
+\textbf{测试项目编号:}&thread/CASE4\\
+\hline
+\textbf{测试项目描述:}&性能压力测试\\
+\hline
+\textbf{测试说明:}&查询1843314个域名，多线程并发访问DNS服务器，获取IP地址。记录时间\\
+\hline
+\textbf{测试步骤及输入:}&客户端请求1843314个域名\\
+\hline
+\textbf{期待结果及输出:}&服务器能够获得正确的IP地址，并返回给客户端\\
+\hline
+\textbf{测试结果:}& 在双核处理器，2G内存的32位机器上，开启200个DNS查询线程，耗时
+2h26min查询结束，客户端收到正确结果。\\
+\hline
+\textbf{测试所花时间（单位：分钟）}& 约130分钟\\
+\hline
+\textbf{备注:}& \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\subsection{稳定性测试用例}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{8em}|p{22em}|}
+\hline
+\textbf{测试项目编号:}&thread/CASE5\\
+\hline
+\textbf{测试项目描述:}&稳定性测试\\
+\hline
+\textbf{测试说明:}&多台主机，多线程，同时向服务器请求大量域名\\
+\hline
+\textbf{测试步骤及输入:}&每个线程从1883314个域名中随机挑选1-200000万不等的域名，
+向服务器请求\\
+\hline
+\textbf{期待结果及输出:}&服务器能正确工作\\
+\hline
+\textbf{测试结果:}&在服务器端的输入速度为11M/s的情况下，客户端仍能收到正确应答。\\
+\hline
+\textbf{测试所花时间（单位：分钟）}& 约130分钟\\
+\hline
+\textbf{备注:}& \\
+\hline
+\end{tabular}
+\end{table}
+
+
+
+%
+%/***************  END OF cache.tex  **************/

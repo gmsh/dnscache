@@ -1,0 +1,136 @@
+%
+%
+%/********************************************************************
+% * filename:		cache.tex
+% * author: 		synckey
+% * version:		v1.0
+% * datetime:		2011-07-05 13:32:37
+% * description:	cache module
+% ********************************************************************/
+\section{缓存模块测试用例设计}
+\subsection{缓存初始化测试用例}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{8em}|p{22em}|}
+\hline
+\textbf{测试项目编号:}&dl\_cache/CASE1\\
+\hline
+\textbf{测试项目描述:}&cache初始化\\
+\hline
+\textbf{测试说明:}& 测试cache初始化功能，DATrie和ip.list中恢复缓冲\\
+\hline
+\textbf{测试步骤及输入:}&调用kache\_init()并给定domains.tri和ip.list\\
+\hline
+\textbf{期待结果及输出:}&通过GDB查看内存，相关内存已正确初始化\\
+\hline
+\textbf{测试结果:}& 初始化正常\\
+\hline
+\textbf{测试所花时间（单位：分钟）}& 约130分钟\\
+\hline
+\textbf{备注:}& \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection {缓存存取测试用例}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{8em}|p{22em}|}
+\hline
+\textbf{测试项目编号:}&dl\_cache/CASE2\\
+\hline
+\textbf{测试项目描述:}&Cache\_store\\
+\hline
+\textbf{测试说明:}&随机产生<Key, Data> 对，放入cache中\\
+\hline
+\textbf{测试步骤及输入:}& 随机数据\\
+\hline
+\textbf{期待结果及输出:}&通过GDB查看内存，数据已经存入缓冲\\
+\hline
+\textbf{测试结果:}&正确\\
+\hline
+\textbf{测试所花时间（单位：分钟）}& 约130分钟\\
+\hline
+\textbf{备注:}& \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection {缓存查找测试用例}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{8em}|p{22em}|}
+\hline
+\textbf{测试项目编号:}&dl\_cache/CASE3\\
+\hline
+\textbf{测试项目描述:}&cache retrieve\\
+\hline
+\textbf{测试说明:}&通过记录随机插入的<key,data>对，对key进行查找，比对data\\
+\hline
+\textbf{测试步骤及输入:}&记录的<key,data>对\\
+\hline
+\textbf{期待结果及输出:}&data一致\\
+\hline
+\textbf{测试结果:}&data一致\\
+\hline
+\textbf{测试所花时间（单位：分钟）}& 约130分钟\\
+\hline
+\textbf{备注:}& \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\subsection{性能及压力测试用例}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{8em}|p{22em}|}
+\hline
+\textbf{测试项目编号:}&dl\_cache/CASE4\\
+\hline
+\textbf{测试项目描述:}&性能压力测试\\
+\hline
+\textbf{测试说明:}&插入 约180000数据，并全部取出。记录时间\\
+\hline
+\textbf{测试步骤及输入:}&长度约180000的数据列表\\
+\hline
+\textbf{期待结果及输出:}&能够在1s内执行完成\\
+\hline
+\textbf{测试结果:}& <1s\\
+\hline
+\textbf{测试所花时间（单位：分钟）}& 约130分钟\\
+\hline
+\textbf{备注:}& \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\subsection{稳定性测试用例}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{8em}|p{22em}|}
+\hline
+\textbf{测试项目编号:}&dl\_cache/CASE5\\
+\hline
+\textbf{测试项目描述:}&稳定性测试\\
+\hline
+\textbf{测试说明:}&持续对缓冲存取， 观测内存CPU等资源使用情况\\
+\hline
+\textbf{测试步骤及输入:}&随机数据\\
+\hline
+\textbf{期待结果及输出:}&数据匹配，且内存CPU占用稳定\\
+\hline
+\textbf{测试结果:}&连续运行24小时，内存CPU占用几乎不变\\
+\hline
+\textbf{测试所花时间（单位：分钟）}& 约24小时\\
+\hline
+\textbf{备注:}& \\
+\hline
+\end{tabular}
+\end{table}
+
+
+%
+%/***************  END OF cache.tex  **************/
