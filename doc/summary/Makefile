@@ -1,20 +1,22 @@
 targetnamea = gmsh
-targetnameb = wakemecn 
+targetnameb = wakemecn
 targetnamec = synckey
-targetnamed = groupsummary 
+targetnamed = groupsummary
 
-all: ${targetnamea}.pdf ${targetnameb}.pdf ${targetnamec}.pdf $(targetnamed).pdf
+all: $(targetnamea).pdf $(targetnameb).pdf ${targetnamec}.pdf $(targetnamed).pdf
 
 $(targetnamea).pdf: $(targetnamea).tex
-	xelatex $(targetnamea).tex && xelatex $(targetnamea).tex 
+	xelatex $^ && xelatex $^ && xelatex $^ && xelatex $^
 
-$(targetnameb).pdf: $(targetnameb).tex 
-	xelatex $(targetnameb).tex && xelatex $(targetnameb).tex
+
+$(targetnameb).pdf:$(targetnameb).tex
+	xelatex $^ && xelatex $^ && xelatex $^ && xelatex $^
 
 $(targetnamec).pdf: $(targetnamec).tex 
-	xelatex $(targetnamec).tex && xelatex $(targetnamec).tex
+	xelatex $^ && xelatex $^ && xelatex $^ && xelatex $^
+
 $(targetnamed).pdf: $(targetnamed).tex 
-	xelatex $(targetnamed).tex && xelatex $(targetnamed).tex
+	xelatex $^ && xelatex $^ && xelatex $^ && xelatex $^
 
 
 

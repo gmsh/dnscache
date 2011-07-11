@@ -1,9 +1,8 @@
-targetmea = softwareRequirementsSpecification
+targetnamea = softwareRequirementsSpecification
 
 all: ${targetnamea}.pdf 
 $(targetnamea).pdf: $(targetnamea).tex
-	xelatex $(targetnamea).tex && xelatex $(targetnamea).tex && \
-	cp $@ $(destdir)
+	xelatex $(targetnamea).tex && xelatex $(targetnamea).tex 
 
 .PHONY: clean
 clean:
